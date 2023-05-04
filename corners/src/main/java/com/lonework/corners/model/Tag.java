@@ -1,0 +1,89 @@
+package com.lonework.corners.model;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+
+@Entity
+public class Tag {
+
+    @Id
+    private Long id;
+    private String name;
+    private String title;
+    private String value;
+    private String creator;
+
+    @ManyToMany
+    @JoinTable(name = "place_has_tag", joinColumns = @JoinColumn(name = "tag_id"), inverseJoinColumns = @JoinColumn(name = "place_id"))
+    @JsonBackReference
+    private Set<Place> places = new HashSet<>();
+
+    public Tag() {
+    }
+
+    public Tag(Long id, String name, String title, String value, String creator, Set<Place> places) {
+        this.id = id;
+        this.name = name;
+        this.title = title;
+        this.value = value;
+        this.creator = creator;
+        this.places = places;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    public Set<Place> getPlaces() {
+        return places;
+    }
+
+    public void setPlaces(Set<Place> places) {
+        this.places = places;
+    };
+
+}

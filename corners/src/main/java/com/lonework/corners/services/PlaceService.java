@@ -1,0 +1,38 @@
+package com.lonework.corners.services;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Service;
+
+import com.lonework.corners.repository.PlaceRepository;
+
+import com.lonework.corners.model.Place;
+
+@Service
+@Configurable
+public class PlaceService {
+
+    @Autowired
+    private PlaceRepository placeRepository;
+
+    public Place getPlaceById(Long id) {
+        // Place place = new Place("1", "Milohlídka", "Rozhledna na cerovce", 2,
+        // "123456789", 200,
+        // "08:00-17:00", null, null, "img", null, "Jicin", "what", null);
+
+        Optional<Place> placeOptional = this.placeRepository.findById(id);
+        if (placeOptional.isPresent()) {
+            return placeOptional.get();
+        } else {
+            return null;
+        }
+
+    }
+
+    public Place createPlace(Place place) {
+        return this.placeRepository.save(place);
+
+    }
+}
