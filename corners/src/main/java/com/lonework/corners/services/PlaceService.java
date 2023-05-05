@@ -1,5 +1,6 @@
 package com.lonework.corners.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.lonework.corners.repository.PlaceRepository;
 
 import com.lonework.corners.model.Place;
+import com.lonework.corners.model.request.PlaceSearchRequest;
 
 @Service
 @Configurable
@@ -28,6 +30,12 @@ public class PlaceService {
         } else {
             return null;
         }
+
+    }
+
+    public Place findPlacesByParametrs(PlaceSearchRequest placeSearchRequest) {
+
+        return placeRepository.findRandomByAtributes(placeSearchRequest.getCity());
 
     }
 

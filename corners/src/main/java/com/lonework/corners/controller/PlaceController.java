@@ -1,6 +1,9 @@
 package com.lonework.corners.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +17,7 @@ import com.lonework.corners.repository.PlaceRepository;
 import com.lonework.corners.services.PlaceService;
 
 import com.lonework.corners.model.Place;
+import com.lonework.corners.model.request.PlaceSearchRequest;
 
 @RestController
 @RequestMapping("/places")
@@ -30,9 +34,16 @@ public class PlaceController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<Place> createPlace(@RequestBody Place place) {
         Place savedPlace = placeService.createPlace(place);
         return ResponseEntity.ok(savedPlace);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/fetch")
+    public Place fetchPlace(@RequestBody PlaceSearchRequest placeSearchRequest) {
+        Place savedPlace = placeService.findPlacesByParametrs(placeSearchRequest);
+        return savedPlace;
     }
 }

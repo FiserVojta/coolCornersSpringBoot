@@ -1,15 +1,17 @@
 package com.lonework.corners.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -19,9 +21,10 @@ public class Place {
     private Long id;
     private String name;
     private String description;
-    private double rating;
+    private Double rating;
     private String phoneNumber;
-    private double price;
+
+    private Double price;
     private String openingHours;
 
     private String image;
@@ -29,8 +32,17 @@ public class Place {
     @OneToOne(mappedBy = "place")
     @JsonManagedReference
     private CustomLocation location;
-    private String city;
     private String gallery;
+
+    @ManyToOne
+    @JoinColumn(name = "state_id")
+    @JsonManagedReference
+    private State state;
+
+    @ManyToOne
+    @JoinColumn(name = "city_id")
+    @JsonManagedReference
+    private City city;
 
     @OneToMany(mappedBy = "place")
     @JsonManagedReference
@@ -47,8 +59,8 @@ public class Place {
     public Place() {
     }
 
-    public Place(Long id, String name, String description, double rating, String phoneNumber, double price,
-            String openingHours, String image, CustomLocation location, String city, String gallery,
+    public Place(Long id, String name, String description, Double rating, String phoneNumber, Double price,
+            String openingHours, String image, CustomLocation location, String gallery, State state, City city,
             Set<Comment> comments, Set<Category> categories, Set<Tag> tags) {
         this.id = id;
         this.name = name;
@@ -59,8 +71,9 @@ public class Place {
         this.openingHours = openingHours;
         this.image = image;
         this.location = location;
-        this.city = city;
         this.gallery = gallery;
+        this.state = state;
+        this.city = city;
         this.comments = comments;
         this.categories = categories;
         this.tags = tags;
@@ -111,11 +124,11 @@ public class Place {
         this.phoneNumber = phoneNumber;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -141,14 +154,6 @@ public class Place {
 
     public void setLocation(CustomLocation location) {
         this.location = location;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
     }
 
     public String getGallery() {
@@ -181,6 +186,22 @@ public class Place {
 
     public void setTags(Set<Tag> tags) {
         this.tags = tags;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
     }
 
 }
