@@ -25,7 +25,7 @@ public class CityControler {
     }
 
     @CrossOrigin(origins = "*")
-    @GetMapping("/{countryId}")
+    @GetMapping("/country/{countryId}")
     public Iterable<City> getAllCitiesByStateId(@PathVariable("countryId") Long countryId) {
         System.out.println("here" + countryId);
         return this.cityService.findAllByStateId(countryId);
