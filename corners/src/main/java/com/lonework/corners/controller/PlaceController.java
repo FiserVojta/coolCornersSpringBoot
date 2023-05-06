@@ -42,8 +42,8 @@ public class PlaceController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/fetch")
-    public Place fetchPlace(@RequestBody PlaceSearchRequest placeSearchRequest) {
-        Place savedPlace = placeService.findPlacesByParametrs(placeSearchRequest);
-        return savedPlace;
+    public Iterable<Place> fetchPlace(@RequestBody PlaceSearchRequest placeSearchRequest) {
+        Iterable<Place> savedPlaces = placeService.findPlacesByParametrs(placeSearchRequest);
+        return savedPlaces;
     }
 }

@@ -6,18 +6,10 @@ import com.lonework.corners.model.Tag;
 
 public class PlaceSearchRequest {
 
-    private String city;
+    private Long city_id;
     private Double rating;
 
     public PlaceSearchRequest() {
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
     }
 
     public Double getRating() {
@@ -26,6 +18,14 @@ public class PlaceSearchRequest {
 
     public void setRating(Double rating) {
         this.rating = rating;
+    }
+
+    public Long getCity_id() {
+        return city_id;
+    }
+
+    public void setCity_id(Long city_id) {
+        this.city_id = city_id;
     }
 
 }

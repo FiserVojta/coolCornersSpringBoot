@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.annotation.Nullable;
@@ -37,23 +38,28 @@ public class Place {
     @ManyToOne
     @JoinColumn(name = "state_id")
     @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private State state;
 
     @ManyToOne
     @JoinColumn(name = "city_id")
     @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private City city;
 
     @OneToMany(mappedBy = "place")
     @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Set<Comment> comments = new HashSet<>();
 
     @OneToMany(mappedBy = "place")
     @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Set<Category> categories = new HashSet<>();
 
     @ManyToMany(mappedBy = "places")
     @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Set<Tag> tags = new HashSet<>();
 
     public Place() {
