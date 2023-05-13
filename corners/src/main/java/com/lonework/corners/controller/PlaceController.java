@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lonework.corners.repository.PlaceRepository;
 import com.lonework.corners.services.PlaceService;
-
+import com.lonework.corners.model.Comment;
 import com.lonework.corners.model.Place;
+import com.lonework.corners.model.request.CommentCreateRequest;
 import com.lonework.corners.model.request.PlaceSearchRequest;
 
 @RestController
@@ -45,5 +46,13 @@ public class PlaceController {
     public Iterable<Place> fetchPlace(@RequestBody PlaceSearchRequest placeSearchRequest) {
         Iterable<Place> savedPlaces = placeService.findPlacesByParametrs(placeSearchRequest);
         return savedPlaces;
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/comment/{placeId}")
+    public Comment createComment(@RequestBody CommentCreateRequest commentCreateRequest,
+            @PathVariable("placeId") Long placeId) {
+        Comment createdComment = placeService.createComment(commentCreateRequest, placeId);
+        return createdComment;
     }
 }

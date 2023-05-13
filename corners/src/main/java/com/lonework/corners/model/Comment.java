@@ -3,8 +3,11 @@ package com.lonework.corners.model;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.lonework.corners.model.request.CommentCreateRequest;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -12,6 +15,7 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class Comment {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String value;
@@ -25,6 +29,13 @@ public class Comment {
     private Place place;
 
     public Comment() {
+    }
+
+    public Comment(CommentCreateRequest request) {
+        this.name = request.getName();
+        this.title = request.getTitle();
+        this.value = request.getValue();
+        this.author = request.getAuthor();
     }
 
     public Comment(Long id, String name, String value, String title, String author, Date created, double rating,
