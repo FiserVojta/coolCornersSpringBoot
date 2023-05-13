@@ -1,11 +1,15 @@
 package com.lonework.corners.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -20,16 +24,15 @@ public class CustomLocation {
     private String city;
     private String state;
 
-    @OneToOne
+    @OneToMany(mappedBy = "location")
     @JsonBackReference
-    @JoinColumn(name = "place_id")
-    private Place place;
+    private Set<Place> places = new HashSet<>();
 
     public CustomLocation() {
     }
 
     public CustomLocation(Long id, String name, double latitude, double longitude, String title, String area,
-            String city, String state, Place place) {
+            String city, String state, Set<Place> places) {
         this.id = id;
         this.name = name;
         this.latitude = latitude;
@@ -38,7 +41,7 @@ public class CustomLocation {
         this.area = area;
         this.city = city;
         this.state = state;
-        this.place = place;
+        this.places = places;
     }
 
     public Long getId() {
@@ -105,12 +108,12 @@ public class CustomLocation {
         this.state = state;
     }
 
-    public Place getPlace() {
-        return place;
+    public Set<Place> getPlaces() {
+        return places;
     }
 
-    public void setPlace(Place place) {
-        this.place = place;
+    public void setPlaces(Set<Place> places) {
+        this.places = places;
     }
 
 }

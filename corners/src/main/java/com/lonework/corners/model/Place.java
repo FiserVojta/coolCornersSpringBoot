@@ -30,8 +30,10 @@ public class Place {
 
     private String image;
 
-    @OneToOne(mappedBy = "place")
+    @ManyToOne
+    @JoinColumn(name = "custom_location_id")
     @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private CustomLocation location;
     private String gallery;
 
@@ -52,10 +54,11 @@ public class Place {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Set<Comment> comments = new HashSet<>();
 
-    @OneToMany(mappedBy = "place")
+    @ManyToOne
+    @JoinColumn(name = "category_id")
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private Set<Category> categories = new HashSet<>();
+    private Category category;
 
     @ManyToMany(mappedBy = "places")
     @JsonManagedReference
@@ -67,7 +70,7 @@ public class Place {
 
     public Place(Long id, String name, String description, Double rating, String phoneNumber, Double price,
             String openingHours, String image, CustomLocation location, String gallery, State state, City city,
-            Set<Comment> comments, Set<Category> categories, Set<Tag> tags) {
+            Set<Comment> comments, Category category, Set<Tag> tags) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -81,7 +84,7 @@ public class Place {
         this.state = state;
         this.city = city;
         this.comments = comments;
-        this.categories = categories;
+        this.category = category;
         this.tags = tags;
     }
 
@@ -178,12 +181,16 @@ public class Place {
         this.comments = comments;
     }
 
-    public Set<Category> getCategories() {
-        return categories;
+    public void setRating(Double rating) {
+        this.rating = rating;
     }
 
-    public void setCategories(Set<Category> categories) {
-        this.categories = categories;
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     public Set<Tag> getTags() {

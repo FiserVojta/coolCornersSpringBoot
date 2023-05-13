@@ -1,11 +1,15 @@
 package com.lonework.corners.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Category {
@@ -15,21 +19,21 @@ public class Category {
     private String value;
     private boolean main;
     private String title;
-    @ManyToOne
-    @JoinColumn(name = "place_id")
+
+    @OneToMany(mappedBy = "category")
     @JsonBackReference
-    private Place place;
+    private Set<Place> places = new HashSet<>();
 
     public Category() {
     }
 
-    public Category(Long id, String name, String value, boolean main, String title, Place place) {
+    public Category(Long id, String name, String value, boolean main, String title, Set<Place> places) {
         this.id = id;
         this.name = name;
         this.value = value;
         this.main = main;
         this.title = title;
-        this.place = place;
+        this.places = places;
     }
 
     // Getters and setters
@@ -73,12 +77,12 @@ public class Category {
         this.id = id;
     }
 
-    public Place getPlace() {
-        return place;
+    public Set<Place> getPlaces() {
+        return places;
     }
 
-    public void setPlace(Place place) {
-        this.place = place;
+    public void setPlaces(Set<Place> places) {
+        this.places = places;
     }
 
 }
