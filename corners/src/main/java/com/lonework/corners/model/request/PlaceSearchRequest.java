@@ -1,15 +1,27 @@
 package com.lonework.corners.model.request;
 
+import java.util.List;
 import java.util.Set;
 
+import com.lonework.corners.model.Category;
 import com.lonework.corners.model.Tag;
 
 public class PlaceSearchRequest {
 
-    private Long city_id;
+    private Long cityId;
     private Double rating;
+    private List<Long> tagIds;
+    private List<Long> categoryIds;
 
     public PlaceSearchRequest() {
+    }
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
     }
 
     public Double getRating() {
@@ -20,12 +32,20 @@ public class PlaceSearchRequest {
         this.rating = rating;
     }
 
-    public Long getCity_id() {
-        return city_id;
+    public List<Long> getTagIds() {
+        return tagIds;
     }
 
-    public void setCity_id(Long city_id) {
-        this.city_id = city_id;
+    public void setTagIds(List<Long> tagIds) {
+        this.tagIds = tagIds;
+    }
+
+    public List<Long> getCategoryIds() {
+        return categoryIds;
+    }
+
+    public void setCategoryIds(List<Long> categoryIds) {
+        this.categoryIds = categoryIds;
     }
 
 }

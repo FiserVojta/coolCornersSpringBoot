@@ -40,7 +40,7 @@ public class PlaceService {
 
     public Iterable<Place> findPlacesByParametrs(PlaceSearchRequest placeSearchRequest) {
 
-        return placeRepository.findRandomByAtributes(placeSearchRequest.getCity_id());
+        return placeRepository.findRandomByAtributes(placeSearchRequest);
 
     }
 
