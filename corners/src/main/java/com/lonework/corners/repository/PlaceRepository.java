@@ -16,9 +16,8 @@ public interface PlaceRepository extends CrudRepository<Place, Long> {
     @Query(value = "SELECT DISTINCT p.* FROM place p " +
             "JOIN place_has_tag pt ON pt.place_id = p.id " +
             "JOIN tag t ON t.id = pt.tag_id " +
-            "WHERE p.city_id = :#{#placeSearchRequest.cityId} " +
+            "WHERE (:#{#placeSearchRequest.cityId} IS NULL OR p.city_id = :#{#placeSearchRequest.cityId}) " +
             "AND (:#{#placeSearchRequest.tagIds} IS NULL OR t.id IN (:#{#placeSearchRequest.tagIds})) " +
             "ORDER BY p.rating", nativeQuery = true)
     Iterable<Place> findRandomByAtributes(@Param("placeSearchRequest") PlaceSearchRequest placeSearchRequest);
-
 }

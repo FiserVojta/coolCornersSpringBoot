@@ -7,11 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
+import com.lonework.corners.repository.CategoryRepository;
 import com.lonework.corners.repository.CommentRepository;
 import com.lonework.corners.repository.PlaceRepository;
+import com.lonework.corners.model.Category;
 import com.lonework.corners.model.Comment;
 import com.lonework.corners.model.Place;
 import com.lonework.corners.model.request.CommentCreateRequest;
+import com.lonework.corners.model.request.PlaceCreateRequest;
 import com.lonework.corners.model.request.PlaceSearchRequest;
 
 @Service
@@ -23,6 +26,9 @@ public class PlaceService {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     public Place getPlaceById(Long id) {
         // Place place = new Place("1", "Milohlídka", "Rozhledna na cerovce", 2,
@@ -39,12 +45,18 @@ public class PlaceService {
     }
 
     public Iterable<Place> findPlacesByParametrs(PlaceSearchRequest placeSearchRequest) {
-
+        System.out.println(placeSearchRequest.getCityId());
+        // placeSearchRequest.setCityId(Long.valueOf("10"));
+        System.out.println(placeSearchRequest.getCityId());
         return placeRepository.findRandomByAtributes(placeSearchRequest);
 
     }
 
-    public Place createPlace(Place place) {
+    public Place createPlace(PlaceCreateRequest placeRequest) {
+        Place place = new Place(placeRequest);
+        // placeRepository.save(place);
+        Optional<Category> cat = categoryRepository.findById(placeRequest.getCategoryId());
+        place.setCategory(cat.get());
         return this.placeRepository.save(place);
 
     }

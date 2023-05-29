@@ -3,11 +3,14 @@ package com.lonework.corners.model.request;
 import java.util.List;
 import java.util.Set;
 
+import org.springframework.lang.Nullable;
+
 import com.lonework.corners.model.Category;
 import com.lonework.corners.model.Tag;
 
 public class PlaceSearchRequest {
 
+    @Nullable
     private Long cityId;
     private Double rating;
     private List<Long> tagIds;

@@ -6,9 +6,14 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.lonework.corners.model.request.PlaceCreateRequest;
+import com.lonework.corners.model.request.PlaceSearchRequest;
+import com.lonework.corners.services.CategoryService;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
@@ -19,9 +24,11 @@ import jakarta.persistence.OneToOne;
 @Entity
 public class Place {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
+    @Nullable
     private Double rating;
     private String phoneNumber;
 
@@ -66,6 +73,18 @@ public class Place {
     private Set<Tag> tags = new HashSet<>();
 
     public Place() {
+    }
+
+    public Place(PlaceCreateRequest placeRequest) {
+        this.name = placeRequest.getName();
+        this.description = placeRequest.getDescription();
+        this.gallery = placeRequest.getGallery();
+        this.openingHours = placeRequest.getOpeningHours();
+        this.price = placeRequest.getPrice();
+        this.image = placeRequest.getImage();
+        this.rating = placeRequest.getRating();
+        this.phoneNumber = placeRequest.getPhoneNumber();
+
     }
 
     public Place(Long id, String name, String description, Double rating, String phoneNumber, Double price,

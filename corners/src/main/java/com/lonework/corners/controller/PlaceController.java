@@ -18,6 +18,7 @@ import com.lonework.corners.services.PlaceService;
 import com.lonework.corners.model.Comment;
 import com.lonework.corners.model.Place;
 import com.lonework.corners.model.request.CommentCreateRequest;
+import com.lonework.corners.model.request.PlaceCreateRequest;
 import com.lonework.corners.model.request.PlaceSearchRequest;
 
 @RestController
@@ -35,10 +36,10 @@ public class PlaceController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping()
-    public ResponseEntity<Place> createPlace(@RequestBody Place place) {
-        Place savedPlace = placeService.createPlace(place);
-        return ResponseEntity.ok(savedPlace);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/create")
+    public Place createPlace(@RequestBody PlaceCreateRequest placeRequest) {
+        Place place = placeService.createPlace(placeRequest);
+        return place;
     }
 
     @CrossOrigin(origins = "*")
