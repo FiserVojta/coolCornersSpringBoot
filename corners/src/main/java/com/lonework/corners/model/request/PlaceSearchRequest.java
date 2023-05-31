@@ -11,20 +11,16 @@ import com.lonework.corners.model.Tag;
 public class PlaceSearchRequest {
 
     @Nullable
-    private Long cityId;
+    private List<Long> cityIds;
     private Double rating;
     private List<Long> tagIds;
     private List<Long> categoryIds;
 
+    private Boolean openNow;
+    private List<Long> stateIds;
+    private locationRange location;
+
     public PlaceSearchRequest() {
-    }
-
-    public Long getCityId() {
-        return cityId;
-    }
-
-    public void setCityId(Long cityId) {
-        this.cityId = cityId;
     }
 
     public Double getRating() {
@@ -49,6 +45,14 @@ public class PlaceSearchRequest {
 
     public void setCategoryIds(List<Long> categoryIds) {
         this.categoryIds = categoryIds;
+    }
+
+    public List<Long> getCityIds() {
+        return cityIds;
+    }
+
+    public void setCityId(List<Long> cityIds) {
+        this.cityIds = cityIds;
     }
 
 }

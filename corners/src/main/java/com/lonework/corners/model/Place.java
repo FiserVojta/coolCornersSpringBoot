@@ -51,6 +51,7 @@ public class Place {
     private State state;
 
     @ManyToOne
+    @Nullable
     @JoinColumn(name = "city_id")
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })

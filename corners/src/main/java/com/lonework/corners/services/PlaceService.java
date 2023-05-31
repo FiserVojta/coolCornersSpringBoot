@@ -45,10 +45,9 @@ public class PlaceService {
     }
 
     public Iterable<Place> findPlacesByParametrs(PlaceSearchRequest placeSearchRequest) {
-        System.out.println(placeSearchRequest.getCityId());
+        System.out.println(placeSearchRequest.getCityIds() + "place id ");
         // placeSearchRequest.setCityId(Long.valueOf("10"));
-        System.out.println(placeSearchRequest.getCityId());
-        return placeRepository.findRandomByAtributes(placeSearchRequest);
+        return placeRepository.findRandomByAttributes(placeSearchRequest);
 
     }
 
