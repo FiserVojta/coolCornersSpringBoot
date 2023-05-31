@@ -20,7 +20,45 @@ public class PlaceSearchRequest {
     private List<Long> stateIds;
     private locationRange location;
 
+    private ResultOrder order;
+
     public PlaceSearchRequest() {
+    }
+
+    public void setCityIds(List<Long> cityIds) {
+        this.cityIds = cityIds;
+    }
+
+    public Boolean getOpenNow() {
+        return openNow;
+    }
+
+    public void setOpenNow(Boolean openNow) {
+        this.openNow = openNow;
+    }
+
+    public List<Long> getStateIds() {
+        return stateIds;
+    }
+
+    public void setStateIds(List<Long> stateIds) {
+        this.stateIds = stateIds;
+    }
+
+    public locationRange getLocation() {
+        return location;
+    }
+
+    public void setLocation(locationRange location) {
+        this.location = location;
+    }
+
+    public ResultOrder getOrder() {
+        return order;
+    }
+
+    public void setOrder(ResultOrder order) {
+        this.order = order;
     }
 
     public Double getRating() {
