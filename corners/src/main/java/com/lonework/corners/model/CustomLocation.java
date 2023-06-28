@@ -5,8 +5,11 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.lonework.corners.model.request.LocationCreateRequest;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -15,6 +18,7 @@ import jakarta.persistence.OneToOne;
 @Entity
 public class CustomLocation {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private double latitude;
@@ -29,6 +33,12 @@ public class CustomLocation {
     private Set<Place> places = new HashSet<>();
 
     public CustomLocation() {
+    }
+
+    public CustomLocation(LocationCreateRequest locationReq) {
+        this.latitude = locationReq.getLatitude();
+        this.longitude = locationReq.getLongitude();
+
     }
 
     public CustomLocation(Long id, String name, double latitude, double longitude, String title, String area,

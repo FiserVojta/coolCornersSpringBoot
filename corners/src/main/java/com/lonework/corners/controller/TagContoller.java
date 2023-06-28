@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lonework.corners.model.City;
 import com.lonework.corners.model.Place;
 import com.lonework.corners.model.Tag;
+import com.lonework.corners.model.request.TagCreateRequest;
 import com.lonework.corners.model.request.TagSearchRequest;
 import com.lonework.corners.services.CityService;
 import com.lonework.corners.services.TagService;
@@ -27,8 +28,22 @@ public class TagContoller {
 
     @CrossOrigin(origins = "*")
     @PostMapping("/fetch")
-    public Iterable<Tag> getAllTagsForPlaces(@RequestBody TagSearchRequest places) {
+    public Iterable<Tag> getAllTagsForPlaces(@RequestBody TagSearchRequest tagSearch) {
 
-        return this.tagService.getAllTagsForPlaces(places);
+        return this.tagService.getAllTagsForPlaces(tagSearch);
+    }
+
+    @CrossOrigin(origins = "*")
+    @PostMapping("")
+    public Tag createTag(@RequestBody TagCreateRequest tag) {
+
+        return this.tagService.createTag(tag);
+    }
+
+    @CrossOrigin(origins = "*")
+    @GetMapping("")
+    public Iterable<Tag> getAllTags() {
+
+        return this.tagService.getAllTags();
     }
 }

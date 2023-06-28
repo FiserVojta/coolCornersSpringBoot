@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.lonework.corners.repository.CategoryRepository;
 import com.lonework.corners.repository.CommentRepository;
+import com.lonework.corners.repository.LocationRepository;
 import com.lonework.corners.repository.PlaceRepository;
 import com.lonework.corners.model.Category;
 import com.lonework.corners.model.Comment;
+import com.lonework.corners.model.CustomLocation;
 import com.lonework.corners.model.Place;
 import com.lonework.corners.model.request.CommentCreateRequest;
 import com.lonework.corners.model.request.PlaceCreateRequest;
@@ -26,6 +28,9 @@ public class PlaceService {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private LocationRepository locationRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -52,8 +57,10 @@ public class PlaceService {
     }
 
     public Place createPlace(PlaceCreateRequest placeRequest) {
+        CustomLocation location = new CustomLocation(placeRequest.getLocation());
+        location = locationRepository.save(location);
         Place place = new Place(placeRequest);
-        // placeRepository.save(place);
+        place.setLocation(location);
         Optional<Category> cat = categoryRepository.findById(placeRequest.getCategoryId());
         place.setCategory(cat.get());
         return this.placeRepository.save(place);

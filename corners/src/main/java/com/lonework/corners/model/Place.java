@@ -16,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -72,6 +73,11 @@ public class Place {
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Set<Tag> tags = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "place_has_tag", joinColumns = @JoinColumn(name = "place_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
+    @JsonBackReference
+    private Set<Trip> trips = new HashSet<>();
 
     public Place() {
     }
@@ -235,6 +241,14 @@ public class Place {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public Set<Trip> getTrips() {
+        return trips;
+    }
+
+    public void setTrips(Set<Trip> trips) {
+        this.trips = trips;
     }
 
 }
