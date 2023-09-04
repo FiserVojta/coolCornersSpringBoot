@@ -11,6 +11,7 @@ import com.lonework.corners.model.request.PlaceSearchRequest;
 import com.lonework.corners.services.CategoryService;
 
 import jakarta.annotation.Nullable;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -74,8 +75,8 @@ public class Place {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Set<Tag> tags = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "place_has_tag", joinColumns = @JoinColumn(name = "place_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "trip_has_place", joinColumns = @JoinColumn(name = "place_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
     @JsonBackReference
     private Set<Trip> trips = new HashSet<>();
 

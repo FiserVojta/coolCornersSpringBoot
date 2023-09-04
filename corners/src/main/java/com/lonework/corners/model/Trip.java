@@ -5,7 +5,9 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.lonework.corners.model.request.TripCreateRequest;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -45,17 +47,17 @@ public class Trip {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private CustomLocation location;
 
-    private String galery;
+    private String gallery;
 
     @ManyToMany(mappedBy = "trips")
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Set<Tag> tags = new HashSet<>();
 
-    @ManyToMany(mappedBy = "trips")
+    @ManyToMany(mappedBy = "trips", cascade = CascadeType.PERSIST)
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private Set<Tag> places = new HashSet<>();
+    private Set<Place> places = new HashSet<>();
 
     public Trip() {
     }
@@ -132,12 +134,12 @@ public class Trip {
         this.location = location;
     }
 
-    public String getGalery() {
-        return galery;
+    public String getGallery() {
+        return gallery;
     }
 
-    public void setGalery(String galery) {
-        this.galery = galery;
+    public void setGallery(String gallery) {
+        this.gallery = gallery;
     }
 
     public Set<Tag> getTags() {
@@ -148,11 +150,11 @@ public class Trip {
         this.tags = tags;
     }
 
-    public Set<Tag> getPlaces() {
+    public Set<Place> getPlaces() {
         return places;
     }
 
-    public void setPlaces(Set<Tag> places) {
+    public void setPlaces(Set<Place> places) {
         this.places = places;
     }
 
