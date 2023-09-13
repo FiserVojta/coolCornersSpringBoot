@@ -17,6 +17,8 @@ public class PlaceCreateRequest {
     private String gallery;
     private Long categoryId;
     private LocationCreateRequest location;
+    private Long cityId;
+    private Long stateId;
 
     public PlaceCreateRequest() {
         this.rating = 0.0;
@@ -100,6 +102,22 @@ public class PlaceCreateRequest {
 
     public void setLocation(LocationCreateRequest location) {
         this.location = location;
+    }
+
+    public Long getCityId() {
+        return cityId;
+    }
+
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
+    }
+
+    public Long getStateId() {
+        return stateId;
+    }
+
+    public void setStateId(Long stateId) {
+        this.stateId = stateId;
     }
 
 }

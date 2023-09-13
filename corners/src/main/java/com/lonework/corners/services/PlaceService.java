@@ -8,13 +8,17 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
 import com.lonework.corners.repository.CategoryRepository;
+import com.lonework.corners.repository.CityRepository;
 import com.lonework.corners.repository.CommentRepository;
 import com.lonework.corners.repository.LocationRepository;
 import com.lonework.corners.repository.PlaceRepository;
+import com.lonework.corners.repository.StateRepository;
 import com.lonework.corners.model.Category;
+import com.lonework.corners.model.City;
 import com.lonework.corners.model.Comment;
 import com.lonework.corners.model.CustomLocation;
 import com.lonework.corners.model.Place;
+import com.lonework.corners.model.State;
 import com.lonework.corners.model.request.CommentCreateRequest;
 import com.lonework.corners.model.request.PlaceCreateRequest;
 import com.lonework.corners.model.request.PlaceSearchRequest;
@@ -31,6 +35,12 @@ public class PlaceService {
 
     @Autowired
     private LocationRepository locationRepository;
+
+    @Autowired
+    private CityRepository cityRepository;
+
+    @Autowired
+    private StateRepository stateRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -63,6 +73,12 @@ public class PlaceService {
         place.setLocation(location);
         Optional<Category> cat = categoryRepository.findById(placeRequest.getCategoryId());
         place.setCategory(cat.get());
+
+        Optional<City> city = cityRepository.findById(placeRequest.getCityId());
+        Optional<State> state = stateRepository.findById(placeRequest.getStateId());
+
+        place.setCity(city.get());
+        place.setState(state.get());
         return this.placeRepository.save(place);
 
     }
