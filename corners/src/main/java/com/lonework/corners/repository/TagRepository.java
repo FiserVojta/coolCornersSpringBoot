@@ -10,7 +10,7 @@ import com.lonework.corners.model.Tag;
 
 public interface TagRepository extends CrudRepository<Tag, Long> {
 
-    @Query("SELECT t FROM Tag t JOIN t.places p WHERE p.id IN :placeIds")
+    @Query("SELECT t FROM Tag t JOIN t.places p JOIN t.trips tr WHERE (p.id IN :placeIds OR tr.id IN :tripIds)")
     // @Query("SELECT c FROM Tag c WHERE c.place_id IN :placeIds")
-    List<Tag> findAllByPlaceIds(@Param("placeIds") List<Long> placeIds);
+    List<Tag> findAllByPlaceIds(@Param("placeIds") List<Long> placeIds, @Param("tripIds") List<Long> tripIds);
 }

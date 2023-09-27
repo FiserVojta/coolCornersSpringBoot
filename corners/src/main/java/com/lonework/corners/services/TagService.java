@@ -22,9 +22,9 @@ public class TagService {
     @Autowired
     private TagRepository tagRepository;
 
-    public Iterable<Tag> getAllTagsForPlaces(TagSearchRequest places) {
+    public Iterable<Tag> getTagsWithRequest(TagSearchRequest tagSearchRequest) {
 
-        return tagRepository.findAllByPlaceIds(places.getPlaceId());
+        return tagRepository.findAllByPlaceIds(tagSearchRequest.getPlaceId(), tagSearchRequest.getTripId());
     }
 
     public Tag createTag(TagCreateRequest tagCreateRequest) {

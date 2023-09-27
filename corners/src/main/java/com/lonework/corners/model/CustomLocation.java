@@ -27,10 +27,15 @@ public class CustomLocation {
     private String area;
     private String city;
     private String state;
+    private Long zoom;
 
     @OneToMany(mappedBy = "location")
     @JsonBackReference
     private Set<Place> places = new HashSet<>();
+
+    @OneToMany(mappedBy = "customLocation")
+    @JsonBackReference
+    private Set<City> cities = new HashSet<>();
 
     public CustomLocation() {
     }
@@ -124,6 +129,22 @@ public class CustomLocation {
 
     public void setPlaces(Set<Place> places) {
         this.places = places;
+    }
+
+    public Long getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(Long zoom) {
+        this.zoom = zoom;
+    }
+
+    public Set<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(Set<City> cities) {
+        this.cities = cities;
     }
 
 }

@@ -30,7 +30,7 @@ public class TagContoller {
     @PostMapping("/fetch")
     public Iterable<Tag> getAllTagsForPlaces(@RequestBody TagSearchRequest tagSearch) {
 
-        return this.tagService.getAllTagsForPlaces(tagSearch);
+        return this.tagService.getTagsWithRequest(tagSearch);
     }
 
     @CrossOrigin(origins = "*")

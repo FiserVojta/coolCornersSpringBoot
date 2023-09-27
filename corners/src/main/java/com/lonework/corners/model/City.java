@@ -32,6 +32,12 @@ public class City {
     @JsonBackReference
     private Set<Place> places = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "custom_location_id")
+    @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    private CustomLocation customLocation;
+
     public City() {
 
     }
