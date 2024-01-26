@@ -69,7 +69,8 @@ public class TripService {
 
     public Iterable<Trip> findTripByparameters(TripSearchRequest tripSearchRequest) {
 
-        Iterable<Trip> trips = tripRepository.findAll();
+        Iterable<Trip> trips = tripRepository.findAllByParametrs(
+                tripSearchRequest.getTags());
         return trips;
     }
 

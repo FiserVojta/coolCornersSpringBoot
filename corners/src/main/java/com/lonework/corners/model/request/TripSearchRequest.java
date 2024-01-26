@@ -4,57 +4,57 @@ import java.util.List;
 
 public class TripSearchRequest {
 
-    private List<Long> categoriesId;
+    private List<Long> categories;
 
-    private List<Long> tagsId;
+    private List<Long> cities;
 
-    private Long countryId;
+    private List<Long> countries;
 
-    private Long cityId;
+    private List<Long> tags;
 
-    private Long durationId;
+    private List<Long> durations;
 
     public TripSearchRequest() {
     }
 
-    public List<Long> getCategoriesId() {
-        return categoriesId;
+    public List<Long> getCategories() {
+        return categories;
     }
 
-    public void setCategoriesId(List<Long> categoriesId) {
-        this.categoriesId = categoriesId;
+    public void setCategories(List<Long> categories) {
+        this.categories = categories;
     }
 
-    public List<Long> getTagsId() {
-        return tagsId;
+    public List<Long> getCities() {
+        return cities;
     }
 
-    public void setTagsId(List<Long> tagsId) {
-        this.tagsId = tagsId;
+    public void setCities(List<Long> cities) {
+        this.cities = cities;
     }
 
-    public Long getCountryId() {
-        return countryId;
+    public List<Long> getCountries() {
+        return countries;
     }
 
-    public void setCountryId(Long countryId) {
-        this.countryId = countryId;
+    public void setCountries(List<Long> countries) {
+        this.countries = countries;
     }
 
-    public Long getCityId() {
-        return cityId;
+    public List<Long> getTags() {
+        return tags;
     }
 
-    public void setCityId(Long cityId) {
-        this.cityId = cityId;
+    public void setTags(List<Long> tags) {
+        this.tags = tags;
     }
 
-    public Long getDurationId() {
-        return durationId;
+    public List<Long> getDurations() {
+        return durations;
     }
 
-    public void setDurationId(Long durationId) {
-        this.durationId = durationId;
+    public void setDurations(List<Long> durations) {
+        this.durations = durations;
     }
 
 }
