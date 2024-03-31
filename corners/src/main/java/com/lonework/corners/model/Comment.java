@@ -1,61 +1,48 @@
 package com.lonework.corners.model;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.lonework.corners.model.request.CommentCreateRequest;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+
 @Entity
 public class Comment {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private UUID id;
+
     private String name;
+
     private String value;
+
     private String title;
+
     private String author;
-    private Date created;
-    private double rating;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "place_id")
-    @JsonBackReference
+    @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Place place;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "trip_id")
+    @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    private Trip trip;
+
+    private LocalDateTime created;
+
+    private Double rating;
+
     public Comment() {
-    }
-
-    public Comment(CommentCreateRequest request) {
-        this.name = request.getName();
-        this.title = request.getTitle();
-        this.value = request.getValue();
-        this.author = request.getAuthor();
-    }
-
-    public Comment(Long id, String name, String value, String title, String author, Date created, double rating,
-            Place place) {
-        this.id = id;
-        this.name = name;
-        this.value = value;
-        this.title = title;
-        this.author = author;
-        this.created = created;
-        this.rating = rating;
-        this.place = place;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -90,20 +77,28 @@ public class Comment {
         this.author = author;
     }
 
-    public Date getCreated() {
+    public LocalDateTime getCreated() {
         return created;
     }
 
-    public void setCreated(Date created) {
+    public void setCreated(LocalDateTime created) {
         this.created = created;
     }
 
-    public double getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public Place getPlace() {
@@ -114,4 +109,11 @@ public class Comment {
         this.place = place;
     }
 
+    public Trip getTrip() {
+        return trip;
+    }
+
+    public void setTrip(Trip trip) {
+        this.trip = trip;
+    }
 }

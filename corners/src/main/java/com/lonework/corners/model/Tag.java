@@ -2,6 +2,7 @@ package com.lonework.corners.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.aspectj.weaver.tools.Trace;
 
@@ -24,8 +25,6 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String title;
-    private String value;
     private String creator;
 
     @ManyToMany
@@ -43,17 +42,12 @@ public class Tag {
 
     public Tag(TagCreateRequest tagCreateRequest) {
         this.name = tagCreateRequest.getName();
-        this.title = "";
-        this.value = tagCreateRequest.getValue();
         this.creator = tagCreateRequest.getCreator();
-
     }
 
     public Tag(Long id, String name, String title, String value, String creator, Set<Place> places) {
         this.id = id;
         this.name = name;
-        this.title = title;
-        this.value = value;
         this.creator = creator;
         this.places = places;
     }
@@ -72,22 +66,6 @@ public class Tag {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     public String getCreator() {

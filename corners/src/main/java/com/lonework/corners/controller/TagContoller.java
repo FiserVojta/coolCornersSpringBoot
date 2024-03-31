@@ -36,14 +36,12 @@ public class TagContoller {
     @CrossOrigin(origins = "*")
     @PostMapping("")
     public Tag createTag(@RequestBody TagCreateRequest tag) {
-
         return this.tagService.createTag(tag);
     }
 
     @CrossOrigin(origins = "*")
     @GetMapping("")
-    public Iterable<Tag> getAllTags() {
-
+    public List<Tag> getAllTags() {
         return this.tagService.getAllTags();
     }
 }

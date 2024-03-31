@@ -3,7 +3,6 @@ package com.lonework.corners.model.request;
 public class TagCreateRequest {
 
     public String name;
-    public String value;
     public String creator;
 
     public TagCreateRequest() {
@@ -17,13 +16,6 @@ public class TagCreateRequest {
         this.name = name;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
 
     public String getCreator() {
         return creator;

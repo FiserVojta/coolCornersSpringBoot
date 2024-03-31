@@ -1,21 +1,20 @@
 package com.lonework.corners.controller;
 
-import java.util.List;
-
+import com.lonework.corners.model.Comment;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lonework.corners.repository.PlaceRepository;
 import com.lonework.corners.services.PlaceService;
-import com.lonework.corners.model.Comment;
 import com.lonework.corners.model.Place;
 import com.lonework.corners.model.request.CommentCreateRequest;
 import com.lonework.corners.model.request.PlaceCreateRequest;
@@ -43,8 +42,8 @@ public class PlaceController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/fetch")
-    public Iterable<Place> fetchPlace(@RequestBody PlaceSearchRequest placeSearchRequest) {
+    @GetMapping(path = "/filter")
+    public Iterable<Place> fetchPlace(PlaceSearchRequest placeSearchRequest) {
         Iterable<Place> savedPlaces = placeService.findPlacesByParametrs(placeSearchRequest);
         return savedPlaces;
     }

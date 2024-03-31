@@ -1,10 +1,5 @@
 package com.lonework.corners.model.request;
 
-import com.lonework.corners.model.Category;
-import com.lonework.corners.model.CustomLocation;
-
-import jakarta.annotation.Nullable;
-
 public class PlaceCreateRequest {
 
     private String name;
@@ -16,9 +11,11 @@ public class PlaceCreateRequest {
     private String image;
     private String gallery;
     private Long categoryId;
-    private LocationCreateRequest location;
-    private Long cityId;
-    private Long stateId;
+
+    private Double longitude;
+
+    private Double latitude;
+
 
     public PlaceCreateRequest() {
         this.rating = 0.0;
@@ -96,28 +93,20 @@ public class PlaceCreateRequest {
         this.categoryId = categoryId;
     }
 
-    public LocationCreateRequest getLocation() {
-        return location;
+
+    public Double getLongitude() {
+        return longitude;
     }
 
-    public void setLocation(LocationCreateRequest location) {
-        this.location = location;
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
-    public Long getCityId() {
-        return cityId;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setCityId(Long cityId) {
-        this.cityId = cityId;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
-
-    public Long getStateId() {
-        return stateId;
-    }
-
-    public void setStateId(Long stateId) {
-        this.stateId = stateId;
-    }
-
 }

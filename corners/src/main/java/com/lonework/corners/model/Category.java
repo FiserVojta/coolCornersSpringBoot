@@ -1,39 +1,43 @@
 package com.lonework.corners.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 public class Category {
     @Id
     private Long id;
+
     private String name;
-    private String value;
+
     private boolean main;
+
     private String title;
 
     @OneToMany(mappedBy = "category")
     @JsonBackReference
-    private Set<Place> places = new HashSet<>();
+    private List<Place> places = new ArrayList<>();
+
+    @OneToMany(mappedBy = "category")
+    @JsonBackReference
+    private List<Trip> trips = new ArrayList<>();
 
     public Category() {
     }
 
-    public Category(Long id, String name, String value, boolean main, String title, Set<Place> places) {
+    public Category(Long id, String name, String value, boolean main, String title, List<Place> places, List<Trip> trips) {
         this.id = id;
         this.name = name;
-        this.value = value;
         this.main = main;
         this.title = title;
         this.places = places;
+        this.trips = trips;
     }
 
     // Getters and setters
@@ -43,14 +47,6 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     public boolean isMain() {
@@ -77,12 +73,19 @@ public class Category {
         this.id = id;
     }
 
-    public Set<Place> getPlaces() {
+    public List<Place> getPlaces() {
         return places;
     }
 
-    public void setPlaces(Set<Place> places) {
+    public void setPlaces(List<Place> places) {
         this.places = places;
     }
 
+    public List<Trip> getTrips() {
+        return trips;
+    }
+
+    public void setTrips(List<Trip> trips) {
+        this.trips = trips;
+    }
 }

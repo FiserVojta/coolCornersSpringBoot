@@ -1,32 +1,31 @@
 package com.lonework.corners.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class State {
+public class Country {
 
     @Id
     private Long id;
+
     private String name;
-    private String description;
 
-    @OneToMany(mappedBy = "state")
+    private String code;
+
+    @OneToMany(mappedBy = "country")
     @JsonBackReference
-    private Set<City> cities = new HashSet<>();
+    private List<City> cities = new ArrayList<>();
 
-    @OneToMany(mappedBy = "state")
-    @JsonBackReference
-    private Set<Place> places = new HashSet<>();
-
-    public State() {
+    public Country() {
     }
 
     public Long getId() {
@@ -45,12 +44,19 @@ public class State {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getCode() {
+        return code;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setCode(String code) {
+        this.code = code;
     }
 
+    public List<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(List<City> cities) {
+        this.cities = cities;
+    }
 }

@@ -1,7 +1,6 @@
 package com.lonework.corners.services;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -11,12 +10,10 @@ import org.springframework.stereotype.Service;
 
 import com.lonework.corners.model.Place;
 import com.lonework.corners.model.Trip;
-import com.lonework.corners.model.TripHasPlace;
 import com.lonework.corners.model.request.PlaceListRequest;
 import com.lonework.corners.model.request.TripCreateRequest;
 import com.lonework.corners.model.request.TripSearchRequest;
 import com.lonework.corners.repository.PlaceRepository;
-import com.lonework.corners.repository.TripHasPlaceRepository;
 import com.lonework.corners.repository.TripRepository;
 
 import jakarta.transaction.Transactional;
@@ -28,9 +25,6 @@ public class TripService {
 
     @Autowired
     private TripRepository tripRepository;
-
-    @Autowired
-    private TripHasPlaceRepository tripHasPlaceRepository;
 
     @Autowired
     private PlaceRepository placeRepository;
@@ -45,7 +39,6 @@ public class TripService {
         }
         Trip trip = tripCreateRequest.getTrip();
 
-        trip.setPlaces(placesSet);
         System.out.println(trip.getPlaces().size());
 
         return this.tripRepository.save(trip);
@@ -61,7 +54,7 @@ public class TripService {
         System.out.println(placeListRequest.getPlaceIds());
         for (Long placeId : placeListRequest.getPlaceIds()) {
 
-            tripHasPlaceRepository.save(new TripHasPlace(placeId, tripId));
+
         }
 
         return tripRepository.findById(tripId);

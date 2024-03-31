@@ -1,12 +1,14 @@
 package com.lonework.corners.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.lonework.corners.model.request.TripCreateRequest;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,25 +41,18 @@ public class Trip {
 
     private String image;
 
-    private String author;
+    private String creator;
 
-    @ManyToOne
-    @JoinColumn(name = "location_id")
-    @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private CustomLocation location;
-
-    private String gallery;
 
     @ManyToMany(mappedBy = "trips")
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private Set<Tag> tags = new HashSet<>();
+    private List<Tag> tags = new ArrayList<>();
 
     @ManyToMany(mappedBy = "trips", cascade = CascadeType.PERSIST)
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private Set<Place> places = new HashSet<>();
+    private List<Place> places = new ArrayList<>();
 
     public Trip() {
     }
@@ -118,43 +113,27 @@ public class Trip {
         this.image = image;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getCreator() {
+        return creator;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setCreator(String author) {
+        this.creator = author;
     }
 
-    public CustomLocation getLocation() {
-        return location;
-    }
-
-    public void setLocation(CustomLocation location) {
-        this.location = location;
-    }
-
-    public String getGallery() {
-        return gallery;
-    }
-
-    public void setGallery(String gallery) {
-        this.gallery = gallery;
-    }
-
-    public Set<Tag> getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(Set<Tag> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 
-    public Set<Place> getPlaces() {
+    public List<Place> getPlaces() {
         return places;
     }
 
-    public void setPlaces(Set<Place> places) {
+    public void setPlaces(List<Place> places) {
         this.places = places;
     }
 

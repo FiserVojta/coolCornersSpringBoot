@@ -1,6 +1,8 @@
 package com.lonework.corners.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -20,23 +22,12 @@ public class City {
     @Id
     private Long id;
     private String name;
-    private String description;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "state_id")
+    @JoinColumn(name = "country_id")
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private State state;
-
-    @OneToMany(mappedBy = "city")
-    @JsonBackReference
-    private Set<Place> places = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "custom_location_id")
-    @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private CustomLocation customLocation;
+    private Country country;
 
     public City() {
 
@@ -58,28 +49,12 @@ public class City {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public Country getCountry() {
+        return country;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public Set<Place> getPlaces() {
-        return places;
-    }
-
-    public void setPlaces(Set<Place> places) {
-        this.places = places;
+    public void setCountry(Country state) {
+        this.country = state;
     }
 
 }

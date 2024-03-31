@@ -20,14 +20,13 @@ public class CityControler {
     @CrossOrigin(origins = "*")
     @GetMapping("")
     public Iterable<City> getAllCities() {
-
         return this.cityService.getAllCities();
     }
 
     @CrossOrigin(origins = "*")
     @GetMapping("/country/{countryId}")
-    public Iterable<City> getAllCitiesByStateId(@PathVariable("countryId") Long countryId) {
+    public Iterable<City> getAllCitiesByCountryId(@PathVariable("countryId") Long countryId) {
         System.out.println("here" + countryId);
-        return this.cityService.findAllByStateId(countryId);
+        return this.cityService.findAllByCountryId(countryId);
     }
 }

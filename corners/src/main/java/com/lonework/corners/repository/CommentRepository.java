@@ -1,8 +1,8 @@
 package com.lonework.corners.repository;
 
+import com.lonework.corners.model.Comment;
 import org.springframework.data.repository.CrudRepository;
 
-import com.lonework.corners.model.Comment;
 
 public interface CommentRepository extends CrudRepository<Comment, Long> {
 

@@ -32,7 +32,7 @@ public class TripCreateRequest {
 
     public Trip getTrip() {
         Trip trip = new Trip();
-        trip.setAuthor(author);
+        trip.setCreator(author);
         trip.setCategory(null);
         trip.setDescription(description);
         trip.setDuration(duration);

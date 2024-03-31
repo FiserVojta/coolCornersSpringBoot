@@ -1,24 +1,28 @@
 package com.lonework.corners.services;
 
+import com.lonework.corners.model.City;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
-import com.lonework.corners.model.City;
-import com.lonework.corners.repository.CityRepository;
+import java.util.List;
+
 
 @Service
 @Configurable
 public class CityService {
 
     @Autowired
-    private CityRepository cityRepository;
+    EntityManager entityManager;
 
-    public Iterable<City> getAllCities() {
-        return cityRepository.findAll();
+    public List<City> getAllCities() {
+        return entityManager.createQuery("SELECT c FROM City c", City.class).getResultList();
     }
 
-    public Iterable<City> findAllByStateId(Long stateId) {
-        return cityRepository.findAllByStateId(stateId);
+    public List<City> findAllByCountryId(Long countryId) {
+        return entityManager.createQuery("SELECT c FROM City c WHERE c.country.id = :countryId ORDER BY name", City.class)
+                .setParameter("countryId", countryId)
+                .getResultList();
     }
 }

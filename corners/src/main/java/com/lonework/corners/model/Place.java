@@ -1,14 +1,14 @@
 package com.lonework.corners.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lonework.corners.model.request.PlaceCreateRequest;
-import com.lonework.corners.model.request.PlaceSearchRequest;
-import com.lonework.corners.services.CategoryService;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
@@ -21,48 +21,33 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+
 
 @Entity
 public class Place {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
-    @Nullable
-    private Double rating;
+
     private String phoneNumber;
 
     private Double price;
+
     private String openingHours;
 
     private String image;
 
-    @ManyToOne
-    @JoinColumn(name = "custom_location_id")
-    @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private CustomLocation location;
-    private String gallery;
+    private Double latitude;
 
-    @ManyToOne
-    @JoinColumn(name = "state_id")
-    @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private State state;
-
-    @ManyToOne
-    @Nullable
-    @JoinColumn(name = "city_id")
-    @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private City city;
+    private Double longitude;
 
     @OneToMany(mappedBy = "place")
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private Set<Comment> comments = new HashSet<>();
+    private List<Comment> comments = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -70,15 +55,16 @@ public class Place {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Category category;
 
-    @ManyToMany(mappedBy = "places")
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "place_has_tag", joinColumns = @JoinColumn(name = "place_id"), inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private Set<Tag> tags = new HashSet<>();
+    private List<Tag> tags = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "trip_has_place", joinColumns = @JoinColumn(name = "place_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
     @JsonBackReference
-    private Set<Trip> trips = new HashSet<>();
+    private List<Trip> trips = new ArrayList<>();
 
     public Place() {
     }
@@ -86,38 +72,29 @@ public class Place {
     public Place(PlaceCreateRequest placeRequest) {
         this.name = placeRequest.getName();
         this.description = placeRequest.getDescription();
-        this.gallery = placeRequest.getGallery();
         this.openingHours = placeRequest.getOpeningHours();
         this.price = placeRequest.getPrice();
         this.image = placeRequest.getImage();
-        this.rating = placeRequest.getRating();
         this.phoneNumber = placeRequest.getPhoneNumber();
-
+        this.latitude = placeRequest.getLatitude();
+        this.longitude = placeRequest.getLongitude();
     }
 
-    public Place(Long id, String name, String description, Double rating, String phoneNumber, Double price,
-            String openingHours, String image, CustomLocation location, String gallery, State state, City city,
-            Set<Comment> comments, Category category, Set<Tag> tags) {
+    public Place(Long id, String name, String description, String phoneNumber, Double price,
+            String openingHours, String image,
+            List<Comment> comments, Category category, List<Tag> tags, Double longitude, Double latitude) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.rating = rating;
         this.phoneNumber = phoneNumber;
         this.price = price;
         this.openingHours = openingHours;
         this.image = image;
-        this.location = location;
-        this.gallery = gallery;
-        this.state = state;
-        this.city = city;
         this.comments = comments;
         this.category = category;
         this.tags = tags;
-    }
-
-    public Place(Long id) {
-
-        this.id = id;
+        this.longitude = longitude;
+        this.latitude = latitude;
     }
 
     public Long getId() {
@@ -142,14 +119,6 @@ public class Place {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public double getRating() {
-        return rating;
-    }
-
-    public void setRating(double rating) {
-        this.rating = rating;
     }
 
     public String getPhoneNumber() {
@@ -184,32 +153,12 @@ public class Place {
         this.image = image;
     }
 
-    public CustomLocation getLocation() {
-        return location;
-    }
-
-    public void setLocation(CustomLocation location) {
-        this.location = location;
-    }
-
-    public String getGallery() {
-        return gallery;
-    }
-
-    public void setGallery(String gallery) {
-        this.gallery = gallery;
-    }
-
-    public Set<Comment> getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(Set<Comment> comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
-    }
-
-    public void setRating(Double rating) {
-        this.rating = rating;
     }
 
     public Category getCategory() {
@@ -220,36 +169,35 @@ public class Place {
         this.category = category;
     }
 
-    public Set<Tag> getTags() {
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setTags(Set<Tag> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 
-    public State getState() {
-        return state;
-    }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
-    public City getCity() {
-        return city;
-    }
-
-    public void setCity(City city) {
-        this.city = city;
-    }
-
-    public Set<Trip> getTrips() {
+    public List<Trip> getTrips() {
         return trips;
     }
 
-    public void setTrips(Set<Trip> trips) {
+    public void setTrips(List<Trip> trips) {
         this.trips = trips;
     }
 
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
 }
