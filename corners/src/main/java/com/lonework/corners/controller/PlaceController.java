@@ -1,9 +1,13 @@
 package com.lonework.corners.controller;
 
 import com.lonework.corners.model.Comment;
+import org.geotools.geojson.feature.FeatureJSON;
+import org.opengis.feature.simple.SimpleFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -55,4 +59,18 @@ public class PlaceController {
         Comment createdComment = placeService.createComment(commentCreateRequest, placeId);
         return createdComment;
     }
+
+
+
+    @CrossOrigin(origins = "*")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
+    public ResponseEntity<String> createPlace(@RequestBody SimpleFeature feature) {
+        // Process the feature as needed, e.g., save to database
+        // For simplicity, we are just returning the feature as a GeoJSON string
+
+        System.out.println(feature.getAttribute("test"));
+
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
+    }
+
 }
