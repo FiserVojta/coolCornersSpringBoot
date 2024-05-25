@@ -7,5 +7,5 @@ create table if not exists comment (
                          place_id INTEGER REFERENCES place (id),
                          trip_id INTEGER REFERENCES trip (id),
                          created TIMESTAMP NOT NULL,
-                         rating DOUBLE PRECISION NOT NULL
+                         rating DOUBLE PRECISION
 );

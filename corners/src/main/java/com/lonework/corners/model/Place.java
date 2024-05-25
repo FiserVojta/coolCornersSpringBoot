@@ -47,7 +47,7 @@ public class Place {
     @OneToMany(mappedBy = "place")
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private List<Comment> comments = new ArrayList<>();
+    private List<Comment> comments;
 
     @ManyToOne
     @JoinColumn(name = "category_id")

@@ -1,5 +1,8 @@
 package com.lonework.corners.model.request;
 
+import org.locationtech.jts.geom.Geometry;
+
+
 public class PlaceCreateRequest {
 
     private String name;
@@ -15,6 +18,8 @@ public class PlaceCreateRequest {
     private Double longitude;
 
     private Double latitude;
+
+    private Geometry geometry;
 
 
     public PlaceCreateRequest() {

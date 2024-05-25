@@ -1,5 +1,6 @@
 package com.lonework.corners.services;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import com.lonework.corners.model.Comment;
@@ -8,6 +9,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
@@ -89,7 +91,17 @@ public class PlaceService {
 
     }
 
+    @Transactional
     public Comment createComment(CommentCreateRequest request, long placeId) {
-        return null;
+        Comment comment = new Comment();
+        comment.setAuthor(request.getAuthor());
+        comment.setName(request.getName());
+        comment.setTitle(request.getTitle());
+        comment.setName(request.getName());
+        comment.setValue(request.getValue());
+        comment.setPlace(entityManager.find(Place.class, placeId));
+        comment.setCreated(LocalDateTime.now());
+        entityManager.persist(comment);
+        return comment;
     }
 }

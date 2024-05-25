@@ -56,21 +56,20 @@ public class PlaceController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/comment/{placeId}")
     public Comment createComment(@RequestBody CommentCreateRequest commentCreateRequest,
             @PathVariable("placeId") Long placeId) {
-        Comment createdComment = placeService.createComment(commentCreateRequest, placeId);
-        return createdComment;
+        return placeService.createComment(commentCreateRequest, placeId);
     }
 
 
 
-    @CrossOrigin(origins = "*")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
-    public ResponseEntity<String> createPlace(@RequestBody SimpleFeature feature) {
-        // Process the feature as needed, e.g., save to database
-        // For simplicity, we are just returning the feature as a GeoJSON string
-
-        System.out.println(feature.getAttribute("test"));
-
-        return new ResponseEntity<>(null, HttpStatus.CREATED);
-    }
+//    @CrossOrigin(origins = "/v1/*")
+//    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
+//    public ResponseEntity<String> createPlace(@RequestBody PlaceCreateRequest feature) {
+//        // Process the feature as needed, e.g., save to database
+//        // For simplicity, we are just returning the feature as a GeoJSON string
+//
+//
+//
+//        return new ResponseEntity<>(null, HttpStatus.CREATED);
+//    }
 
 }
