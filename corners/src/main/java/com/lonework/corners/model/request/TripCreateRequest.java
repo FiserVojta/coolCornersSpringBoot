@@ -8,7 +8,7 @@ public class TripCreateRequest {
 
     private List<Long> placeIdList;
 
-    private List<Long> categoryIdList;
+    private Long categoryId;
 
     private List<Long> tagIdList;
 
@@ -48,12 +48,12 @@ public class TripCreateRequest {
         this.placeIdList = placeIdList;
     }
 
-    public List<Long> getCategoryIdList() {
-        return categoryIdList;
+    public Long getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategoryIdList(List<Long> categoryIdList) {
-        this.categoryIdList = categoryIdList;
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
     }
 
     public List<Long> getTagIdList() {

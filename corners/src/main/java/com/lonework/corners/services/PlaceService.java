@@ -1,12 +1,13 @@
 package com.lonework.corners.services;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
+import com.lonework.corners.model.Category;
 import com.lonework.corners.model.Comment;
+import com.lonework.corners.model.Place;
+import com.lonework.corners.model.request.CommentCreateRequest;
+import com.lonework.corners.model.request.PlaceCreateRequest;
+import com.lonework.corners.model.request.PlaceSearchRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
@@ -14,48 +15,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
-import com.lonework.corners.repository.CategoryRepository;
-import com.lonework.corners.repository.CommentRepository;
-import com.lonework.corners.repository.PlaceRepository;
-import com.lonework.corners.repository.CountryRepository;
-import com.lonework.corners.model.Category;
-import com.lonework.corners.model.City;
-import com.lonework.corners.model.Place;
-import com.lonework.corners.model.request.CommentCreateRequest;
-import com.lonework.corners.model.request.PlaceCreateRequest;
-import com.lonework.corners.model.request.PlaceSearchRequest;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 
 @Service
 @Configurable
 public class PlaceService {
 
     @Autowired
-    private PlaceRepository placeRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private CountryRepository stateRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
-
-    @Autowired
     EntityManager entityManager;
 
     public Place getPlaceById(Long id) {
-        Optional<Place> placeOptional = this.placeRepository.findById(id);
-        if (placeOptional.isPresent()) {
-            return placeOptional.get();
-        } else {
-            return null;
-        }
-
+        Optional<Place> placeOptional = Optional.ofNullable(entityManager.find(Place.class, id));
+        return placeOptional.orElse(null);
     }
 
-    public Iterable<Place> findPlacesByParametrs(PlaceSearchRequest placeSearchRequest) {
-        CriteriaBuilder  criteriaBuilder = entityManager.getCriteriaBuilder();
+    public Iterable<Place> findPlacesByParameters(PlaceSearchRequest placeSearchRequest) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         var query = criteriaBuilder.createQuery(Place.class);
         Root<Place> root = query.from(Place.class);
 
@@ -70,25 +47,22 @@ public class PlaceService {
         query.select(root).where(categoryPredicate);
 
 
-//        Predicate tagPredicate = criteriaBuilder.conjunction();
-//        if(placeSearchRequest.getTagIds() != null && !placeSearchRequest.getTagIds().isEmpty()) {
-//            CriteriaBuilder.In<Long> tagInClause = criteriaBuilder.in(root.get("tags").get("id"));
-//            for (Long value : placeSearchRequest.getTagIds()) {
-//                tagInClause.value(value);
-//            }
-//            tagPredicate = criteriaBuilder.and(tagPredicate, tagInClause);
-//        }
-//        query.select(root).where(tagPredicate);
-        System.out.println("" + query.toString());
+        //        Predicate tagPredicate = criteriaBuilder.conjunction();
+        //        if(placeSearchRequest.getTagIds() != null && !placeSearchRequest.getTagIds().isEmpty()) {
+        //            CriteriaBuilder.In<Long> tagInClause = criteriaBuilder.in(root.get("tags").get("id"));
+        //            for (Long value : placeSearchRequest.getTagIds()) {
+        //                tagInClause.value(value);
+        //            }
+        //            tagPredicate = criteriaBuilder.and(tagPredicate, tagInClause);
+        //        }
+        //        query.select(root).where(tagPredicate);
         return entityManager.createQuery(query).getResultList();
     }
 
     public Place createPlace(PlaceCreateRequest placeRequest) {
         Place place = new Place(placeRequest);
-        Optional<Category> cat = categoryRepository.findById(placeRequest.getCategoryId());
-        place.setCategory(cat.get());
-        return this.placeRepository.save(place);
-
+        place.setCategory(entityManager.find(Category.class, placeRequest.getCategoryId()));
+        return entityManager.merge(place);
     }
 
     @Transactional

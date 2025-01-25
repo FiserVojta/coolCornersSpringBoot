@@ -6,8 +6,6 @@ create table if not exists place (
                        price DOUBLE PRECISION,
                        opening_hours TEXT,
                        category_id INTEGER NOT NULL REFERENCES category (id),
-                       image VARCHAR(255),
-                        latitude DOUBLE PRECISION NOT NULL,
-                        longitude DOUBLE PRECISION NOT NULL
+                       image VARCHAR(255)
 );
 

@@ -12,6 +12,7 @@ import com.lonework.corners.model.request.PlaceCreateRequest;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,20 +30,24 @@ public class Place {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column
     private String name;
+
+    @Column
     private String description;
 
+    @Column
     private String phoneNumber;
 
+    @Column
     private Double price;
 
+    @Column
     private String openingHours;
 
+    @Column
     private String image;
-
-    private Double latitude;
-
-    private Double longitude;
 
     @OneToMany(mappedBy = "place")
     @JsonManagedReference
@@ -76,8 +81,6 @@ public class Place {
         this.price = placeRequest.getPrice();
         this.image = placeRequest.getImage();
         this.phoneNumber = placeRequest.getPhoneNumber();
-        this.latitude = placeRequest.getLatitude();
-        this.longitude = placeRequest.getLongitude();
     }
 
     public Place(Long id, String name, String description, String phoneNumber, Double price,
@@ -93,8 +96,6 @@ public class Place {
         this.comments = comments;
         this.category = category;
         this.tags = tags;
-        this.longitude = longitude;
-        this.latitude = latitude;
     }
 
     public Long getId() {
@@ -183,21 +184,5 @@ public class Place {
 
     public void setTrips(List<Trip> trips) {
         this.trips = trips;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
     }
 }

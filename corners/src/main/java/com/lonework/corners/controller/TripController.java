@@ -1,24 +1,22 @@
 package com.lonework.corners.controller;
 
-import java.util.Optional;
-
+import com.lonework.corners.model.Trip;
+import com.lonework.corners.model.request.PlaceListRequest;
+import com.lonework.corners.model.request.TripCreateRequest;
+import com.lonework.corners.model.request.TripSearchRequest;
+import com.lonework.corners.services.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lonework.corners.model.Trip;
-import com.lonework.corners.model.request.PlaceCreateRequest;
-import com.lonework.corners.model.request.PlaceListRequest;
-import com.lonework.corners.model.request.TripCreateRequest;
-import com.lonework.corners.model.request.TripSearchRequest;
-import com.lonework.corners.repository.TripRepository;
-import com.lonework.corners.services.TripService;
+import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/trip")
@@ -36,7 +34,7 @@ public class TripController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
-    public Optional<Trip> FindTripById(@PathVariable Long id) {
+    public Trip FindTripById(@PathVariable Long id) {
 
         return this.tripService.findTripById(id);
     }
@@ -49,8 +47,8 @@ public class TripController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping("/find")
-    public Iterable<Trip> findTrip(@RequestBody TripSearchRequest tripSearchRequest) {
+    @GetMapping("/find")
+    public Iterable<Trip> findTrip(@ModelAttribute TripSearchRequest tripSearchRequest) {
 
         return this.tripService.findTripByparameters(tripSearchRequest);
     }

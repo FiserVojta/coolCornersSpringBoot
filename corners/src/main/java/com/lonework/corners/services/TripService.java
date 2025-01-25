@@ -1,22 +1,21 @@
 package com.lonework.corners.services;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import org.springframework.stereotype.Service;
-
-import com.lonework.corners.model.Place;
+import com.lonework.corners.model.Category;
 import com.lonework.corners.model.Trip;
 import com.lonework.corners.model.request.PlaceListRequest;
 import com.lonework.corners.model.request.TripCreateRequest;
 import com.lonework.corners.model.request.TripSearchRequest;
-import com.lonework.corners.repository.PlaceRepository;
-import com.lonework.corners.repository.TripRepository;
-
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
 
 @Service
 @Configurable
@@ -24,47 +23,49 @@ import jakarta.transaction.Transactional;
 public class TripService {
 
     @Autowired
-    private TripRepository tripRepository;
-
-    @Autowired
-    private PlaceRepository placeRepository;
+    EntityManager entityManager;
 
     public Trip crateTrip(TripCreateRequest tripCreateRequest) {
 
-        Iterable<Place> places = this.placeRepository.findAllById(tripCreateRequest.getPlaceIdList());
-        Set<Place> placesSet = new HashSet<>();
-
-        for (Place place : places) {
-            placesSet.add(place);
-        }
+        //        if (tripCreateRequest.getPlaceIdList() != null && !tripCreateRequest.getPlaceIdList().isEmpty()) {
+        //            //Iterable<Place> places = this.placeRepository.findAllById(tripCreateRequest.getPlaceIdList());
+        //            Set<Place> placesSet = new HashSet<>();
+        //                        for (Place place : places) {
+        //                placesSet.add(place);
+        //            }
+        //        }
         Trip trip = tripCreateRequest.getTrip();
-
-        System.out.println(trip.getPlaces().size());
-
-        return this.tripRepository.save(trip);
+        trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
+        return entityManager.merge(trip);
     }
 
-    public Optional<Trip> findTripById(long id) {
+    public Trip findTripById(long id) {
 
-        return this.tripRepository.findById(id);
+        return entityManager.find(Trip.class, id);
     }
 
     public Optional<Trip> addPlacesToTrip(PlaceListRequest placeListRequest, Long tripId) {
-        // Iterable<TripHasPlace> tripsHasPlaces =
+
         System.out.println(placeListRequest.getPlaceIds());
         for (Long placeId : placeListRequest.getPlaceIds()) {
 
 
         }
-
-        return tripRepository.findById(tripId);
+        return Optional.ofNullable(entityManager.find(Trip.class, tripId));
     }
 
     public Iterable<Trip> findTripByparameters(TripSearchRequest tripSearchRequest) {
 
-        Iterable<Trip> trips = tripRepository.findAllByParametrs(
-                tripSearchRequest.getTags());
-        return trips;
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Trip> cq = cb.createQuery(Trip.class);
+        Root<Trip> tripRoot = cq.from(Trip.class);
+        if (tripSearchRequest.getCategories() != null && !tripSearchRequest.getCategories().isEmpty()) {
+            var categoryPredicate = tripRoot.get("category").get("id").in(tripSearchRequest.getCategories());
+            cq.where(categoryPredicate);
+        }
+
+
+        return entityManager.createQuery(cq).getResultList();
     }
 
 }
