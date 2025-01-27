@@ -1,25 +1,21 @@
 package com.lonework.corners.model.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.locationtech.jts.geom.Geometry;
 
 
 public class PlaceCreateRequest {
 
-    private String name;
-    private String description;
-    private Double rating;
-    private String phoneNumber;
-    private Double price;
-    private String openingHours;
-    private String image;
-    private String gallery;
-    private Long categoryId;
-
-    private Double longitude;
-
-    private Double latitude;
-
-    private Geometry geometry;
+    @JsonProperty private String name;
+    @JsonProperty private String description;
+    @JsonProperty private Double rating;
+    @JsonProperty private String phoneNumber;
+    @JsonProperty private Double price;
+    @JsonProperty private String openingHours;
+    @JsonProperty private String image;
+    @JsonProperty private String gallery;
+    @JsonProperty private Long categoryId;
+    @JsonProperty private Geometry geometry;
 
 
     public PlaceCreateRequest() {
@@ -98,20 +94,11 @@ public class PlaceCreateRequest {
         this.categoryId = categoryId;
     }
 
-
-    public Double getLongitude() {
-        return longitude;
+    public Geometry getGeometry() {
+        return geometry;
     }
 
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
     }
 }

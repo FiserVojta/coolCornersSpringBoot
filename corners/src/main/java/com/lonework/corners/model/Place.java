@@ -3,7 +3,9 @@ package com.lonework.corners.model;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -22,6 +24,9 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.locationtech.jts.geom.Geometry;
 
 
 @Entity
@@ -71,6 +76,10 @@ public class Place {
     @JsonBackReference
     private List<Trip> trips = new ArrayList<>();
 
+    @Column(columnDefinition = "geometry(Point, 4326)")
+    @JdbcTypeCode(org.hibernate.type.SqlTypes.GEOMETRY)
+    private Geometry geometry;
+
     public Place() {
     }
 
@@ -81,21 +90,7 @@ public class Place {
         this.price = placeRequest.getPrice();
         this.image = placeRequest.getImage();
         this.phoneNumber = placeRequest.getPhoneNumber();
-    }
-
-    public Place(Long id, String name, String description, String phoneNumber, Double price,
-            String openingHours, String image,
-            List<Comment> comments, Category category, List<Tag> tags, Double longitude, Double latitude) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.phoneNumber = phoneNumber;
-        this.price = price;
-        this.openingHours = openingHours;
-        this.image = image;
-        this.comments = comments;
-        this.category = category;
-        this.tags = tags;
+        this.geometry = placeRequest.getGeometry();
     }
 
     public Long getId() {
@@ -184,5 +179,46 @@ public class Place {
 
     public void setTrips(List<Trip> trips) {
         this.trips = trips;
+    }
+
+    public Geometry getGeometry() {
+        return geometry;
+    }
+
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {return true;}
+        if (!(o instanceof Place place)) {return false;}
+        return Objects.equals(id, place.id) && Objects.equals(name, place.name) && Objects.equals(description, place.description)
+                && Objects.equals(phoneNumber, place.phoneNumber) && Objects.equals(price, place.price) && Objects.equals(openingHours,
+                place.openingHours) && Objects.equals(image, place.image) && Objects.equals(comments, place.comments) && Objects.equals(category,
+                place.category) && Objects.equals(tags, place.tags) && Objects.equals(trips, place.trips) && Objects.equals(geometry, place.geometry);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, phoneNumber, price, openingHours, image, comments, category, tags, trips, geometry);
+    }
+
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Place.class.getSimpleName() + "[", "]")
+                .add("id=" + id)
+                .add("name='" + name + "'")
+                .add("description='" + description + "'")
+                .add("phoneNumber='" + phoneNumber + "'")
+                .add("price=" + price)
+                .add("openingHours='" + openingHours + "'")
+                .add("image='" + image + "'")
+                .add("comments=" + comments)
+                .add("category=" + category)
+                .add("tags=" + tags)
+                .add("trips=" + trips)
+                .add("geometry=" + geometry)
+                .toString();
     }
 }

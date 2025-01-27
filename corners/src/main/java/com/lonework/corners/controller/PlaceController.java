@@ -46,7 +46,7 @@ public class PlaceController {
     }
 
     @CrossOrigin(origins = "*")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/comment/{placeId}")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{placeId}/comment")
     public Comment createComment(@RequestBody CommentCreateRequest commentCreateRequest,
             @PathVariable("placeId") Long placeId) {
         return placeService.createComment(commentCreateRequest, placeId);

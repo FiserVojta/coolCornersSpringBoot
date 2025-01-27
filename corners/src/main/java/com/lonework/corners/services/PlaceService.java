@@ -59,10 +59,14 @@ public class PlaceService {
         return entityManager.createQuery(query).getResultList();
     }
 
+    @Transactional
     public Place createPlace(PlaceCreateRequest placeRequest) {
+        placeRequest.getGeometry().setSRID(4326);
         Place place = new Place(placeRequest);
         place.setCategory(entityManager.find(Category.class, placeRequest.getCategoryId()));
-        return entityManager.merge(place);
+        System.out.println(place.getGeometry().toText());
+        entityManager.persist(place);
+        return null;
     }
 
     @Transactional
