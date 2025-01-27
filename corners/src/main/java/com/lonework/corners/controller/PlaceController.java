@@ -27,22 +27,20 @@ public class PlaceController {
     @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
     public Place getPlaceById(@PathVariable("id") Long id) {
-
         return this.placeService.getPlaceById(id);
     }
 
     @CrossOrigin(origins = "*")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/create")
     public Place createPlace(@RequestBody PlaceCreateRequest placeRequest) {
-        Place place = placeService.createPlace(placeRequest);
-        return place;
+        return placeService.createPlace(placeRequest);
     }
 
     @CrossOrigin(origins = "*")
-    @GetMapping(path = "/filter")
+    @GetMapping(path = "/")
     public Iterable<Place> fetchPlace(PlaceSearchRequest placeSearchRequest) {
-        Iterable<Place> savedPlaces = placeService.findPlacesByParameters(placeSearchRequest);
-        return savedPlaces;
+        return placeService.findPlacesByParameters(placeSearchRequest);
+
     }
 
     @CrossOrigin(origins = "*")

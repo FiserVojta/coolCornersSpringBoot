@@ -8,6 +8,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import com.lonework.corners.model.request.TripCreateRequest;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -17,6 +18,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import org.locationtech.jts.geom.Geometry;
+
 
 @Entity
 public class Trip {
@@ -54,7 +57,17 @@ public class Trip {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Place> places = new ArrayList<>();
 
+    private Geometry geometry;
+
     public Trip() {
+    }
+
+    public Trip(TripCreateRequest tripCreateRequest){
+        this.geometry = tripCreateRequest.getGeometry();
+        this.name = tripCreateRequest.getName();
+        this.duration = tripCreateRequest.getDuration();
+        this.description = tripCreateRequest.getDescription();
+        this.creator = tripCreateRequest.getAuthor();
     }
 
     public Long getId() {
@@ -137,4 +150,11 @@ public class Trip {
         this.places = places;
     }
 
+    public Geometry getGeometry() {
+        return geometry;
+    }
+
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
+    }
 }

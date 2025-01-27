@@ -2,42 +2,41 @@ package com.lonework.corners.model.request;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lonework.corners.model.Trip;
+import org.locationtech.jts.geom.Geometry;
+
 
 public class TripCreateRequest {
 
+    @JsonProperty
     private List<Long> placeIdList;
 
+    @JsonProperty
     private Long categoryId;
 
+    @JsonProperty
     private List<Long> tagIdList;
 
+    @JsonProperty
     private String name;
 
+    @JsonProperty
     private String author;
 
+    @JsonProperty
     private String description;
 
+    @JsonProperty
     private Integer duration;
 
-    // like if its trip in
+    @JsonProperty
     private String Type;
 
-    private String state;
-
-    private String city;
+    @JsonProperty
+    private Geometry geometry;
 
     public TripCreateRequest() {
-    }
-
-    public Trip getTrip() {
-        Trip trip = new Trip();
-        trip.setCreator(author);
-        trip.setCategory(null);
-        trip.setDescription(description);
-        trip.setDuration(duration);
-        trip.setName(name);
-        return trip;
     }
 
     public List<Long> getPlaceIdList() {
@@ -104,20 +103,11 @@ public class TripCreateRequest {
         Type = type;
     }
 
-    public String getState() {
-        return state;
+    public Geometry getGeometry() {
+        return geometry;
     }
 
-    public void setState(String state) {
-        this.state = state;
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
     }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
 }

@@ -25,17 +25,17 @@ public class TripService {
     @Autowired
     EntityManager entityManager;
 
-    public Trip crateTrip(TripCreateRequest tripCreateRequest) {
+    @Autowired
+    PlaceService placeService;
 
-        //        if (tripCreateRequest.getPlaceIdList() != null && !tripCreateRequest.getPlaceIdList().isEmpty()) {
-        //            //Iterable<Place> places = this.placeRepository.findAllById(tripCreateRequest.getPlaceIdList());
-        //            Set<Place> placesSet = new HashSet<>();
-        //                        for (Place place : places) {
-        //                placesSet.add(place);
-        //            }
-        //        }
-        Trip trip = tripCreateRequest.getTrip();
+    public Trip crateTrip(TripCreateRequest tripCreateRequest) {
+        Trip trip = new Trip(tripCreateRequest);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
+        if (tripCreateRequest.getPlaceIdList() != null && !tripCreateRequest.getPlaceIdList().isEmpty()) {
+            trip.setPlaces(tripCreateRequest.getPlaceIdList().stream()
+                    .map(id -> placeService.getPlaceById(id))
+                    .toList());
+        }
         return entityManager.merge(trip);
     }
 

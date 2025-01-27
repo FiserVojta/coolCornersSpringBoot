@@ -27,21 +27,20 @@ public class TripController {
 
     @CrossOrigin(origins = "*")
     @PostMapping("")
-    public Trip CreateTrip(@RequestBody TripCreateRequest tripRequest) {
-
+    public Trip createTrip(@RequestBody TripCreateRequest tripRequest) {
         return this.tripService.crateTrip(tripRequest);
     }
 
     @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
-    public Trip FindTripById(@PathVariable Long id) {
+    public Trip findTripById(@PathVariable Long id) {
 
         return this.tripService.findTripById(id);
     }
 
     @CrossOrigin(origins = "*")
     @PostMapping("/add-places/{id}")
-    public Optional<Trip> AddPlacesToTrip(@RequestBody PlaceListRequest placeListRequest, @PathVariable Long id) {
+    public Optional<Trip> addPlacesToTrip(@RequestBody PlaceListRequest placeListRequest, @PathVariable Long id) {
 
         return this.tripService.addPlacesToTrip(placeListRequest, id);
     }

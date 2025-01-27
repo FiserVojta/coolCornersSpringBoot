@@ -31,16 +31,6 @@ public class Category {
     public Category() {
     }
 
-    public Category(Long id, String name, String value, boolean main, String title, List<Place> places, List<Trip> trips) {
-        this.id = id;
-        this.name = name;
-        this.main = main;
-        this.title = title;
-        this.places = places;
-        this.trips = trips;
-    }
-
-    // Getters and setters
     public String getName() {
         return name;
     }
