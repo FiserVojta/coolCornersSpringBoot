@@ -1,10 +1,13 @@
 package com.lonework.corners.services;
 
 import com.lonework.corners.model.Category;
+import com.lonework.corners.model.Place;
 import com.lonework.corners.model.Trip;
 import com.lonework.corners.model.request.PlaceListRequest;
 import com.lonework.corners.model.request.TripCreateRequest;
 import com.lonework.corners.model.request.TripSearchRequest;
+import com.lonework.corners.model.response.PlaceSimpleResponse;
+import com.lonework.corners.model.response.TripDetailResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -31,17 +35,16 @@ public class TripService {
     public Trip crateTrip(TripCreateRequest tripCreateRequest) {
         Trip trip = new Trip(tripCreateRequest);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
-        if (tripCreateRequest.getPlaceIdList() != null && !tripCreateRequest.getPlaceIdList().isEmpty()) {
-            trip.setPlaces(tripCreateRequest.getPlaceIdList().stream()
+        if (tripCreateRequest.getPlaceIds() != null && !tripCreateRequest.getPlaceIds().isEmpty()) {
+            trip.setPlaces(tripCreateRequest.getPlaceIds().stream()
                     .map(id -> placeService.getPlaceById(id))
                     .toList());
         }
         return entityManager.merge(trip);
     }
 
-    public Trip findTripById(long id) {
-
-        return entityManager.find(Trip.class, id);
+    public TripDetailResponse findTripById(long id) {
+        return getTripDetailResponse(entityManager.find(Trip.class, id));
     }
 
     public Optional<Trip> addPlacesToTrip(PlaceListRequest placeListRequest, Long tripId) {
@@ -54,7 +57,7 @@ public class TripService {
         return Optional.ofNullable(entityManager.find(Trip.class, tripId));
     }
 
-    public Iterable<Trip> findTripByparameters(TripSearchRequest tripSearchRequest) {
+    public Iterable<Trip> findTripByParameters(TripSearchRequest tripSearchRequest) {
 
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Trip> cq = cb.createQuery(Trip.class);
@@ -63,9 +66,30 @@ public class TripService {
             var categoryPredicate = tripRoot.get("category").get("id").in(tripSearchRequest.getCategories());
             cq.where(categoryPredicate);
         }
-
-
         return entityManager.createQuery(cq).getResultList();
+    }
+
+    private TripDetailResponse getTripDetailResponse(Trip trip) {
+        return new TripDetailResponse(
+                trip,
+                getPlacesDetailResponse(trip.getPlaces()),
+                null);
+    }
+
+    private List<PlaceSimpleResponse> getPlacesDetailResponse(List<Place> places) {
+        return places.stream()
+                .map(this::getSimplePlaceResponse)
+                .toList();
+    }
+
+    private PlaceSimpleResponse getSimplePlaceResponse(Place place) {
+        return new PlaceSimpleResponse(
+                place.getId(),
+                place.getName(),
+                place.getImage(),
+                null,
+                null
+        );
     }
 
 }

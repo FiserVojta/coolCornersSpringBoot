@@ -4,6 +4,7 @@ import com.lonework.corners.model.Trip;
 import com.lonework.corners.model.request.PlaceListRequest;
 import com.lonework.corners.model.request.TripCreateRequest;
 import com.lonework.corners.model.request.TripSearchRequest;
+import com.lonework.corners.model.response.TripDetailResponse;
 import com.lonework.corners.services.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,13 +29,12 @@ public class TripController {
     @CrossOrigin(origins = "*")
     @PostMapping("")
     public Trip createTrip(@RequestBody TripCreateRequest tripRequest) {
-        return this.tripService.crateTrip(tripRequest);
+        return tripService.crateTrip(tripRequest);
     }
 
     @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
-    public Trip findTripById(@PathVariable Long id) {
-
+    public TripDetailResponse findTripById(@PathVariable Long id) {
         return this.tripService.findTripById(id);
     }
 
@@ -49,6 +49,6 @@ public class TripController {
     @GetMapping("/find")
     public Iterable<Trip> findTrip(@ModelAttribute TripSearchRequest tripSearchRequest) {
 
-        return this.tripService.findTripByparameters(tripSearchRequest);
+        return this.tripService.findTripByParameters(tripSearchRequest);
     }
 }

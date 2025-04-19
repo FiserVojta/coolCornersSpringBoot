@@ -71,8 +71,7 @@ public class Place {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "trip_has_place", joinColumns = @JoinColumn(name = "place_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
+    @ManyToMany(mappedBy = "places", cascade = CascadeType.PERSIST)
     @JsonBackReference
     private List<Trip> trips = new ArrayList<>();
 

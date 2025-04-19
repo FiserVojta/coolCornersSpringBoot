@@ -15,10 +15,20 @@ create table if not exists trip_has_tag (
                               trip_id INTEGER NOT NULL REFERENCES trip (id)
 );
 
-create table if not exists trip_has_place (
-                                            id uuid PRIMARY KEY,
-                                            place_id INTEGER NOT NULL REFERENCES place (id),
-                                            trip_id INTEGER NOT NULL REFERENCES trip (id)
+CREATE TABLE IF NOT EXISTS trip_has_place (
+                                              place_id INTEGER NOT NULL,
+                                              trip_id  INTEGER NOT NULL,
+
+    -- Make (place_id, trip_id) the composite primary key
+                                              CONSTRAINT pk_trip_has_place PRIMARY KEY (place_id, trip_id),
+
+    -- Foreign key references
+    CONSTRAINT fk_trip_has_place_place
+        FOREIGN KEY (place_id)
+        REFERENCES place (id),
+    CONSTRAINT fk_trip_has_place_trip
+        FOREIGN KEY (trip_id)
+        REFERENCES trip (id)
     );
 
 CREATE SEQUENCE if not exists trip_seq;

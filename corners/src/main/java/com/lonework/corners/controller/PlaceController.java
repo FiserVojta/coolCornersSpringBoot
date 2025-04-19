@@ -1,6 +1,8 @@
 package com.lonework.corners.controller;
 
 import com.lonework.corners.model.Comment;
+import com.lonework.corners.model.response.PlaceDetailResponse;
+import org.geotools.api.feature.simple.SimpleFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,8 +28,8 @@ public class PlaceController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
-    public Place getPlaceById(@PathVariable("id") Long id) {
-        return this.placeService.getPlaceById(id);
+    public PlaceDetailResponse getPlaceById(@PathVariable("id") Long id) {
+        return this.placeService.getPlaceResponse(id);
     }
 
     @CrossOrigin(origins = "*")
@@ -37,7 +39,7 @@ public class PlaceController {
     }
 
     @CrossOrigin(origins = "*")
-    @GetMapping(path = "/")
+    @GetMapping()
     public Iterable<Place> fetchPlace(PlaceSearchRequest placeSearchRequest) {
         return placeService.findPlacesByParameters(placeSearchRequest);
 

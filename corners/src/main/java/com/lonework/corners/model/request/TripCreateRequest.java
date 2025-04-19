@@ -3,14 +3,13 @@ package com.lonework.corners.model.request;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lonework.corners.model.Trip;
 import org.locationtech.jts.geom.Geometry;
 
 
 public class TripCreateRequest {
 
     @JsonProperty
-    private List<Long> placeIdList;
+    private List<Long> placeIds;
 
     @JsonProperty
     private Long categoryId;
@@ -39,12 +38,12 @@ public class TripCreateRequest {
     public TripCreateRequest() {
     }
 
-    public List<Long> getPlaceIdList() {
-        return placeIdList;
+    public List<Long> getPlaceIds() {
+        return placeIds;
     }
 
-    public void setPlaceIdList(List<Long> placeIdList) {
-        this.placeIdList = placeIdList;
+    public void setPlaceIds(List<Long> placeIds) {
+        this.placeIds = placeIds;
     }
 
     public Long getCategoryId() {

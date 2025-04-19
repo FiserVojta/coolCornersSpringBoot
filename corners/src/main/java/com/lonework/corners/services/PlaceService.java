@@ -6,11 +6,14 @@ import com.lonework.corners.model.Place;
 import com.lonework.corners.model.request.CommentCreateRequest;
 import com.lonework.corners.model.request.PlaceCreateRequest;
 import com.lonework.corners.model.request.PlaceSearchRequest;
+import com.lonework.corners.model.response.PlaceDetailResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
+import org.geotools.api.feature.simple.SimpleFeature;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
@@ -26,9 +29,30 @@ public class PlaceService {
     @Autowired
     EntityManager entityManager;
 
+    @Autowired
+    FeatureTypeClass featureTypeClass;
+
     public Place getPlaceById(Long id) {
-        Optional<Place> placeOptional = Optional.ofNullable(entityManager.find(Place.class, id));
-        return placeOptional.orElse(null);
+        return entityManager.find(Place.class, id);
+
+    }
+
+
+    public PlaceDetailResponse getPlaceResponse(Long id){
+        var place = getPlaceById(id);
+        return
+                new PlaceDetailResponse(
+                        place,
+                        getPlaceFeature(place)
+                );
+    }
+
+    public SimpleFeature getPlaceFeature(Place place){
+        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureTypeClass.placeFeatureType());
+        featureBuilder.set("name", place.getName());
+        featureBuilder.set("id", place.getId().toString());
+        featureBuilder.set("geometry", place.getGeometry());
+        return featureBuilder.buildFeature(place.getId().toString());
     }
 
     public Iterable<Place> findPlacesByParameters(PlaceSearchRequest placeSearchRequest) {
@@ -78,7 +102,7 @@ public class PlaceService {
         comment.setName(request.getName());
         comment.setValue(request.getValue());
         comment.setPlace(entityManager.find(Place.class, placeId));
-        comment.setCreated(LocalDateTime.now());
+       // comment.setCreated(LocalDateTime.now());
         entityManager.persist(comment);
         return comment;
     }
