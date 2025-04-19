@@ -1,0 +1,96 @@
+package com.lonework.corners.trip.services;
+
+import com.lonework.corners.category.model.Category;
+import com.lonework.corners.place.model.Place;
+import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.place.model.PlaceListRequest;
+import com.lonework.corners.trip.model.TripCreateRequest;
+import com.lonework.corners.trip.model.TripSearchRequest;
+import com.lonework.corners.place.model.PlaceSimpleResponse;
+import com.lonework.corners.trip.model.TripDetailResponse;
+import com.lonework.corners.place.services.PlaceService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+
+@Service
+@Configurable
+@Transactional
+public class TripService {
+
+    @Autowired
+    EntityManager entityManager;
+
+    @Autowired
+    PlaceService placeService;
+
+    public Trip crateTrip(TripCreateRequest tripCreateRequest) {
+        Trip trip = new Trip(tripCreateRequest);
+        trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
+        if (tripCreateRequest.getPlaceIds() != null && !tripCreateRequest.getPlaceIds().isEmpty()) {
+            trip.setPlaces(tripCreateRequest.getPlaceIds().stream()
+                    .map(id -> placeService.getPlaceById(id))
+                    .toList());
+        }
+        return entityManager.merge(trip);
+    }
+
+    public TripDetailResponse findTripById(long id) {
+        return getTripDetailResponse(entityManager.find(Trip.class, id));
+    }
+
+    public Optional<Trip> addPlacesToTrip(PlaceListRequest placeListRequest, Long tripId) {
+
+        System.out.println(placeListRequest.getPlaceIds());
+        for (Long placeId : placeListRequest.getPlaceIds()) {
+
+
+        }
+        return Optional.ofNullable(entityManager.find(Trip.class, tripId));
+    }
+
+    public Iterable<Trip> findTripByParameters(TripSearchRequest tripSearchRequest) {
+
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Trip> cq = cb.createQuery(Trip.class);
+        Root<Trip> tripRoot = cq.from(Trip.class);
+        if (tripSearchRequest.getCategories() != null && !tripSearchRequest.getCategories().isEmpty()) {
+            var categoryPredicate = tripRoot.get("category").get("id").in(tripSearchRequest.getCategories());
+            cq.where(categoryPredicate);
+        }
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    private TripDetailResponse getTripDetailResponse(Trip trip) {
+        return new TripDetailResponse(
+                trip,
+                getPlacesDetailResponse(trip.getPlaces()),
+                null);
+    }
+
+    private List<PlaceSimpleResponse> getPlacesDetailResponse(List<Place> places) {
+        return places.stream()
+                .map(this::getSimplePlaceResponse)
+                .toList();
+    }
+
+    private PlaceSimpleResponse getSimplePlaceResponse(Place place) {
+        return new PlaceSimpleResponse(
+                place.getId(),
+                place.getName(),
+                place.getImage(),
+                null,
+                null
+        );
+    }
+
+}
