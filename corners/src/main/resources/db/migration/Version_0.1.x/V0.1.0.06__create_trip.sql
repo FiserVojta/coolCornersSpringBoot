@@ -10,9 +10,9 @@ create table if not exists trip (
                       FOREIGN KEY (category_id) REFERENCES category (id)
 );
 create table if not exists trip_has_tag (
-                              id uuid PRIMARY KEY,
                               tag_id INTEGER NOT NULL REFERENCES tag (id),
-                              trip_id INTEGER NOT NULL REFERENCES trip (id)
+                              trip_id INTEGER NOT NULL REFERENCES trip (id),
+    CONSTRAINT pk_trip_has_tag PRIMARY KEY (tag_id, trip_id)
 );
 
 CREATE TABLE IF NOT EXISTS trip_has_place (

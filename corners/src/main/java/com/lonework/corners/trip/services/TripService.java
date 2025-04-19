@@ -59,13 +59,16 @@ public class TripService {
     }
 
     public Iterable<Trip> findTripByParameters(TripSearchRequest tripSearchRequest) {
-
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Trip> cq = cb.createQuery(Trip.class);
         Root<Trip> tripRoot = cq.from(Trip.class);
         if (tripSearchRequest.getCategories() != null && !tripSearchRequest.getCategories().isEmpty()) {
             var categoryPredicate = tripRoot.get("category").get("id").in(tripSearchRequest.getCategories());
             cq.where(categoryPredicate);
+        }
+        if (tripSearchRequest.getTags() != null && !tripSearchRequest.getTags().isEmpty()) {
+            var tagPredicate = tripRoot.get("tags").get("id").in(tripSearchRequest.getTags());
+            cq.where(tagPredicate);
         }
         return entityManager.createQuery(cq).getResultList();
     }

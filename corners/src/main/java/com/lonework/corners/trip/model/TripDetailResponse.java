@@ -2,6 +2,7 @@ package com.lonework.corners.trip.model;
 
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
+import com.lonework.corners.tag.model.Tag;
 import org.geotools.api.feature.simple.SimpleFeature;
 
 import java.util.List;
@@ -15,7 +16,8 @@ public record TripDetailResponse(Long id,
                                  Double rating,
                                  SimpleFeature feature,
                                  List<PlaceSimpleResponse> places,
-                                 List<Comment> comments) {
+                                 List<Comment> comments,
+                                 List<Tag> tags) {
     public TripDetailResponse(Trip trip, List<PlaceSimpleResponse> places, SimpleFeature feature) {
         this(
                 trip.getId(),
@@ -26,7 +28,8 @@ public record TripDetailResponse(Long id,
                 trip.getRating(),
                 feature,
                 places,
-                null
+                null,
+                trip.getTags()
         );
     }
 

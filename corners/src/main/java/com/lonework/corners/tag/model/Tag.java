@@ -8,6 +8,7 @@ import com.lonework.corners.place.model.Place;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import com.lonework.corners.trip.model.Trip;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,8 +31,7 @@ public class Tag {
     @JsonBackReference
     private Set<Place> places = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(name = "trip_has_tag", joinColumns = @JoinColumn(name = "tag_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.PERSIST)
     @JsonBackReference
     private Set<Trip> trips = new HashSet<>();
 
@@ -82,4 +82,11 @@ public class Tag {
         this.places = places;
     };
 
+    public Set<Trip> getTrips() {
+        return trips;
+    }
+
+    public void setTrips(Set<Trip> trips) {
+        this.trips = trips;
+    }
 }

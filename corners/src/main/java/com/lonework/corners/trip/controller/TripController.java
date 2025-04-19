@@ -48,7 +48,6 @@ public class TripController {
     @CrossOrigin(origins = "*")
     @GetMapping("/find")
     public Iterable<Trip> findTrip(@ModelAttribute TripSearchRequest tripSearchRequest) {
-
         return this.tripService.findTripByParameters(tripSearchRequest);
     }
 }

@@ -46,8 +46,10 @@ public class Trip {
 
     private String creator;
 
-
-    @ManyToMany(mappedBy = "trips")
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "trip_has_tag",
+            joinColumns = @JoinColumn(name = "trip_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Tag> tags = new ArrayList<>();
