@@ -89,7 +89,7 @@ public class TripService {
                 place.getName(),
                 place.getImage(),
                 null,
-                null
+                placeService.getPlaceFeature(place)
         );
     }
 

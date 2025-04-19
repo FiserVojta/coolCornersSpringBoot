@@ -35,7 +35,6 @@ public class PlaceService {
 
     }
 
-
     public PlaceDetailResponse getPlaceResponse(Long id){
         var place = getPlaceById(id);
         return
