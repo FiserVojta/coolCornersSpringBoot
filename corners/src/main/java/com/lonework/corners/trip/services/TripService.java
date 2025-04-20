@@ -5,11 +5,14 @@ import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.place.model.PlaceListRequest;
 import com.lonework.corners.trip.model.TripCreateRequest;
+import com.lonework.corners.trip.model.TripRateRequest;
+import com.lonework.corners.trip.model.TripRating;
 import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
 import com.lonework.corners.trip.model.TripDetailResponse;
 import com.lonework.corners.place.services.PlaceService;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
@@ -36,6 +39,9 @@ public class TripService {
     public Trip crateTrip(TripCreateRequest tripCreateRequest) {
         Trip trip = new Trip(tripCreateRequest);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
+        trip.setTags(tripCreateRequest.getTagIdList().stream()
+                .map(id -> entityManager.find(com.lonework.corners.tag.model.Tag.class, id))
+                .toList());
         if (tripCreateRequest.getPlaceIds() != null && !tripCreateRequest.getPlaceIds().isEmpty()) {
             trip.setPlaces(tripCreateRequest.getPlaceIds().stream()
                     .map(id -> placeService.getPlaceById(id))
@@ -71,6 +77,26 @@ public class TripService {
             cq.where(tagPredicate);
         }
         return entityManager.createQuery(cq).getResultList();
+    }
+
+    @Transactional
+    public Double rateTrip(TripRateRequest tripRateRequest, Long tripId) {
+        var trip = entityManager.find(Trip.class, tripId);
+        if (trip == null) {
+            throw new EntityNotFoundException("Trip not found");
+        }
+        entityManager.merge(new TripRating(tripRateRequest, tripId));
+        trip.setRating(countTripRating(tripId));
+        entityManager.merge(trip);
+
+        return trip.getRating();
+    }
+
+    private Double countTripRating(Long tripId) {
+        return entityManager
+                .createQuery("SELECT AVG(tr.rating) FROM TripRating tr WHERE tr.tripId = :tripId", Double.class)
+                .setParameter("tripId", tripId)
+                .getSingleResult();
     }
 
     private TripDetailResponse getTripDetailResponse(Trip trip) {
