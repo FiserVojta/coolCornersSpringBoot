@@ -1,5 +1,6 @@
 package com.lonework.corners.comment.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -43,6 +44,7 @@ public class Comment {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Trip trip;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
 
     private Double rating;

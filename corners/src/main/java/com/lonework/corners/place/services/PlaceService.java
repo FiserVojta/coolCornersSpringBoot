@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 
 @Service
 @Configurable
@@ -99,7 +101,7 @@ public class PlaceService {
         comment.setName(request.getName());
         comment.setValue(request.getValue());
         comment.setPlace(entityManager.find(Place.class, placeId));
-       // comment.setCreated(LocalDateTime.now());
+        comment.setCreated(LocalDateTime.now());
         entityManager.persist(comment);
         return comment;
     }
