@@ -26,8 +26,7 @@ public class Tag {
     private String name;
     private String creator;
 
-    @ManyToMany
-    @JoinTable(name = "place_has_tag", joinColumns = @JoinColumn(name = "tag_id"), inverseJoinColumns = @JoinColumn(name = "place_id"))
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.PERSIST)
     @JsonBackReference
     private Set<Place> places = new HashSet<>();
 

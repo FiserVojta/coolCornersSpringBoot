@@ -8,6 +8,7 @@ import com.lonework.corners.place.model.PlaceCreateRequest;
 import com.lonework.corners.place.model.PlaceSearchRequest;
 import com.lonework.corners.place.model.PlaceDetailResponse;
 import com.lonework.corners.common.model.FeatureTypeClass;
+import com.lonework.corners.tag.model.Tag;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -67,18 +68,16 @@ public class PlaceService {
             }
             categoryPredicate = criteriaBuilder.and(categoryPredicate, categoryInClause);
         }
+        if(placeSearchRequest.getTags() != null && !placeSearchRequest.getTags().isEmpty()){
+            CriteriaBuilder.In<Long> tagsInClause = criteriaBuilder.in(root.join("tags").get("id")); // Assuming "tags" is a field name
+            for (Long tagId : placeSearchRequest.getTags()) {
+                tagsInClause = tagsInClause.value(tagId);
+            }
+            categoryPredicate = criteriaBuilder.and(categoryPredicate, tagsInClause);
+        }
+
         query.select(root).where(categoryPredicate);
 
-
-        //        Predicate tagPredicate = criteriaBuilder.conjunction();
-        //        if(placeSearchRequest.getTagIds() != null && !placeSearchRequest.getTagIds().isEmpty()) {
-        //            CriteriaBuilder.In<Long> tagInClause = criteriaBuilder.in(root.get("tags").get("id"));
-        //            for (Long value : placeSearchRequest.getTagIds()) {
-        //                tagInClause.value(value);
-        //            }
-        //            tagPredicate = criteriaBuilder.and(tagPredicate, tagInClause);
-        //        }
-        //        query.select(root).where(tagPredicate);
         return entityManager.createQuery(query).getResultList();
     }
 
@@ -87,7 +86,9 @@ public class PlaceService {
         placeRequest.getGeometry().setSRID(4326);
         Place place = new Place(placeRequest);
         place.setCategory(entityManager.find(Category.class, placeRequest.getCategoryId()));
-        System.out.println(place.getGeometry().toText());
+        place.setTags(entityManager.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class)
+                .setParameter("ids", placeRequest.getTags())
+                .getResultList());
         entityManager.persist(place);
         return null;
     }

@@ -39,7 +39,7 @@ public class TripService {
     public Trip crateTrip(TripCreateRequest tripCreateRequest) {
         Trip trip = new Trip(tripCreateRequest);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
-        trip.setTags(tripCreateRequest.getTagIdList().stream()
+        trip.setTags(tripCreateRequest.getTags().stream()
                 .map(id -> entityManager.find(com.lonework.corners.tag.model.Tag.class, id))
                 .toList());
         if (tripCreateRequest.getPlaceIds() != null && !tripCreateRequest.getPlaceIds().isEmpty()) {

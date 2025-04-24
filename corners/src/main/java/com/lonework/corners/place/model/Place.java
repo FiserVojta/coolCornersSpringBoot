@@ -70,6 +70,7 @@ public class Place {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Tag> tags = new ArrayList<>();
 
+
     @ManyToMany(mappedBy = "places", cascade = CascadeType.PERSIST)
     @JsonBackReference
     private List<Trip> trips = new ArrayList<>();

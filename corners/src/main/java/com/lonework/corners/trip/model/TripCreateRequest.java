@@ -15,7 +15,7 @@ public class TripCreateRequest {
     private Long categoryId;
 
     @JsonProperty
-    private List<Long> tagIdList;
+    private List<Long> tags;
 
     @JsonProperty
     private String name;
@@ -54,12 +54,12 @@ public class TripCreateRequest {
         this.categoryId = categoryId;
     }
 
-    public List<Long> getTagIdList() {
-        return tagIdList;
+    public List<Long> getTags() {
+        return tags;
     }
 
-    public void setTagIdList(List<Long> tagIdList) {
-        this.tagIdList = tagIdList;
+    public void setTags(List<Long> tagIdList) {
+        this.tags = tagIdList;
     }
 
     public String getName() {

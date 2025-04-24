@@ -3,6 +3,8 @@ package com.lonework.corners.place.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.locationtech.jts.geom.Geometry;
 
+import java.util.List;
+
 
 public class PlaceCreateRequest {
 
@@ -16,6 +18,7 @@ public class PlaceCreateRequest {
     @JsonProperty private String gallery;
     @JsonProperty private Long categoryId;
     @JsonProperty private Geometry geometry;
+    @JsonProperty private List<Long> tags;
 
 
     public PlaceCreateRequest() {
@@ -100,5 +103,13 @@ public class PlaceCreateRequest {
 
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
+    }
+
+    public List<Long> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Long> tags) {
+        this.tags = tags;
     }
 }

@@ -5,7 +5,7 @@ create table if not exists tag (
 );
 
 create table if not exists  place_has_tag (
-                               id uuid PRIMARY KEY,
                                tag_id INTEGER NOT NULL REFERENCES tag (id),
-                               place_id INTEGER NOT NULL REFERENCES place (id)
+                               place_id INTEGER NOT NULL REFERENCES place (id),
+    CONSTRAINT pk_place_has_tag PRIMARY KEY (place_id, tag_id)
 );
