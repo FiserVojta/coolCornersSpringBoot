@@ -2,10 +2,14 @@ package com.lonework.corners.place.controller;
 
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.place.model.PlaceDetailResponse;
+import com.lonework.corners.place.model.PlaceRateRequest;
+import com.lonework.corners.trip.model.TripRateRequest;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,7 +55,12 @@ public class PlaceController {
         return placeService.createComment(commentCreateRequest, placeId);
     }
 
-
+    @CrossOrigin(origins = "*")
+    @PatchMapping("/{placeId}/rate")
+    public void rateTrip(@RequestBody PlaceRateRequest placeRateRequest, @PathVariable Long placeId) {
+        this.placeService.ratePlace(placeRateRequest, placeId);
+        new Response().setMessage("Trip rated successfully");
+    }
 
 //    @CrossOrigin(origins = "/v1/*")
 //    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")

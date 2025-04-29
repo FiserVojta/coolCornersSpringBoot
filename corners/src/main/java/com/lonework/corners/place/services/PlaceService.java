@@ -5,11 +5,17 @@ import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.comment.model.CommentCreateRequest;
 import com.lonework.corners.place.model.PlaceCreateRequest;
+import com.lonework.corners.place.model.PlaceRateRequest;
+import com.lonework.corners.place.model.PlaceRating;
 import com.lonework.corners.place.model.PlaceSearchRequest;
 import com.lonework.corners.place.model.PlaceDetailResponse;
 import com.lonework.corners.common.model.FeatureTypeClass;
 import com.lonework.corners.tag.model.Tag;
+import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.trip.model.TripRateRequest;
+import com.lonework.corners.trip.model.TripRating;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
@@ -105,5 +111,18 @@ public class PlaceService {
         comment.setCreated(LocalDateTime.now());
         entityManager.persist(comment);
         return comment;
+    }
+
+    @Transactional
+    public Double ratePlace(PlaceRateRequest placeRateRequest, Long placeId) {
+        var place = entityManager.find(Place.class, placeId);
+        if (place == null) {
+            throw new EntityNotFoundException("Place not found");
+        }
+        entityManager.merge(new PlaceRating(placeRateRequest, placeId));
+        //place.setRating(countTripRating(tripId));
+        //entityManager.merge(trip);
+
+        return null;
     }
 }
