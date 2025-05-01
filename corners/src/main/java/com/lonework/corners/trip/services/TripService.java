@@ -1,9 +1,12 @@
 package com.lonework.corners.trip.services;
 
 import com.lonework.corners.category.model.Category;
+import com.lonework.corners.comment.controller.CommentFacade;
+import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
-import com.lonework.corners.place.model.PlaceListRequest;
+import com.lonework.corners.place.model.DTO.PlaceListRequest;
+import com.lonework.corners.trip.model.TripCommentRequest;
 import com.lonework.corners.trip.model.TripCreateRequest;
 import com.lonework.corners.trip.model.TripRateRequest;
 import com.lonework.corners.trip.model.TripRating;
@@ -36,6 +39,9 @@ public class TripService {
     @Autowired
     PlaceService placeService;
 
+    @Autowired
+    CommentFacade commentFacade;
+
     public Trip crateTrip(TripCreateRequest tripCreateRequest) {
         Trip trip = new Trip(tripCreateRequest);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
@@ -56,7 +62,6 @@ public class TripService {
 
     public Optional<Trip> addPlacesToTrip(PlaceListRequest placeListRequest, Long tripId) {
 
-        System.out.println(placeListRequest.getPlaceIds());
         for (Long placeId : placeListRequest.getPlaceIds()) {
 
 
@@ -90,6 +95,16 @@ public class TripService {
         entityManager.merge(trip);
 
         return trip.getRating();
+    }
+
+
+    public void commentTrip(TripCommentRequest tripCommentRequest, Long tripId) {
+        var trip = entityManager.find(Trip.class, tripId);
+        if (trip == null) {
+            throw new EntityNotFoundException("Trip not found");
+        }
+        var comment = new Comment(tripCommentRequest, trip);
+        commentFacade.createComment(comment);
     }
 
     private Double countTripRating(Long tripId) {

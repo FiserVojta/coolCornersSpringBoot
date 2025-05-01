@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
+import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.trip.model.Trip;
 

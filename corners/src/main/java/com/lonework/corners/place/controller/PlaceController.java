@@ -2,8 +2,7 @@ package com.lonework.corners.place.controller;
 
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.place.model.PlaceDetailResponse;
-import com.lonework.corners.place.model.PlaceRateRequest;
-import com.lonework.corners.trip.model.TripRateRequest;
+import com.lonework.corners.place.model.DTO.PlaceRateRequest;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lonework.corners.place.services.PlaceService;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.comment.model.CommentCreateRequest;
-import com.lonework.corners.place.model.PlaceCreateRequest;
-import com.lonework.corners.place.model.PlaceSearchRequest;
+import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
+import com.lonework.corners.place.model.DTO.PlaceSearchRequest;
 
 @RestController
 @RequestMapping("/places")

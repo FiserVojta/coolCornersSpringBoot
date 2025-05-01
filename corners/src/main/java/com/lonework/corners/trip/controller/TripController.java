@@ -1,7 +1,8 @@
 package com.lonework.corners.trip.controller;
 
-import com.lonework.corners.place.model.PlaceListRequest;
+import com.lonework.corners.place.model.DTO.PlaceListRequest;
 import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.trip.model.TripCommentRequest;
 import com.lonework.corners.trip.model.TripCreateRequest;
 import com.lonework.corners.trip.model.TripDetailResponse;
 import com.lonework.corners.trip.model.TripRateRequest;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -60,5 +60,12 @@ public class TripController {
     public void rateTrip(@RequestBody TripRateRequest tripRateRequest, @PathVariable Long tripId) {
         this.tripService.rateTrip(tripRateRequest, tripId);
         new Response().setMessage("Trip rated successfully");
+    }
+
+    @CrossOrigin(origins = "*")
+    @PatchMapping("/{tripId}/comment")
+    public void commentTrip(@RequestBody TripCommentRequest tripCommentRequest, @PathVariable Long tripId) {
+        this.tripService.commentTrip(tripCommentRequest, tripId);
+        new Response().setMessage("Trip commented successfully");
     }
 }

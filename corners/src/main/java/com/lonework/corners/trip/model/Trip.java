@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import com.lonework.corners.category.model.Category;
+import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.place.model.Place;
 import jakarta.persistence.CascadeType;
@@ -18,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import org.locationtech.jts.geom.Geometry;
 
 
@@ -62,6 +64,11 @@ public class Trip {
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Place> places;
+
+    @OneToMany(mappedBy = "trip")
+    @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    private List<Comment> comments;
 
     private Geometry geometry;
 
@@ -162,5 +169,13 @@ public class Trip {
 
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

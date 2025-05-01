@@ -5,6 +5,7 @@ import com.lonework.corners.place.model.PlaceSimpleResponse;
 import com.lonework.corners.tag.model.Tag;
 import org.geotools.api.feature.simple.SimpleFeature;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,7 +29,7 @@ public record TripDetailResponse(Long id,
                 trip.getRating(),
                 feature,
                 places,
-                null,
+                trip.getComments(),
                 trip.getTags()
         );
     }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.trip.model.TripCommentRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -38,10 +39,10 @@ public class Comment {
     @JsonIgnore
     private Place place;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id")
     @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonIgnore
     private Trip trip;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -50,6 +51,15 @@ public class Comment {
     private Double rating;
 
     public Comment() {
+    }
+
+    public Comment(TripCommentRequest tripCommentRequest, Trip trip) {
+        this.name = tripCommentRequest.createdBy();
+        this.value = tripCommentRequest.value();
+        this.author = tripCommentRequest.createdBy();
+        this.created = LocalDateTime.now();
+        this.rating = null;
+        this.trip = trip;
     }
 
     public String getName() {

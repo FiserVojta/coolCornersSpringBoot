@@ -1,4 +1,4 @@
-package com.lonework.corners.place.model;
+package com.lonework.corners.place.model.DTO;
 
 import java.util.List;
 

@@ -1,6 +1,6 @@
 package com.lonework.corners.place.model;
 
-import com.lonework.corners.trip.model.TripRateRequest;
+import com.lonework.corners.place.model.DTO.PlaceRateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,4 +1,4 @@
-package com.lonework.corners.place.model;
+package com.lonework.corners.place.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.locationtech.jts.geom.Geometry;
