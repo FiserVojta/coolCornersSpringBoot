@@ -38,7 +38,6 @@ public class PlaceService {
 
     public Place getPlaceById(Long id) {
         return entityManager.find(Place.class, id);
-
     }
 
     public PlaceDetailResponse getPlaceResponse(Long id){
