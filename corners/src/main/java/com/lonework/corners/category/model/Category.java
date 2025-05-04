@@ -1,9 +1,13 @@
 package com.lonework.corners.category.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.lonework.corners.event.model.Event;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
@@ -16,11 +20,18 @@ public class Category {
     @Id
     private Long id;
 
+    @Column
     private String name;
 
+    @Column
     private boolean main;
 
+    @Column
     private String title;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private CategoryType categoryType;
 
     @OneToMany(mappedBy = "category")
     @JsonBackReference
@@ -29,6 +40,10 @@ public class Category {
     @OneToMany(mappedBy = "category")
     @JsonBackReference
     private List<Trip> trips = new ArrayList<>();
+
+    @OneToMany(mappedBy = "category")
+    @JsonBackReference
+    private List<Event> events = new ArrayList<>();
 
     public Category() {
     }
@@ -79,5 +94,21 @@ public class Category {
 
     public void setTrips(List<Trip> trips) {
         this.trips = trips;
+    }
+
+    public CategoryType getCategoryType() {
+        return categoryType;
+    }
+
+    public void setCategoryType(CategoryType type) {
+        this.categoryType = type;
+    }
+
+    public List<Event> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<Event> events) {
+        this.events = events;
     }
 }

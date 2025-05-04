@@ -1,11 +1,19 @@
 package com.lonework.corners.event.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.lonework.corners.category.model.Category;
+import com.lonework.corners.common.model.EntityStatus;
 import com.lonework.corners.event.model.DTO.EventCreateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -33,16 +41,44 @@ public class Event {
     @Column
     private String venue;
 
+    @Column
+    private Integer capacity;
+
+    @Column
+    private Integer duration;
+
+    @Column
+    private ZonedDateTime startTime;
+
+    @Column
+    private Double price;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    private Category category;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private EntityStatus entityStatus;
+
     public Event() {
         this.createdAt = ZonedDateTime.now();
     }
 
-    public Event(EventCreateRequest eventCreateRequest){
+    public Event(EventCreateRequest eventCreateRequest, Category category){
         this.name = eventCreateRequest.name();
         this.createdBy = eventCreateRequest.createdBy();
-        this.venue = eventCreateRequest.location();
+        this.venue = eventCreateRequest.venue();
         this.description = eventCreateRequest.description();
         this.createdAt = ZonedDateTime.now();
+        this.capacity = eventCreateRequest.capacity();
+        this.startTime = eventCreateRequest.startTime();
+        this.duration = eventCreateRequest.duration();
+        this.price = eventCreateRequest.price();
+        this.category = category;
+        this.entityStatus = EntityStatus.ACTIVE;
     }
 
     @Override
@@ -103,5 +139,53 @@ public class Event {
 
     public void setVenue(String venue) {
         this.venue = venue;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
+    }
+
+    public ZonedDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(ZonedDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
+    public EntityStatus getEntityStatus() {
+        return entityStatus;
+    }
+
+    public void setEntityStatus(EntityStatus entityStatus) {
+        this.entityStatus = entityStatus;
     }
 }
