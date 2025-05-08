@@ -1,5 +1,6 @@
 package com.lonework.corners.common.controller;
 
+import jakarta.annotation.security.PermitAll;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,11 +10,14 @@ import java.security.Principal;
 
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/public/api/user")
 public class UserController {
 
     @GetMapping("/profile")
+    @PermitAll
     public ResponseEntity<String> profile(Principal principal) {
-        return ResponseEntity.ok("Hello, " + principal.getName());
+        String name = (principal != null) ? principal.getName() : "Guest";
+        return ResponseEntity.ok("Hello, " + name);
     }
+
 }

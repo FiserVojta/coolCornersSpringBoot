@@ -1,8 +1,14 @@
 package com.lonework.corners.place.controller;
 
 import com.lonework.corners.comment.model.Comment;
-import com.lonework.corners.place.model.PlaceDetailResponse;
+import com.lonework.corners.comment.model.CommentCreateRequest;
+import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
 import com.lonework.corners.place.model.DTO.PlaceRateRequest;
+import com.lonework.corners.place.model.DTO.PlaceSearchRequest;
+import com.lonework.corners.place.model.Place;
+import com.lonework.corners.place.model.PlaceDetailResponse;
+import com.lonework.corners.place.services.PlaceService;
+import jakarta.annotation.security.PermitAll;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -15,40 +21,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lonework.corners.place.services.PlaceService;
-import com.lonework.corners.place.model.Place;
-import com.lonework.corners.comment.model.CommentCreateRequest;
-import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
-import com.lonework.corners.place.model.DTO.PlaceSearchRequest;
 
 @RestController
-@RequestMapping("/places")
-public class PlaceController {
+@RequestMapping("/public/places")
+public class PublicPlaceController {
 
     @Autowired
     private PlaceService placeService;
 
-
     @CrossOrigin(origins = "*")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/create")
-    public Place createPlace(@RequestBody PlaceCreateRequest placeRequest) {
-        return placeService.createPlace(placeRequest);
-    }
-
-
-    @CrossOrigin(origins = "*")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{placeId}/comment")
-    public Comment createComment(@RequestBody CommentCreateRequest commentCreateRequest,
-            @PathVariable("placeId") Long placeId) {
-        return placeService.createComment(commentCreateRequest, placeId);
+    @GetMapping("/{id}")
+    @PermitAll
+    public PlaceDetailResponse getPlaceById(@PathVariable("id") Long id) {
+        return this.placeService.getPlaceResponse(id);
     }
 
     @CrossOrigin(origins = "*")
-    @PatchMapping("/{placeId}/rate")
-    public void rateTrip(@RequestBody PlaceRateRequest placeRateRequest, @PathVariable Long placeId) {
-        this.placeService.ratePlace(placeRateRequest, placeId);
-        new Response().setMessage("Trip rated successfully");
+    @GetMapping()
+    @PermitAll
+    public Iterable<Place> fetchPlace(PlaceSearchRequest placeSearchRequest) {
+        return placeService.findPlacesByParameters(placeSearchRequest);
+
     }
+
 
 //    @CrossOrigin(origins = "/v1/*")
 //    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")

@@ -8,6 +8,7 @@ import com.lonework.corners.trip.model.TripDetailResponse;
 import com.lonework.corners.trip.model.TripRateRequest;
 import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.trip.services.TripService;
+import jakarta.annotation.security.RolesAllowed;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,7 +25,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/trip")
+@RequestMapping("/trips")
 public class TripController {
 
     @Autowired
@@ -37,22 +38,10 @@ public class TripController {
     }
 
     @CrossOrigin(origins = "*")
-    @GetMapping("/{id}")
-    public TripDetailResponse findTripById(@PathVariable Long id) {
-        return this.tripService.findTripById(id);
-    }
-
-    @CrossOrigin(origins = "*")
     @PostMapping("/add-places/{id}")
     public Optional<Trip> addPlacesToTrip(@RequestBody PlaceListRequest placeListRequest, @PathVariable Long id) {
 
         return this.tripService.addPlacesToTrip(placeListRequest, id);
-    }
-
-    @CrossOrigin(origins = "*")
-    @GetMapping("/find")
-    public Iterable<Trip> findTrip(@ModelAttribute TripSearchRequest tripSearchRequest) {
-        return this.tripService.findTripByParameters(tripSearchRequest);
     }
 
     @CrossOrigin(origins = "*")
