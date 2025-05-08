@@ -2,6 +2,7 @@ package com.lonework.corners.category.controller;
 
 import com.lonework.corners.category.model.CategorySearchParameters;
 import com.lonework.corners.place.model.DTO.PlaceSearchRequest;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +13,7 @@ import com.lonework.corners.category.model.Category;
 import com.lonework.corners.category.services.CategoryService;
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/public/categories")
 public class CategoryController {
 
     @Autowired
@@ -20,6 +21,7 @@ public class CategoryController {
 
     @CrossOrigin(origins = "*")
     @GetMapping("")
+    @PermitAll
     public Iterable<Category> getPlaceById(CategorySearchParameters categorySearchParameters) {
         return CategoryService.getAllCategories(categorySearchParameters);
     }

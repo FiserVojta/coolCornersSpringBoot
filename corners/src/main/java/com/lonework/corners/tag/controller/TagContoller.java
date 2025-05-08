@@ -2,6 +2,7 @@ package com.lonework.corners.tag.controller;
 
 import java.util.List;
 
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ import com.lonework.corners.tag.model.TagSearchRequest;
 import com.lonework.corners.tag.services.TagService;
 
 @RestController
-@RequestMapping("/tag")
+@RequestMapping("/public/tags")
 public class TagContoller {
 
     @Autowired
@@ -37,6 +38,7 @@ public class TagContoller {
 
     @CrossOrigin(origins = "*")
     @GetMapping("")
+    @PermitAll
     public List<Tag> getAllTags() {
         return this.tagService.getAllTags();
     }
