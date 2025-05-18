@@ -11,6 +11,8 @@ import com.lonework.corners.trip.services.TripService;
 import jakarta.annotation.security.RolesAllowed;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -34,7 +36,13 @@ public class TripController {
     @CrossOrigin(origins = "*")
     @PostMapping("")
     public Trip createTrip(@RequestBody TripCreateRequest tripRequest) {
-        return tripService.crateTrip(tripRequest);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            String email = jwt.getClaimAsString("email");
+            return tripService.crateTrip(tripRequest, email);
+        }
+        throw new RuntimeException("JWT token not found or invalid");
+
     }
 
     @CrossOrigin(origins = "*")

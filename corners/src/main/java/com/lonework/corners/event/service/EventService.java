@@ -22,16 +22,16 @@ public class EventService {
     EntityManager entityManager;
 
     @Transactional
-   public Event createEvent(EventCreateRequest eventCreateRequest){
+   public Event createEvent(EventCreateRequest eventCreateRequest, String createdBy){
         var category = entityManager.find(com.lonework.corners.category.model.Category.class, eventCreateRequest.categoryId());
-         Event event = new Event(eventCreateRequest, category);
+         Event event = new Event(eventCreateRequest, category, createdBy);
          return entityManager.merge(event);
    }
 
     @Transactional
     public Event updatedEvent(EventCreateRequest eventCreateRequest, Long id){
         var category = entityManager.find(com.lonework.corners.category.model.Category.class, eventCreateRequest.categoryId());
-        Event event = new Event(eventCreateRequest, category);
+        Event event = new Event(eventCreateRequest, category, eventCreateRequest.createdBy());
         event.setId(id);
         return entityManager.merge(event);
     }

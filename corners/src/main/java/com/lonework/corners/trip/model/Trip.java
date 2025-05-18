@@ -48,6 +48,8 @@ public class Trip {
 
     private String creator;
 
+    private String createdBy;
+
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "trip_has_tag",
             joinColumns = @JoinColumn(name = "trip_id"),
@@ -75,7 +77,7 @@ public class Trip {
     public Trip() {
     }
 
-    public Trip(TripCreateRequest tripCreateRequest){
+    public Trip(TripCreateRequest tripCreateRequest, String createdBy){
         this.geometry = tripCreateRequest.getGeometry();
         this.name = tripCreateRequest.getName();
         this.duration = tripCreateRequest.getDuration();

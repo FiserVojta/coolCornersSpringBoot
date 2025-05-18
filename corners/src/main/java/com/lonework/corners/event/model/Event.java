@@ -67,9 +67,9 @@ public class Event {
         this.createdAt = ZonedDateTime.now();
     }
 
-    public Event(EventCreateRequest eventCreateRequest, Category category){
+    public Event(EventCreateRequest eventCreateRequest, Category category, String createdBy){
         this.name = eventCreateRequest.name();
-        this.createdBy = eventCreateRequest.createdBy();
+        this.createdBy = createdBy;
         this.venue = eventCreateRequest.venue();
         this.description = eventCreateRequest.description();
         this.createdAt = ZonedDateTime.now();

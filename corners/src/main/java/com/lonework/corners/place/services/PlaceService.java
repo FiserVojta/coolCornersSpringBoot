@@ -2,14 +2,14 @@ package com.lonework.corners.place.services;
 
 import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
-import com.lonework.corners.place.model.Place;
 import com.lonework.corners.comment.model.CommentCreateRequest;
+import com.lonework.corners.common.model.FeatureTypeClass;
 import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
 import com.lonework.corners.place.model.DTO.PlaceRateRequest;
-import com.lonework.corners.place.model.PlaceRating;
 import com.lonework.corners.place.model.DTO.PlaceSearchRequest;
+import com.lonework.corners.place.model.Place;
 import com.lonework.corners.place.model.PlaceDetailResponse;
-import com.lonework.corners.common.model.FeatureTypeClass;
+import com.lonework.corners.place.model.PlaceRating;
 import com.lonework.corners.tag.model.Tag;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -40,16 +40,15 @@ public class PlaceService {
         return entityManager.find(Place.class, id);
     }
 
-    public PlaceDetailResponse getPlaceResponse(Long id){
+    public PlaceDetailResponse getPlaceResponse(Long id) {
         var place = getPlaceById(id);
-        return
-                new PlaceDetailResponse(
-                        place,
-                        getPlaceFeature(place)
-                );
+        return new PlaceDetailResponse(
+                place,
+                getPlaceFeature(place)
+        );
     }
 
-    public SimpleFeature getPlaceFeature(Place place){
+    public SimpleFeature getPlaceFeature(Place place) {
         SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureTypeClass.placeFeatureType());
         featureBuilder.set("name", place.getName());
         featureBuilder.set("id", place.getId().toString());
@@ -70,7 +69,7 @@ public class PlaceService {
             }
             categoryPredicate = criteriaBuilder.and(categoryPredicate, categoryInClause);
         }
-        if(placeSearchRequest.getTags() != null && !placeSearchRequest.getTags().isEmpty()){
+        if (placeSearchRequest.getTags() != null && !placeSearchRequest.getTags().isEmpty()) {
             CriteriaBuilder.In<Long> tagsInClause = criteriaBuilder.in(root.join("tags").get("id")); // Assuming "tags" is a field name
             for (Long tagId : placeSearchRequest.getTags()) {
                 tagsInClause = tagsInClause.value(tagId);
@@ -84,9 +83,9 @@ public class PlaceService {
     }
 
     @Transactional
-    public Place createPlace(PlaceCreateRequest placeRequest) {
+    public Place createPlace(PlaceCreateRequest placeRequest, String email) {
         placeRequest.getGeometry().setSRID(4326);
-        Place place = new Place(placeRequest);
+        Place place = new Place(placeRequest, email);
         place.setCategory(entityManager.find(Category.class, placeRequest.getCategoryId()));
         place.setTags(entityManager.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class)
                 .setParameter("ids", placeRequest.getTags())
@@ -96,7 +95,21 @@ public class PlaceService {
     }
 
     @Transactional
-    public Comment createComment(CommentCreateRequest request, long placeId) {
+    public Place updatePlace(PlaceCreateRequest placeRequest, String email, Long placeId) {
+        placeRequest.getGeometry().setSRID(4326);
+        Place place = new Place(placeRequest, email);
+        place.setId(placeId);
+        place.setCategory(entityManager.find(Category.class, placeRequest.getCategoryId()));
+        place.setTags(entityManager.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class)
+                .setParameter("ids", placeRequest.getTags())
+                .getResultList());
+        entityManager.merge(place);
+        return null;
+    }
+
+
+    @Transactional
+    public Comment commentPlace(CommentCreateRequest request, long placeId) {
         Comment comment = new Comment();
         comment.setAuthor(request.getAuthor());
         comment.setName(request.getName());

@@ -38,7 +38,6 @@ public class TagContoller {
 
     @CrossOrigin(origins = "*")
     @GetMapping("")
-    @PermitAll
     public List<Tag> getAllTags() {
         return this.tagService.getAllTags();
     }

@@ -1,5 +1,6 @@
 package com.lonework.corners.place.model;
 
+import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.tag.model.Tag;
 import org.geotools.api.feature.simple.SimpleFeature;
@@ -16,8 +17,9 @@ public record PlaceDetailResponse(
         Double rating,
         SimpleFeature feature,
         String openingHours,
-        List<Tag>   tags,
-        List<Comment> comments
+        List<Tag> tags,
+        List<Comment> comments,
+        Category category
 ) {
 
     public PlaceDetailResponse(Place place, SimpleFeature feature) {
@@ -31,7 +33,8 @@ public record PlaceDetailResponse(
                 feature,
                 place.getOpeningHours(),
                 place.getTags(),
-                place.getComments()
+                place.getComments(),
+                place.getCategory()
         );
     }
 }

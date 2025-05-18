@@ -54,6 +54,9 @@ public class Place {
     @Column
     private String image;
 
+    @Column
+    private String createdBy;
+
     @OneToMany(mappedBy = "place")
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
@@ -83,7 +86,7 @@ public class Place {
     public Place() {
     }
 
-    public Place(PlaceCreateRequest placeRequest) {
+    public Place(PlaceCreateRequest placeRequest, String createdBy) {
         this.name = placeRequest.getName();
         this.description = placeRequest.getDescription();
         this.openingHours = placeRequest.getOpeningHours();
@@ -91,6 +94,7 @@ public class Place {
         this.image = placeRequest.getImage();
         this.phoneNumber = placeRequest.getPhoneNumber();
         this.geometry = placeRequest.getGeometry();
+        this.createdBy = createdBy;
     }
 
     public Long getId() {
@@ -189,6 +193,14 @@ public class Place {
         this.geometry = geometry;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {return true;}
@@ -196,7 +208,8 @@ public class Place {
         return Objects.equals(id, place.id) && Objects.equals(name, place.name) && Objects.equals(description, place.description)
                 && Objects.equals(phoneNumber, place.phoneNumber) && Objects.equals(price, place.price) && Objects.equals(openingHours,
                 place.openingHours) && Objects.equals(image, place.image) && Objects.equals(comments, place.comments) && Objects.equals(category,
-                place.category) && Objects.equals(tags, place.tags) && Objects.equals(trips, place.trips) && Objects.equals(geometry, place.geometry);
+                place.category) && Objects.equals(tags, place.tags) && Objects.equals(trips, place.trips) && Objects.equals(geometry, place.geometry)
+                && Objects.equals(createdBy, place.createdBy);
     }
 
     @Override
@@ -219,6 +232,7 @@ public class Place {
                 .add("tags=" + tags)
                 .add("trips=" + trips)
                 .add("geometry=" + geometry)
+                .add("createdBy=" + createdBy)
                 .toString();
     }
 }

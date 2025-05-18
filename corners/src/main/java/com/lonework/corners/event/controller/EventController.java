@@ -4,9 +4,12 @@ import com.lonework.corners.event.model.DTO.EventCreateRequest;
 import com.lonework.corners.event.model.Event;
 import com.lonework.corners.event.model.EventSearchParameters;
 import com.lonework.corners.event.service.EventService;
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +31,15 @@ public class EventController {
 
     @CrossOrigin(origins = "*")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
+    @PermitAll
     public Event createEvent(@RequestBody EventCreateRequest eventCreateRequest) {
-        return eventService.createEvent(eventCreateRequest);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            String email = jwt.getClaimAsString("email");
+            return eventService.createEvent(eventCreateRequest, email);
+        }
+
+        throw new RuntimeException("JWT token not found or invalid");
     }
 
     @CrossOrigin(origins = "*")
