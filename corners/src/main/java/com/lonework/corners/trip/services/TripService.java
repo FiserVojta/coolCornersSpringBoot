@@ -98,12 +98,12 @@ public class TripService {
     }
 
 
-    public void commentTrip(TripCommentRequest tripCommentRequest, Long tripId) {
+    public void commentTrip(TripCommentRequest tripCommentRequest, Long tripId, String createBy) {
         var trip = entityManager.find(Trip.class, tripId);
         if (trip == null) {
             throw new EntityNotFoundException("Trip not found");
         }
-        var comment = new Comment(tripCommentRequest, trip);
+        var comment = new Comment(tripCommentRequest, trip, createBy);
         commentFacade.createComment(comment);
     }
 

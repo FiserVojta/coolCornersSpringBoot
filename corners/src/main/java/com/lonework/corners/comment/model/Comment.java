@@ -53,10 +53,10 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(TripCommentRequest tripCommentRequest, Trip trip) {
-        this.name = tripCommentRequest.createdBy();
+    public Comment(TripCommentRequest tripCommentRequest, Trip trip, String createdBy) {
+        this.name = createdBy;
         this.value = tripCommentRequest.value();
-        this.author = tripCommentRequest.createdBy();
+        this.author = createdBy;
         this.created = LocalDateTime.now();
         this.rating = null;
         this.trip = trip;

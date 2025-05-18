@@ -58,7 +58,14 @@ public class PlaceController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{placeId}/comment")
     public Comment commentPlace(@RequestBody CommentCreateRequest commentCreateRequest,
             @PathVariable("placeId") Long placeId) {
-        return placeService.commentPlace(commentCreateRequest, placeId);
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            String email = jwt.getClaimAsString("email");
+            return placeService.commentPlace(commentCreateRequest, placeId, email);
+        }
+
+        throw new RuntimeException("JWT token not found or invalid");
+
     }
 
     @CrossOrigin(origins = "*")

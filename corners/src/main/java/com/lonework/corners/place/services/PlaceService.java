@@ -109,12 +109,11 @@ public class PlaceService {
 
 
     @Transactional
-    public Comment commentPlace(CommentCreateRequest request, long placeId) {
+    public Comment commentPlace(CommentCreateRequest request, long placeId, String email) {
         Comment comment = new Comment();
-        comment.setAuthor(request.getAuthor());
-        comment.setName(request.getName());
+        comment.setAuthor(email);
         comment.setTitle(request.getTitle());
-        comment.setName(request.getName());
+        comment.setName(email);
         comment.setValue(request.getValue());
         comment.setPlace(entityManager.find(Place.class, placeId));
         comment.setCreated(LocalDateTime.now());

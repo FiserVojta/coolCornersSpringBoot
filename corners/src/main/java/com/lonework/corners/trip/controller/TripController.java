@@ -62,7 +62,12 @@ public class TripController {
     @CrossOrigin(origins = "*")
     @PatchMapping("/{tripId}/comment")
     public void commentTrip(@RequestBody TripCommentRequest tripCommentRequest, @PathVariable Long tripId) {
-        this.tripService.commentTrip(tripCommentRequest, tripId);
-        new Response().setMessage("Trip commented successfully");
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            String email = jwt.getClaimAsString("email");
+            this.tripService.commentTrip(tripCommentRequest, tripId, email);
+            return;
+        }
+        throw new RuntimeException("JWT token not found or invalid");
     }
 }
