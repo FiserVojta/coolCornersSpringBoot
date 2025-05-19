@@ -8,7 +8,7 @@ import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,14 +32,9 @@ public class EventController {
     @CrossOrigin(origins = "*")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
     @PermitAll
-    public Event createEvent(@RequestBody EventCreateRequest eventCreateRequest) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.getPrincipal() instanceof Jwt jwt) {
-            String email = jwt.getClaimAsString("email");
-            return eventService.createEvent(eventCreateRequest, email);
-        }
+    public Event createEvent(@RequestBody EventCreateRequest eventCreateRequest, @AuthenticationPrincipal Jwt jwt) {
+        return eventService.createEvent(eventCreateRequest, jwt.getClaimAsString("email"));
 
-        throw new RuntimeException("JWT token not found or invalid");
     }
 
     @CrossOrigin(origins = "*")
