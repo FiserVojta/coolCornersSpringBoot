@@ -30,14 +30,6 @@ public class WanderPublicController {
     @Inject
     WanderService wanderService;
 
-    @CrossOrigin(origins = "*")
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
-    @PermitAll
-    public ResponseEntity<Wander> createWander(@RequestBody WanderCreateRequest wanderCreateRequest) {
-
-        return ResponseEntity.ok(wanderService.createWander(wanderCreateRequest, "test"));
-    }
-
     @GetMapping("/{id}")
     @PermitAll
     public ResponseEntity<Wander> getWander(@PathVariable("id") Long id) {

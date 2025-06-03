@@ -2,6 +2,7 @@ package com.lonework.corners.wander.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
@@ -13,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -30,15 +32,23 @@ public class WanderPart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToMany(mappedBy = "wanderparts", cascade = CascadeType.PERSIST)
-    @JsonBackReference
+    @ManyToMany
+    @JoinTable(name = "wanderpart_place",
+            joinColumns = @JoinColumn(name = "wanderpart_id"),
+            inverseJoinColumns = @JoinColumn(name = "place_id"))
+    @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Place> places = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "wanderparts", cascade = CascadeType.PERSIST)
-    @JsonBackReference
+    @ManyToMany
+    @JoinTable(name = "wanderpart_trip",
+            joinColumns = @JoinColumn(name = "wanderpart_id"),
+            inverseJoinColumns = @JoinColumn(name = "trip_id"))
+    @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Trip> trips = new ArrayList<>();
 
-    @Column
+    @Column(name = "\"order\"")
     private Integer order;
 
     @ManyToOne(fetch = FetchType.LAZY)

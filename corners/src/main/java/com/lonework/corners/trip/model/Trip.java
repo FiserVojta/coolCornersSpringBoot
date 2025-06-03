@@ -3,6 +3,7 @@ package com.lonework.corners.trip.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -59,10 +60,8 @@ public class Trip {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
-    @JoinTable(name = "trip_has_wanderpart", joinColumns = @JoinColumn(name = "trip_id"), inverseJoinColumns = @JoinColumn(name = "wanderpart_id"))
-    @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @ManyToMany(mappedBy = "trips")
+    @JsonBackReference
     private List<WanderPart> wanderparts = new ArrayList<>();
 
 
