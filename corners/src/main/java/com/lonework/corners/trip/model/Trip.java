@@ -10,6 +10,7 @@ import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.place.model.Place;
+import com.lonework.corners.wander.model.WanderPart;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -57,6 +58,12 @@ public class Trip {
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private List<Tag> tags = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "trip_has_wanderpart", joinColumns = @JoinColumn(name = "trip_id"), inverseJoinColumns = @JoinColumn(name = "wanderpart_id"))
+    @JsonManagedReference
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    private List<WanderPart> wanderparts = new ArrayList<>();
 
 
     @ManyToMany(cascade = CascadeType.PERSIST)

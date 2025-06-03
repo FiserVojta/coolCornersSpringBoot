@@ -8,6 +8,7 @@ import com.lonework.corners.place.model.Place;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.wander.model.Wander;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,12 +35,20 @@ public class Tag {
     @JsonBackReference
     private Set<Trip> trips = new HashSet<>();
 
+    @ManyToMany(mappedBy = "tags", cascade = CascadeType.PERSIST)
+    @JsonBackReference
+    private Set<Wander> wanders = new HashSet<>();
+
     public Tag() {
     }
 
     public Tag(TagCreateRequest tagCreateRequest) {
         this.name = tagCreateRequest.getName();
         this.creator = tagCreateRequest.getCreator();
+    }
+
+    public Tag(Long id) {
+        this.id = id;
     }
 
     public Tag(Long id, String name, String title, String value, String creator, Set<Place> places) {

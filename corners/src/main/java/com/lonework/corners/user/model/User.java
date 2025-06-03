@@ -27,7 +27,14 @@ public class User {
     @Column(name = "created_at")
     private ZonedDateTime createdAt = ZonedDateTime.now();
 
-    // --- Getters and Setters ---
+
+    public User() {
+    }
+
+
+    public User(Long id) {
+        this.id = id;
+    }
 
     public Long getId() {
         return id;

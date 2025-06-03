@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.lonework.corners.event.model.Event;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.wander.model.Wander;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -43,10 +44,19 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     @JsonBackReference
+    private List<Wander> wanders = new ArrayList<>();
+
+    @OneToMany(mappedBy = "category")
+    @JsonBackReference
     private List<Event> events = new ArrayList<>();
 
     public Category() {
     }
+
+    public Category(Long id) {
+        this.id = id;
+    }
+
 
     public String getName() {
         return name;
