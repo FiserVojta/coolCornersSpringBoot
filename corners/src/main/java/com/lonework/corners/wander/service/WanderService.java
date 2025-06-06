@@ -274,6 +274,73 @@ public class WanderService {
     }
     
     /**
+     * Add a user to a wander as a wanderer
+     */
+    @Transactional
+    public Wander joinWander(Long wanderId, String userEmail) {
+        // Find the wander
+        Wander wander = entityManager.find(Wander.class, wanderId);
+        if (wander == null) {
+            throw new EntityNotFoundException("Wander not found with id: " + wanderId);
+        }
+        
+        // Find the user
+        User user = userService.getUser(userEmail);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found with email: " + userEmail);
+        }
+        
+        // Check if user is already a wanderer
+        if (wander.getWanderers() != null && wander.getWanderers().contains(user)) {
+            throw new IllegalStateException("User is already a wanderer of this wander");
+        }
+        
+        // Check capacity if set
+        if (wander.getCapacity() != null && wander.getWanderers() != null 
+                && wander.getWanderers().size() >= wander.getCapacity()) {
+            throw new IllegalStateException("Wander has reached its capacity");
+        }
+        
+        // Add user to wanderers
+        if (wander.getWanderers() == null) {
+            wander.setWanderers(new ArrayList<>());
+        }
+        wander.getWanderers().add(user);
+        
+        // Save and return
+        return entityManager.merge(wander);
+    }
+    
+    /**
+     * Remove a user from a wander
+     */
+    @Transactional
+    public Wander leaveWander(Long wanderId, String userEmail) {
+        // Find the wander
+        Wander wander = entityManager.find(Wander.class, wanderId);
+        if (wander == null) {
+            throw new EntityNotFoundException("Wander not found with id: " + wanderId);
+        }
+        
+        // Find the user
+        User user = userService.getUser(userEmail);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found with email: " + userEmail);
+        }
+        
+        // Check if user is a wanderer
+        if (wander.getWanderers() == null || !wander.getWanderers().contains(user)) {
+            throw new IllegalStateException("User is not a wanderer of this wander");
+        }
+        
+        // Remove user from wanderers
+        wander.getWanderers().remove(user);
+        
+        // Save and return
+        return entityManager.merge(wander);
+    }
+    
+    /**
      * Delete a wander
      */
     @Transactional

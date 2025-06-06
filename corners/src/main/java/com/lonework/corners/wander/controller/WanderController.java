@@ -7,10 +7,9 @@ import jakarta.inject.Inject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -22,8 +21,40 @@ public class WanderController {
 
     @PostMapping("")
     public ResponseEntity<Wander> createWander(@RequestBody WanderCreateRequest wanderCreateRequest, @AuthenticationPrincipal Jwt jwt) {
-
         return ResponseEntity.ok(wanderService.createWander(wanderCreateRequest, jwt.getClaimAsString("email")));
     }
-
+    
+    @GetMapping("")
+    public ResponseEntity<List<Wander>> getAllWanders() {
+        return ResponseEntity.ok(wanderService.getAllWanders());
+    }
+    
+    @GetMapping("/{wanderId}")
+    public ResponseEntity<Wander> getWander(@PathVariable Long wanderId) {
+        return ResponseEntity.ok(wanderService.getWander(wanderId));
+    }
+    
+    @PutMapping("/{wanderId}")
+    public ResponseEntity<Wander> updateWander(
+            @PathVariable Long wanderId,
+            @RequestBody WanderCreateRequest wanderCreateRequest,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(wanderService.updateWander(wanderId, wanderCreateRequest, jwt.getClaimAsString("email")));
+    }
+    
+    @PostMapping("/{wanderId}/join")
+    public ResponseEntity<Wander> joinWander(@PathVariable Long wanderId, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(wanderService.joinWander(wanderId, jwt.getClaimAsString("email")));
+    }
+    
+    @PostMapping("/{wanderId}/leave")
+    public ResponseEntity<Wander> leaveWander(@PathVariable Long wanderId, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(wanderService.leaveWander(wanderId, jwt.getClaimAsString("email")));
+    }
+    
+    @DeleteMapping("/{wanderId}")
+    public ResponseEntity<Void> deleteWander(@PathVariable Long wanderId) {
+        wanderService.deleteWander(wanderId);
+        return ResponseEntity.noContent().build();
+    }
 }
