@@ -175,47 +175,71 @@ public class WanderService {
                 throw new EntityNotFoundException("Category not found with id: " + wanderCreateRequest.category());
             }
             existingWander.setCategory(category);
+        } else {
+            existingWander.setCategory(null);
         }
         
         // Update tags
-        if (wanderCreateRequest.tags() != null) {
+        if (wanderCreateRequest.tags() != null && !wanderCreateRequest.tags().isEmpty()) {
             List<Tag> tags = entityManager.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class)
                     .setParameter("ids", wanderCreateRequest.tags())
                     .getResultList();
+            
+            if (tags.size() != wanderCreateRequest.tags().size()) {
+                throw new EntityNotFoundException("Some tags were not found");
+            }
             existingWander.setTags(tags);
+        } else {
+            existingWander.setTags(new ArrayList<>());
         }
         
         // Update wanderers
-        if (wanderCreateRequest.wanderers() != null) {
+        if (wanderCreateRequest.wanderers() != null && !wanderCreateRequest.wanderers().isEmpty()) {
             List<User> wanderers = entityManager.createQuery("SELECT u FROM User u WHERE u.id IN :ids", User.class)
                     .setParameter("ids", wanderCreateRequest.wanderers())
                     .getResultList();
+            
+            if (wanderers.size() != wanderCreateRequest.wanderers().size()) {
+                throw new EntityNotFoundException("Some wanderers were not found");
+            }
             existingWander.setWanderers(wanderers);
+        } else {
+            existingWander.setWanderers(new ArrayList<>());
         }
         
         // Update wander parts - remove old ones and add new ones
         // First, remove existing wander parts
-        if (existingWander.getWanderParts() != null) {
-            for (WanderPart oldPart : existingWander.getWanderParts()) {
-                entityManager.remove(oldPart);
-            }
+        if (existingWander.getWanderParts() != null && !existingWander.getWanderParts().isEmpty()) {
+            // Remove the association from the wander_has_parts table
+            entityManager.createQuery("DELETE FROM WanderPart wp WHERE wp.wander.id = :wanderId")
+                    .setParameter("wanderId", wanderId)
+                    .executeUpdate();
         }
         
-        // Create new wander parts
+        // Merge the wander to update basic properties
+        existingWander = entityManager.merge(existingWander);
+        entityManager.flush();
+        
+        // Create new wander parts if provided
         if (wanderCreateRequest.wanderParts() != null && !wanderCreateRequest.wanderParts().isEmpty()) {
             List<WanderPart> newWanderParts = new ArrayList<>();
             
             for (WanderCreateRequest.WanderPartCreateRequest partRequest : wanderCreateRequest.wanderParts()) {
                 WanderPart wanderPart = new WanderPart();
                 wanderPart.setOrder(partRequest.order());
-                wanderPart.setWander(existingWander);
                 
                 // Set places
                 if (partRequest.places() != null && !partRequest.places().isEmpty()) {
                     List<Place> places = entityManager.createQuery("SELECT p FROM Place p WHERE p.id IN :ids", Place.class)
                             .setParameter("ids", partRequest.places())
                             .getResultList();
+                    
+                    if (places.size() != partRequest.places().size()) {
+                        throw new EntityNotFoundException("Some places were not found for wander part");
+                    }
                     wanderPart.setPlaces(places);
+                } else {
+                    wanderPart.setPlaces(new ArrayList<>());
                 }
                 
                 // Set trips
@@ -223,9 +247,19 @@ public class WanderService {
                     List<Trip> trips = entityManager.createQuery("SELECT t FROM Trip t WHERE t.id IN :ids", Trip.class)
                             .setParameter("ids", partRequest.trips())
                             .getResultList();
+                    
+                    if (trips.size() != partRequest.trips().size()) {
+                        throw new EntityNotFoundException("Some trips were not found for wander part");
+                    }
                     wanderPart.setTrips(trips);
+                } else {
+                    wanderPart.setTrips(new ArrayList<>());
                 }
                 
+                // Set the wander reference
+                wanderPart.setWander(existingWander);
+                
+                // Persist the new wander part
                 entityManager.persist(wanderPart);
                 newWanderParts.add(wanderPart);
             }
@@ -235,6 +269,7 @@ public class WanderService {
             existingWander.setWanderParts(new ArrayList<>());
         }
         
+        // Final merge to ensure all relationships are updated
         return entityManager.merge(existingWander);
     }
     
