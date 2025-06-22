@@ -2,6 +2,8 @@ package com.lonework.corners.user.service;
 
 
 import com.lonework.corners.user.model.User;
+import com.lonework.corners.user.model.UserDetailResponse;
+import com.lonework.corners.user.model.UserListlResponse;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 
 @Service
@@ -27,6 +30,24 @@ public class UserService {
                 .findFirst()
                 .orElse(null);
     }
+
+    public UserDetailResponse getUserDetail(String email){
+        return entityManager.createQuery("select u from User u where u.email = :email", User.class)
+                .setParameter("email", email)
+                .getResultList()
+                .stream()
+                .findFirst()
+                .map(UserDetailResponse::new)
+                .orElse(null);
+    }
+
+    public List<UserListlResponse> getUserList(){
+        return entityManager.createQuery("select u from User u", User.class)
+                .getResultStream()
+                .map(UserListlResponse::new)
+                .toList();
+    }
+
 
     public void ensureUserExists(String keycloakId, String email, String name) {
         entityManager.createQuery("select u from User u where u.keycloakId = :keycloakId", User.class)
