@@ -1,8 +1,21 @@
 package com.lonework.corners.user.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.lonework.corners.wander.model.Wander;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 
 @Entity
@@ -26,6 +39,10 @@ public class User {
 
     @Column(name = "created_at")
     private ZonedDateTime createdAt = ZonedDateTime.now();
+
+    @ManyToMany(mappedBy = "wanderers", cascade = CascadeType.PERSIST)
+    @JsonBackReference
+    private List<Wander> wanders = new ArrayList<>();
 
 
     public User() {
@@ -82,6 +99,14 @@ public class User {
 
     public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<Wander> getWanders() {
+        return wanders;
+    }
+
+    public void setWanders(List<Wander> wanders) {
+        this.wanders = wanders;
     }
 
     @Override
