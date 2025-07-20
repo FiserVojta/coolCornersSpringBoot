@@ -3,7 +3,8 @@ package com.lonework.corners.user.service;
 
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
-import com.lonework.corners.user.model.UserListlResponse;
+import com.lonework.corners.user.model.UserListResponse;
+import com.lonework.corners.wander.controller.WanderFacade;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -22,7 +23,10 @@ public class UserService {
     @Inject
     EntityManager entityManager;
 
-    public User getUser(String email){
+    @Inject
+    WanderFacade wanderFacade;
+
+    public User getUser(String email) {
         return entityManager.createQuery("select u from User u where u.email = :email", User.class)
                 .setParameter("email", email)
                 .getResultList()
@@ -31,20 +35,18 @@ public class UserService {
                 .orElse(null);
     }
 
-    public UserDetailResponse getUserDetail(String email){
-        return entityManager.createQuery("select u from User u where u.email = :email", User.class)
+    public UserDetailResponse getUserDetail(String email) {
+        var user = entityManager.createQuery("select u from User u where u.email = :email", User.class)
                 .setParameter("email", email)
-                .getResultList()
-                .stream()
-                .findFirst()
-                .map(UserDetailResponse::new)
-                .orElse(null);
+                .getSingleResult();
+
+        return new UserDetailResponse(user, wanderFacade.getWanderListResponse(user.getWanders()));
     }
 
-    public List<UserListlResponse> getUserList(){
+    public List<UserListResponse> getUserList() {
         return entityManager.createQuery("select u from User u", User.class)
                 .getResultStream()
-                .map(UserListlResponse::new)
+                .map(UserListResponse::new)
                 .toList();
     }
 

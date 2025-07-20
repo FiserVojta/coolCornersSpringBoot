@@ -8,6 +8,7 @@ import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.service.UserService;
 import com.lonework.corners.wander.model.Wander;
 import com.lonework.corners.wander.model.WanderCreateRequest;
+import com.lonework.corners.wander.model.WanderListResponse;
 import com.lonework.corners.wander.model.WanderPart;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -28,7 +29,7 @@ public class WanderService {
     @Inject
     EntityManager entityManager;
     
-    @Autowired
+    @Inject
     UserService userService;
 
     public Wander createWander(WanderCreateRequest wanderCreateRequest, String createdBy) {
@@ -358,5 +359,14 @@ public class WanderService {
         }
         
         entityManager.remove(wander);
+    }
+
+    public List<WanderListResponse> getWanderListResponse(List<Wander> wanders) {
+        List<WanderListResponse> wanderListResponses = new ArrayList<>();
+        for (Wander wander : wanders) {
+            WanderListResponse wanderListResponse = new WanderListResponse(wander);
+            wanderListResponses.add(wanderListResponse);
+        }
+        return wanderListResponses;
     }
 }

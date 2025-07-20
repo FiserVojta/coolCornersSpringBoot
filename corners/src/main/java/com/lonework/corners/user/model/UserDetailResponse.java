@@ -1,9 +1,9 @@
 package com.lonework.corners.user.model;
 
 import com.lonework.corners.wander.model.Wander;
+import com.lonework.corners.wander.model.WanderListResponse;
 
 import java.util.List;
-import java.util.Set;
 
 
 public record UserDetailResponse(
@@ -14,9 +14,9 @@ public record UserDetailResponse(
         String createdAt,
         String discordId,
         Integer rating,
-        List<Wander> wanderList
+        List<WanderListResponse> wanderList
 ) {
-    public UserDetailResponse(User user) {
+    public UserDetailResponse(User user, List<WanderListResponse> wanderList) {
         this(
                 user.getId(),
                 user.getEmail(),
@@ -25,7 +25,7 @@ public record UserDetailResponse(
                 user.getCreatedAt().toString(),
                 null,
                 null,
-                user.getWanders()
+                wanderList
         );
     }
 }

@@ -1,13 +1,13 @@
 package com.lonework.corners.user.model;
 
-public record UserListlResponse(
+public record UserListResponse(
         Long id,
         String email,
         String name,
         String displayName,
         Integer rating
 ) {
-    public UserListlResponse(User user) {
+    public UserListResponse(User user) {
         this(
                 user.getId(),
                 user.getEmail(),
