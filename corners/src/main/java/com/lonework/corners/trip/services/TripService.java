@@ -3,6 +3,8 @@ package com.lonework.corners.trip.services;
 import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.controller.CommentFacade;
 import com.lonework.corners.comment.model.Comment;
+import com.lonework.corners.common.model.PagedResult;
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.place.model.DTO.PlaceListRequest;
@@ -69,7 +71,7 @@ public class TripService {
         return Optional.ofNullable(entityManager.find(Trip.class, tripId));
     }
 
-    public Iterable<Trip> findTripByParameters(TripSearchRequest tripSearchRequest) {
+    public PagedResult<Trip> findTripByParameters(TripSearchRequest tripSearchRequest, PagingQueryParams pagingQueryParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Trip> cq = cb.createQuery(Trip.class);
         Root<Trip> tripRoot = cq.from(Trip.class);
@@ -81,7 +83,14 @@ public class TripService {
             var tagPredicate = tripRoot.get("tags").get("id").in(tripSearchRequest.getTags());
             cq.where(tagPredicate);
         }
-        return entityManager.createQuery(cq).getResultList();
+        var data = entityManager.createQuery(cq)
+                .setFirstResult(pagingQueryParams.page() != null ? pagingQueryParams.page() : 0)
+                .setMaxResults(pagingQueryParams.size() != null ? pagingQueryParams.size() : 10)
+                .getResultList();
+
+       long total = entityManager.createQuery("SELECT COUNT(w) FROM Trip w", Long.class)
+                .getSingleResult();
+        return new PagedResult<>(data, total);
     }
 
     @Transactional

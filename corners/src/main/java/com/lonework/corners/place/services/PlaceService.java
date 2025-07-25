@@ -4,6 +4,8 @@ import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.comment.model.CommentCreateRequest;
 import com.lonework.corners.common.model.FeatureTypeClass;
+import com.lonework.corners.common.model.PagedResult;
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
 import com.lonework.corners.place.model.DTO.PlaceRateRequest;
 import com.lonework.corners.place.model.DTO.PlaceSearchRequest;
@@ -56,7 +58,7 @@ public class PlaceService {
         return featureBuilder.buildFeature(place.getId().toString());
     }
 
-    public Iterable<Place> findPlacesByParameters(PlaceSearchRequest placeSearchRequest) {
+    public PagedResult<Place> findPlacesByParameters(PlaceSearchRequest placeSearchRequest, PagingQueryParams pagingQueryParams) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         var query = criteriaBuilder.createQuery(Place.class);
         Root<Place> root = query.from(Place.class);
@@ -78,8 +80,11 @@ public class PlaceService {
         }
 
         query.select(root).where(categoryPredicate);
-
-        return entityManager.createQuery(query).getResultList();
+        var data = entityManager.createQuery(query)
+                .setFirstResult(pagingQueryParams.page() != null ? pagingQueryParams.page() : 0)
+                .setMaxResults(pagingQueryParams.size() != null ? pagingQueryParams.size() : 10)
+                .getResultList();
+        return new PagedResult<>(data, 1L);
     }
 
     @Transactional

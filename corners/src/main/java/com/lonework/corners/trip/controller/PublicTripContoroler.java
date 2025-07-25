@@ -1,11 +1,12 @@
 package com.lonework.corners.trip.controller;
 
+import com.lonework.corners.common.model.PagedResult;
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.trip.model.TripDetailResponse;
 import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.trip.services.TripService;
 import jakarta.annotation.security.PermitAll;
-import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,8 +34,8 @@ public class PublicTripContoroler {
     @CrossOrigin(origins = "*")
     @GetMapping("")
     @PermitAll
-    public Iterable<Trip> findTrip(@ModelAttribute TripSearchRequest tripSearchRequest) {
-        return this.tripService.findTripByParameters(tripSearchRequest);
+    public PagedResult<Trip> findTrip(@ModelAttribute TripSearchRequest tripSearchRequest, PagingQueryParams queryParams) {
+        return this.tripService.findTripByParameters(tripSearchRequest, queryParams);
     }
 }
 

@@ -2,6 +2,8 @@ package com.lonework.corners.place.controller;
 
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.comment.model.CommentCreateRequest;
+import com.lonework.corners.common.model.PagedResult;
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
 import com.lonework.corners.place.model.DTO.PlaceRateRequest;
 import com.lonework.corners.place.model.DTO.PlaceSearchRequest;
@@ -39,8 +41,8 @@ public class PublicPlaceController {
     @CrossOrigin(origins = "*")
     @GetMapping()
     @PermitAll
-    public Iterable<Place> fetchPlace(PlaceSearchRequest placeSearchRequest) {
-        return placeService.findPlacesByParameters(placeSearchRequest);
+    public PagedResult<Place> fetchPlace(PlaceSearchRequest placeSearchRequest, PagingQueryParams pagingQueryParams) {
+        return placeService.findPlacesByParameters(placeSearchRequest, pagingQueryParams);
 
     }
 

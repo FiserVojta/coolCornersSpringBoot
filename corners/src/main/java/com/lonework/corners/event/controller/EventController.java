@@ -34,25 +34,12 @@ public class EventController {
     @PermitAll
     public Event createEvent(@RequestBody EventCreateRequest eventCreateRequest, @AuthenticationPrincipal Jwt jwt) {
         return eventService.createEvent(eventCreateRequest, jwt.getClaimAsString("email"));
-
     }
 
     @CrossOrigin(origins = "*")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
     public Event updateEvent(@PathVariable("id") Long id, @RequestBody EventCreateRequest eventCreateRequest) {
         return eventService.updatedEvent(eventCreateRequest, id);
-    }
-
-    @CrossOrigin(origins = "*")
-    @GetMapping(path = "/{id}")
-    public Event getEvent(@PathVariable("id") Long id) {
-        return eventService.getEvent(id);
-    }
-
-    @CrossOrigin(origins = "*")
-    @GetMapping("/find")
-    public Iterable<Event> findTrip(@ModelAttribute EventSearchParameters eventSearchParameters) {
-        return this.eventService.findEventByParameters(eventSearchParameters);
     }
 
     @CrossOrigin(origins = "*")

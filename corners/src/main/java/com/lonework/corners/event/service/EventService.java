@@ -1,6 +1,8 @@
 package com.lonework.corners.event.service;
 
 import com.lonework.corners.common.model.EntityStatus;
+import com.lonework.corners.common.model.PagedResult;
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.event.model.DTO.EventCreateRequest;
 import com.lonework.corners.event.model.Event;
 import com.lonework.corners.event.model.EventSearchParameters;
@@ -53,10 +55,16 @@ public class EventService {
     }
 
     @Transactional
-    public List<Event> findEventByParameters(EventSearchParameters eventSearchParameters){
-        return entityManager.createQuery("SELECT e from Event e where e.entityStatus = :status", Event.class)
+    public PagedResult<Event> findEventByParameters(EventSearchParameters eventSearchParameters, PagingQueryParams queryParams){
+        var data = entityManager.createQuery("SELECT e from Event e where e.entityStatus = :status", Event.class)
                 .setParameter("status", EntityStatus.ACTIVE)
+                .setFirstResult(queryParams.page() != null ? queryParams.page() : 0)
+                .setMaxResults(queryParams.size() != null ? queryParams.size() : 10)
                 .getResultList();
+        long total = entityManager.createQuery("SELECT COUNT(e) FROM Event e where e.entityStatus = :status", Long.class)
+                .setParameter("status", EntityStatus.ACTIVE)
+                .getSingleResult();
+        return new PagedResult<>(data, total);
     }
 
 
