@@ -24,16 +24,6 @@ public class WanderController {
         return ResponseEntity.ok(wanderService.createWander(wanderCreateRequest, jwt.getClaimAsString("email")));
     }
     
-    @GetMapping("")
-    public ResponseEntity<List<Wander>> getAllWanders() {
-        return ResponseEntity.ok(wanderService.getAllWanders());
-    }
-    
-    @GetMapping("/{wanderId}")
-    public ResponseEntity<Wander> getWander(@PathVariable Long wanderId) {
-        return ResponseEntity.ok(wanderService.getWander(wanderId));
-    }
-    
     @PutMapping("/{wanderId}")
     public ResponseEntity<Wander> updateWander(
             @PathVariable Long wanderId,

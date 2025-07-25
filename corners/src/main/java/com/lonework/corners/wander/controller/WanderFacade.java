@@ -1,5 +1,7 @@
 package com.lonework.corners.wander.controller;
 
+import com.lonework.corners.common.model.PagedResult;
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.wander.model.Wander;
 import com.lonework.corners.wander.model.WanderDetailResponse;
 import com.lonework.corners.wander.model.WanderListResponse;
@@ -22,8 +24,8 @@ public class WanderFacade {
         return new WanderDetailResponse(wanderService.getWander(id));
     }
 
-    public List<WanderListResponse> getAllWanders() {
-        return wanderService.getAllWanders().stream().map(WanderListResponse::new).toList();
+    public PagedResult<WanderListResponse> getWanderListResponse(PagingQueryParams queryParams) {
+        return wanderService.getWanders(queryParams);
     }
 
     public List<WanderListResponse> getWanderListResponse(List<Wander> wanders) {

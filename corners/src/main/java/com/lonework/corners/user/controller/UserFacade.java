@@ -1,5 +1,7 @@
 package com.lonework.corners.user.controller;
 
+import com.lonework.corners.common.model.PagedResult;
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserListResponse;
@@ -18,8 +20,8 @@ public class UserFacade {
     @Inject
     UserService userService;
 
-    public List<UserListResponse> getUserList() {
-        return userService.getUserList();
+    public PagedResult<UserListResponse> getUserList(PagingQueryParams queryParams) {
+        return userService.getUserList(queryParams);
     }
 
     public UserDetailResponse getUserDetail(String email) {

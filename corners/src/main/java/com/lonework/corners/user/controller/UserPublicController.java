@@ -1,5 +1,7 @@
 package com.lonework.corners.user.controller;
 
+import com.lonework.corners.common.model.PagedResult;
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserListResponse;
 import jakarta.inject.Inject;
@@ -25,7 +27,7 @@ public class UserPublicController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<UserListResponse>> getUserList() {
-        return ResponseEntity.ok(userFacade.getUserList());
+    public ResponseEntity<PagedResult<UserListResponse>> getUserList(PagingQueryParams queryParams) {
+        return ResponseEntity.ok(userFacade.getUserList(queryParams));
     }
 }
