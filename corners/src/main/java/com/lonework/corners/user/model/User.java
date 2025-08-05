@@ -9,13 +9,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 
 @Entity
@@ -44,6 +45,10 @@ public class User {
     @JsonBackReference
     private List<Wander> wanders = new ArrayList<>();
 
+
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.PERSIST)
+    @JsonBackReference
+    private List<Wander> wandersOrganized = new ArrayList<>();
 
     public User() {
     }
@@ -109,15 +114,25 @@ public class User {
         this.wanders = wanders;
     }
 
+    public List<Wander> getWandersOrganized() {
+        return wandersOrganized;
+    }
+
+    public void setWandersOrganized(List<Wander> wandersOrganized) {
+        this.wandersOrganized = wandersOrganized;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof User user)) {return false;}
         return Objects.equals(id, user.id) && Objects.equals(keycloakId, user.keycloakId) && Objects.equals(email, user.email)
-                && Objects.equals(name, user.name) && Objects.equals(displayName, user.displayName) && Objects.equals(createdAt, user.createdAt);
+                && Objects.equals(name, user.name) && Objects.equals(displayName, user.displayName) && Objects.equals(createdAt, user.createdAt)
+                && Objects.equals(wanders, user.wanders) && Objects.equals(wandersOrganized, user.wandersOrganized);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, keycloakId, email, name, displayName, createdAt);
+        return Objects.hash(id, keycloakId, email, name, displayName, createdAt, wanders, wandersOrganized);
     }
 }

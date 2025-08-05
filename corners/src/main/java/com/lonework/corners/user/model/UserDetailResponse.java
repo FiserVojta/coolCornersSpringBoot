@@ -14,9 +14,10 @@ public record UserDetailResponse(
         String createdAt,
         String discordId,
         Integer rating,
-        List<WanderListResponse> wanderList
+        List<WanderListResponse> wandersOrganized,
+        List<WanderListResponse> wandersAttended
 ) {
-    public UserDetailResponse(User user, List<WanderListResponse> wanderList) {
+    public UserDetailResponse(User user, List<WanderListResponse> wandersAttended,  List<WanderListResponse> wandersOrganized) {
         this(
                 user.getId(),
                 user.getEmail(),
@@ -25,7 +26,8 @@ public record UserDetailResponse(
                 user.getCreatedAt().toString(),
                 null,
                 null,
-                wanderList
+                wandersOrganized,
+                wandersAttended
         );
     }
 }

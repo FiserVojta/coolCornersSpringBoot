@@ -41,7 +41,9 @@ public class UserService {
                 .setParameter("email", email)
                 .getSingleResult();
 
-        return new UserDetailResponse(user, wanderFacade.getWanderListResponse(user.getWanders()));
+        return new UserDetailResponse(user,
+                wanderFacade.getWanderListResponse(user.getWanders()),
+                wanderFacade.getWanderListResponse(user.getWandersOrganized()));
     }
 
     public PagedResult<UserListResponse> getUserList(PagingQueryParams queryParams) {

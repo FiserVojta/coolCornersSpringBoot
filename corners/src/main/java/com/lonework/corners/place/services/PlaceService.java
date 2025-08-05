@@ -60,31 +60,50 @@ public class PlaceService {
 
     public PagedResult<Place> findPlacesByParameters(PlaceSearchRequest placeSearchRequest, PagingQueryParams pagingQueryParams) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
+        // --- Main query ---
         var query = criteriaBuilder.createQuery(Place.class);
         Root<Place> root = query.from(Place.class);
 
-        Predicate categoryPredicate = criteriaBuilder.conjunction();
-        if (placeSearchRequest.getCategory() != null && !placeSearchRequest.getCategory().isEmpty()) {
-            CriteriaBuilder.In<Long> categoryInClause = criteriaBuilder.in(root.join("category").get("id")); // Assuming "category" is a field name
-            for (Long categoryId : placeSearchRequest.getCategory()) {
-                categoryInClause = categoryInClause.value(categoryId);
-            }
-            categoryPredicate = criteriaBuilder.and(categoryPredicate, categoryInClause);
-        }
-        if (placeSearchRequest.getTags() != null && !placeSearchRequest.getTags().isEmpty()) {
-            CriteriaBuilder.In<Long> tagsInClause = criteriaBuilder.in(root.join("tags").get("id")); // Assuming "tags" is a field name
-            for (Long tagId : placeSearchRequest.getTags()) {
-                tagsInClause = tagsInClause.value(tagId);
-            }
-            categoryPredicate = criteriaBuilder.and(categoryPredicate, tagsInClause);
-        }
+        Predicate predicate = buildPredicate(criteriaBuilder, root, placeSearchRequest);
 
-        query.select(root).where(categoryPredicate);
+        query.select(root).where(predicate);
+
         var data = entityManager.createQuery(query)
                 .setFirstResult(pagingQueryParams.page() != null ? pagingQueryParams.page() : 0)
                 .setMaxResults(pagingQueryParams.size() != null ? pagingQueryParams.size() : 10)
                 .getResultList();
-        return new PagedResult<>(data, 1L);
+
+        // --- Count query ---
+        var countQuery = criteriaBuilder.createQuery(Long.class);
+        Root<Place> countRoot = countQuery.from(Place.class);
+        Predicate countPredicate = buildPredicate(criteriaBuilder, countRoot, placeSearchRequest);
+        countQuery.select(criteriaBuilder.count(countRoot)).where(countPredicate);
+        Long total = entityManager.createQuery(countQuery).getSingleResult();
+
+        return new PagedResult<>(data, total);
+    }
+
+    private Predicate buildPredicate(CriteriaBuilder cb, Root<Place> root, PlaceSearchRequest request) {
+        Predicate predicate = cb.conjunction();
+
+        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
+            CriteriaBuilder.In<Long> categoryInClause = cb.in(root.join("category").get("id"));
+            for (Long categoryId : request.getCategory()) {
+                categoryInClause.value(categoryId);
+            }
+            predicate = cb.and(predicate, categoryInClause);
+        }
+
+        if (request.getTags() != null && !request.getTags().isEmpty()) {
+            CriteriaBuilder.In<Long> tagsInClause = cb.in(root.join("tags").get("id"));
+            for (Long tagId : request.getTags()) {
+                tagsInClause.value(tagId);
+            }
+            predicate = cb.and(predicate, tagsInClause);
+        }
+
+        return predicate;
     }
 
     @Transactional
