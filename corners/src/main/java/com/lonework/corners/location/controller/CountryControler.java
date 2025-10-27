@@ -1,5 +1,6 @@
 package com.lonework.corners.location.controller;
 
+import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,7 +11,7 @@ import com.lonework.corners.location.model.Country;
 import com.lonework.corners.location.services.CountryService;
 
 @RestController
-@RequestMapping("/country")
+@RequestMapping("/public/country")
 public class CountryControler {
 
     @Autowired
@@ -18,8 +19,8 @@ public class CountryControler {
 
     @CrossOrigin(origins = "*")
     @GetMapping("")
-    public Iterable<Country> getAllStates() {
-
+    @PermitAll
+    public Iterable<Country> getAllCountries() {
         return this.stateService.getAllCountries();
     }
 

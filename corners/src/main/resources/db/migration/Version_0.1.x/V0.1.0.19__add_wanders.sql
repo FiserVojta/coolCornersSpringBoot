@@ -1,4 +1,4 @@
-CREATE TABLE wander (
+    CREATE TABLE if not exists wander (
                         id BIGSERIAL PRIMARY KEY,
                         created_by_user_id BIGINT,
                         description TEXT,
@@ -10,14 +10,14 @@ CREATE TABLE wander (
                         CONSTRAINT fk_wander_category FOREIGN KEY (category_id) REFERENCES category(id)
 );
 
-CREATE TABLE wanderpart (
+CREATE TABLE if not exists wanderpart (
                             id BIGSERIAL PRIMARY KEY,
                             "order" INTEGER,
                             wander_part_id BIGINT,
                             CONSTRAINT fk_wander FOREIGN KEY (wander_part_id) REFERENCES wander(id)
 );
 
-CREATE TABLE wanderpart_place (
+CREATE TABLE if not exists wanderpart_place (
                                   wanderpart_id BIGINT NOT NULL,
                                   place_id BIGINT NOT NULL,
                                   PRIMARY KEY (wanderpart_id, place_id),
@@ -25,7 +25,7 @@ CREATE TABLE wanderpart_place (
                                   CONSTRAINT fk_wanderpart_place_place FOREIGN KEY (place_id) REFERENCES place(id)
 );
 
-CREATE TABLE wanderpart_trip (
+CREATE TABLE if not exists wanderpart_trip (
                                  wanderpart_id BIGINT NOT NULL,
                                  trip_id BIGINT NOT NULL,
                                  PRIMARY KEY (wanderpart_id, trip_id),
@@ -35,7 +35,7 @@ CREATE TABLE wanderpart_trip (
 
 
 
-CREATE TABLE wander_has_wanderers (
+CREATE TABLE if not exists wander_has_wanderers (
                                       wander_id BIGINT NOT NULL,
                                       user_id BIGINT NOT NULL,
                                       PRIMARY KEY (wander_id, user_id),
@@ -43,7 +43,7 @@ CREATE TABLE wander_has_wanderers (
                                       CONSTRAINT fk_wander_has_wanderers_user FOREIGN KEY (user_id) REFERENCES corneruser(id)
 );
 
-CREATE TABLE wander_has_tag (
+CREATE TABLE if not exists wander_has_tag (
                                 wander_id BIGINT NOT NULL,
                                 tag_id BIGINT NOT NULL,
                                 PRIMARY KEY (wander_id, tag_id),
@@ -51,7 +51,7 @@ CREATE TABLE wander_has_tag (
                                 CONSTRAINT fk_wander_has_tag_tag FOREIGN KEY (tag_id) REFERENCES tag(id)
 );
 
-CREATE TABLE wander_has_parts (
+CREATE TABLE if not exists wander_has_parts (
                                   wander_id BIGINT NOT NULL,
                                   wander_part_id BIGINT NOT NULL,
                                   PRIMARY KEY (wander_id, wander_part_id),
