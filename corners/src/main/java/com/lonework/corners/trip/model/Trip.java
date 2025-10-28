@@ -89,6 +89,7 @@ public class Trip {
         this.duration = tripCreateRequest.getDuration();
         this.description = tripCreateRequest.getDescription();
         this.creator = tripCreateRequest.getAuthor();
+        this.createdBy = createdBy;
     }
 
     public Long getId() {
