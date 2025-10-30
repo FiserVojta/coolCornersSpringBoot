@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: fiservojta/coolcorners-be
+  IMAGE_NAME: ${{ github.repository_owner }}/coolcorners-be
   DEPLOYMENT_REPO: FiserVojta/coolcornersdeployment
   DEPLOYMENT_FILE: backend/deployment.yaml
 
@@ -18,6 +18,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
       - name: Checkout code
@@ -40,6 +41,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
       - name: Generate version tag
         id: version
         run: |
@@ -56,6 +63,7 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          labels: ${{ steps.meta.outputs.labels }}
 
       - name: Checkout deployment repository
         uses: actions/checkout@v4
@@ -67,7 +75,7 @@ jobs:
       - name: Update deployment manifest
         run: |
           cd deployment-repo
-          sed -i "s|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}|g" ${{ env.DEPLOYMENT_FILE }}
+          sed -i "s|image: ${{ env.REGISTRY }}/fiservojta/coolcorners-be:.*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}|g" ${{ env.DEPLOYMENT_FILE }}
           
           # Show the change
           echo "Updated deployment.yaml:"
@@ -79,7 +87,7 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
           git add ${{ env.DEPLOYMENT_FILE }}
-          git commit -m "Update backend image to ${{ steps.version.outputs.version }}"
+          git commit -m "Update backend image to ${{ steps.version.outputs.version }}" || echo "No changes to commit"
           git push
 
       - name: Summary
@@ -89,3 +97,4 @@ jobs:
           echo "- **Image:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Deployment repo updated:** ${{ env.DEPLOYMENT_REPO }}" >> $GITHUB_STEP_SUMMARY
           echo "- **ArgoCD will automatically sync within 3 minutes**" >> $GITHUB_STEP_SUMMARY
+          echo "- **View in ArgoCD:** https://argocd.coolcorners.org" >> $GITHUB_STEP_SUMMARY
