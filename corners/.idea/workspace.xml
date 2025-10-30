@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2a56a64c-b63b-4a3e-80cd-ca4604c967ae" name="Changes" comment="fix category enum and trip created by">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/flyway.conf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/CornersApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/category/controller/CategoryController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/category/model/Category.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/category/model/CategorySearchParameters.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/category/model/CategoryType.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/category/services/CategoryService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/comment/controller/CommentFacade.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/comment/model/Comment.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/comment/model/CommentCreateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/comment/services/CommentService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/common/model/EntityStatus.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/common/model/FeatureTypeClass.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/common/model/PagedResult.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/common/model/PagingQueryParams.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/common/model/QueryOrder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/common/model/ResultOrder.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/common/services/GeometryUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/config/CorsConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/config/JacksonTimeConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/config/JpaConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/config/JsonConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/config/SecurityConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/event/controller/EventController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/event/controller/PublicEventController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/event/model/DTO/EventCreateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/event/model/Event.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/event/model/EventSearchParameters.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/event/service/EventService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/location/controller/CityControler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/location/controller/CountryControler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/location/model/City.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/location/model/Country.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/location/model/LocationCreateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/location/model/locationRange.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/location/services/CityService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/location/services/CountryService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/controller/PlaceController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/controller/PublicPlaceController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/model/DTO/PlaceCreateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/model/DTO/PlaceListRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/model/DTO/PlaceRateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/model/DTO/PlaceSearchRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/model/Place.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/model/PlaceDetailResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/model/PlaceRating.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/model/PlaceSimpleResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/place/services/PlaceService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/tag/controller/TagContoller.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/tag/model/Tag.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/tag/model/TagCreateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/tag/model/TagSearchRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/tag/services/TagService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/controller/PublicTripContoroler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/controller/TripController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/model/Trip.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/model/TripCommentRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/model/TripCreateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/model/TripDetailResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/model/TripRateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/model/TripRating.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/model/TripSearchRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/trip/services/TripService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/user/controller/UserController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/user/controller/UserFacade.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/user/controller/UserPublicController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/user/model/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/user/model/UserDetailResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/user/model/UserListResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/user/service/JwtUserSyncFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/user/service/UserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/controller/WanderController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/controller/WanderFacade.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/controller/WanderPublicController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/model/Wander.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/model/WanderCreateRequest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/model/WanderDetailResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/model/WanderListResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/model/WanderPart.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/lonework/corners/wander/service/WanderService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.01__create_country.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.02__create_city.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.03__create_category.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.04__create_place.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.05__create_tag.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.06__create_trip.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.07__create_comment.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.08__fill_categories.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.09__add_geometries.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.10__add_geometries.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.11__create_trip_rating.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.12__create_places_rating.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.13__create_event.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.14__update_category.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.15__extend_events.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.16__add_entity_status.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.17__add_place_created_by.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.18__add_user.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x/V0.1.0.19__add_wanders.sql" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Record" />
+        <option value="Class" />
+        <option value="Enum" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="feature/authorization" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;FiserVojta&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://FiserVojta@github.com/FiserVojta/coolCornersSpringBoot.git&quot;,
+    &quot;accountId&quot;: &quot;6d4c083b-9474-44c6-9db4-bf5490b033f1&quot;
+  }
+}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;contexts&quot;: [
+    {
+      &quot;name&quot;: &quot;arn:aws:eks:eu-central-1:113590434675:cluster/dev08&quot;
+    }
+  ],
+  &quot;isMigrated&quot;: true
+}</component>
+  <component name="KubernetesSettings">
+    <option name="contextName" value="arn:aws:eks:eu-central-1:113590434675:cluster/dev08" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2bsHoHHQgf7AKsGIoKbIzKa5pzT" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;Spring Boot.CornersApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;21&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/vojtechfiser/Documents/private-projects/coolCorners/springboot/corners/src/main/resources/db/migration/Version_0.1.x&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.appearance&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Applications/IntelliJ IDEA.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/db/migration/Version_0.1.x" />
+      <recent name="$PROJECT_DIR$/src/main/java/com/lonework/corners" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.lonework.corners.user.model" />
+      <recent name="com.lonework.corners.user.controller" />
+      <recent name="com.lonework.corners.place.controller" />
+      <recent name="com.lonework.corners.event.controller" />
+      <recent name="com.lonework.corners.trip.model" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Spring Boot.CornersApplication">
+    <configuration name=" V0_1_1__create_counry.sql" type="DatabaseScript" editBeforeRun="true" temporary="true" nameIsGenerated="true">
+      <script-file value="$PROJECT_DIR$/src/db/migration/Version_0.1.x/ V0_1_1__create_counry.sql" />
+      <script-mode>FILE</script-mode>
+      <method v="2" />
+    </configuration>
+    <configuration name="CornersApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="corners" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.lonework.corners.CornersApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Database Script. V0_1_1__create_counry.sql" />
+        <item itemvalue="Database Script. V0_1_1__create_counry.sql" />
+        <item itemvalue="Database Script. V0_1_1__create_counry.sql" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-125ca727e0f0-intellij.indexing.shared.core-IU-243.23654.189" />
+        <option value="bundled-js-predefined-d6986cc7102b-822845ee3bb5-JavaScript-IU-243.23654.189" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2a56a64c-b63b-4a3e-80cd-ca4604c967ae" name="Changes" comment="" />
+      <created>1706997039446</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1706997039446</updated>
+      <workItem from="1706997040452" duration="9757000" />
+      <workItem from="1708278934059" duration="13147000" />
+      <workItem from="1709810890731" duration="710000" />
+      <workItem from="1709811609328" duration="3397000" />
+      <workItem from="1710060992921" duration="1809000" />
+      <workItem from="1710063363189" duration="1086000" />
+      <workItem from="1710070669473" duration="597000" />
+      <workItem from="1710160454639" duration="2879000" />
+      <workItem from="1710490548127" duration="4951000" />
+      <workItem from="1710649989581" duration="1451000" />
+      <workItem from="1710765740319" duration="3793000" />
+      <workItem from="1711280070520" duration="4733000" />
+      <workItem from="1711327854940" duration="1000" />
+      <workItem from="1711519615930" duration="6723000" />
+      <workItem from="1711610851639" duration="5621000" />
+      <workItem from="1712404822098" duration="2362000" />
+      <workItem from="1713086816894" duration="1222000" />
+      <workItem from="1716122613975" duration="4098000" />
+      <workItem from="1716127517869" duration="1644000" />
+      <workItem from="1716129170987" duration="662000" />
+      <workItem from="1716602779396" duration="7218000" />
+      <workItem from="1717149487210" duration="11727000" />
+      <workItem from="1737806694019" duration="6485000" />
+      <workItem from="1737815105097" duration="5257000" />
+      <workItem from="1737897908285" duration="814000" />
+      <workItem from="1737984398037" duration="3756000" />
+      <workItem from="1738374557921" duration="7994000" />
+      <workItem from="1743326206965" duration="12642000" />
+      <workItem from="1743672155830" duration="6698000" />
+      <workItem from="1743766170445" duration="27146000" />
+      <workItem from="1744030121023" duration="9465000" />
+      <workItem from="1744332731780" duration="90313000" />
+      <workItem from="1745495753838" duration="4552000" />
+      <workItem from="1745562865554" duration="3000" />
+      <workItem from="1745758992687" duration="4047000" />
+      <workItem from="1745840416887" duration="7750000" />
+      <workItem from="1746021087949" duration="37777000" />
+      <workItem from="1746253482931" duration="35190000" />
+      <workItem from="1746450890216" duration="8713000" />
+      <workItem from="1746527771956" duration="4299000" />
+      <workItem from="1746606258525" duration="25833000" />
+      <workItem from="1747049493110" duration="10934000" />
+      <workItem from="1747289328771" duration="6505000" />
+      <workItem from="1747476284627" duration="21627000" />
+      <workItem from="1747619038992" duration="103229000" />
+      <workItem from="1749451360661" duration="317000" />
+      <workItem from="1749451921340" duration="170000" />
+      <workItem from="1750465936161" duration="14040000" />
+      <workItem from="1752495464091" duration="6166000" />
+      <workItem from="1752586209728" duration="2286000" />
+      <workItem from="1752624098742" duration="13340000" />
+      <workItem from="1753432382334" duration="22067000" />
+      <workItem from="1754051052493" duration="12499000" />
+      <workItem from="1754727230036" duration="4613000" />
+      <workItem from="1758970906941" duration="4517000" />
+      <workItem from="1759239388762" duration="2411000" />
+      <workItem from="1759836347364" duration="3980000" />
+      <workItem from="1760620542064" duration="1366000" />
+      <workItem from="1760767701898" duration="11912000" />
+      <workItem from="1760957783202" duration="5869000" />
+      <workItem from="1761477879830" duration="1713000" />
+      <workItem from="1761648745208" duration="9377000" />
+      <workItem from="1761822276448" duration="24000" />
+    </task>
+    <task id="LOCAL-00001" summary="add flyway, and simplify project">
+      <option name="closed" value="true" />
+      <created>1711867025492</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1711867025492</updated>
+    </task>
+    <task id="LOCAL-00002" summary="add support for geo jsons">
+      <option name="closed" value="true" />
+      <created>1716167695689</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1716167695689</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fix coments">
+      <option name="closed" value="true" />
+      <created>1716612076513</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1716612076513</updated>
+    </task>
+    <task id="LOCAL-00004" summary="replace repositories with entity manager">
+      <option name="closed" value="true" />
+      <created>1737809989137</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1737809989137</updated>
+    </task>
+    <task id="LOCAL-00005" summary="fix geomtries a and save them to DB">
+      <option name="closed" value="true" />
+      <created>1737940274875</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1737940274875</updated>
+    </task>
+    <task id="LOCAL-00006" summary="update trips">
+      <option name="closed" value="true" />
+      <created>1737987610758</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1737987610758</updated>
+    </task>
+    <task id="LOCAL-00007" summary="updates">
+      <option name="closed" value="true" />
+      <created>1745034598342</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1745034598342</updated>
+    </task>
+    <task id="LOCAL-00008" summary="updates">
+      <option name="closed" value="true" />
+      <created>1745034689088</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1745034689088</updated>
+    </task>
+    <task id="LOCAL-00009" summary="restructure project based on basic entities">
+      <option name="closed" value="true" />
+      <created>1745036146757</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1745036146757</updated>
+    </task>
+    <task id="LOCAL-00010" summary="add simple place to trip response">
+      <option name="closed" value="true" />
+      <created>1745037395127</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1745037395127</updated>
+    </task>
+    <task id="LOCAL-00011" summary="add tags to trips">
+      <option name="closed" value="true" />
+      <created>1745070659308</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1745070659308</updated>
+    </task>
+    <task id="LOCAL-00012" summary="add draft rating to  trips">
+      <option name="closed" value="true" />
+      <created>1745160079445</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1745160079445</updated>
+    </task>
+    <task id="LOCAL-00013" summary="fix datetime issue">
+      <option name="closed" value="true" />
+      <created>1745211673555</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1745211673555</updated>
+    </task>
+    <task id="LOCAL-00014" summary="fix tags for places">
+      <option name="closed" value="true" />
+      <created>1745498964364</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1745498964364</updated>
+    </task>
+    <task id="LOCAL-00015" summary="place ratings">
+      <option name="closed" value="true" />
+      <created>1745894593664</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1745894593664</updated>
+    </task>
+    <task id="LOCAL-00016" summary="place add comment to trips">
+      <option name="closed" value="true" />
+      <created>1746077824867</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1746077824867</updated>
+    </task>
+    <task id="LOCAL-00017" summary="return tags for places">
+      <option name="closed" value="true" />
+      <created>1746084255037</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1746084255037</updated>
+    </task>
+    <task id="LOCAL-00018" summary="events first draft">
+      <option name="closed" value="true" />
+      <created>1746108696463</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1746108696463</updated>
+    </task>
+    <task id="LOCAL-00019" summary="add events">
+      <option name="closed" value="true" />
+      <created>1746366865994</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1746366865994</updated>
+    </task>
+    <task id="LOCAL-00020" summary="auth first draft">
+      <option name="closed" value="true" />
+      <created>1746527809628</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1746527809628</updated>
+    </task>
+    <task id="LOCAL-00021" summary="authorization">
+      <option name="closed" value="true" />
+      <created>1746711925542</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1746711925542</updated>
+    </task>
+    <task id="LOCAL-00022" summary="place edit feature">
+      <option name="closed" value="true" />
+      <created>1747551934405</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1747551934405</updated>
+    </task>
+    <task id="LOCAL-00023" summary="take author of comment from jwt token">
+      <option name="closed" value="true" />
+      <created>1747576348647</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1747576348647</updated>
+    </task>
+    <task id="LOCAL-00024" summary="add user">
+      <option name="closed" value="true" />
+      <created>1747663279219</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1747663279219</updated>
+    </task>
+    <task id="LOCAL-00025" summary="wanderes first draft">
+      <option name="closed" value="true" />
+      <created>1748957960925</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1748957960925</updated>
+    </task>
+    <task id="LOCAL-00026" summary="fix create wander with cloude">
+      <option name="closed" value="true" />
+      <created>1748959338239</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1748959338239</updated>
+    </task>
+    <task id="LOCAL-00027" summary="updates in wanders">
+      <option name="closed" value="true" />
+      <created>1749215230947</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1749215230947</updated>
+    </task>
+    <task id="LOCAL-00028" summary="basic user display operations">
+      <option name="closed" value="true" />
+      <created>1750585930718</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1750585930718</updated>
+    </task>
+    <task id="LOCAL-00029" summary="add wanders to users">
+      <option name="closed" value="true" />
+      <created>1752587534016</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1752587534016</updated>
+    </task>
+    <task id="LOCAL-00030" summary="add facades and wanders">
+      <option name="closed" value="true" />
+      <created>1753020631673</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1753020631673</updated>
+    </task>
+    <task id="LOCAL-00031" summary="add paging to wanders and users">
+      <option name="closed" value="true" />
+      <created>1753435734666</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1753435734666</updated>
+    </task>
+    <task id="LOCAL-00032" summary="add paging to wanders and users">
+      <option name="closed" value="true" />
+      <created>1753448175066</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1753448175066</updated>
+    </task>
+    <task id="LOCAL-00033" summary="update paging fot more entities">
+      <option name="closed" value="true" />
+      <created>1754388956514</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1754388956514</updated>
+    </task>
+    <task id="LOCAL-00034" summary="fix category enum and trip created by">
+      <option name="closed" value="true" />
+      <created>1761655068434</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1761655068434</updated>
+    </task>
+    <option name="localTasksCounter" value="35" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="restructure project based on basic entities" />
+    <MESSAGE value="add simple place to trip response" />
+    <MESSAGE value="add tags to trips" />
+    <MESSAGE value="add draft rating to  trips" />
+    <MESSAGE value="fix datetime issue" />
+    <MESSAGE value="fix tags for places" />
+    <MESSAGE value="place ratings" />
+    <MESSAGE value="place add comment to trips" />
+    <MESSAGE value="return tags for places" />
+    <MESSAGE value="events first draft" />
+    <MESSAGE value="add events" />
+    <MESSAGE value="auth first draft" />
+    <MESSAGE value="authorization" />
+    <MESSAGE value="place edit feature" />
+    <MESSAGE value="take author of comment from jwt token" />
+    <MESSAGE value="add user" />
+    <MESSAGE value="wanderes first draft" />
+    <MESSAGE value="fix create wander with cloude" />
+    <MESSAGE value="updates in wanders" />
+    <MESSAGE value="basic user display operations" />
+    <MESSAGE value="add wanders to users" />
+    <MESSAGE value="add facades and wanders" />
+    <MESSAGE value="add paging to wanders and users" />
+    <MESSAGE value="update paging fot more entities" />
+    <MESSAGE value="fix category enum and trip created by" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix category enum and trip created by" />
+  </component>
+  <component name="XDebuggerManager">
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="org.hibernate.query.sqm.tree.predicate.SqmJunctionPredicate" memberName="predicates" />
+      </pinned-members>
+    </pin-to-top-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
