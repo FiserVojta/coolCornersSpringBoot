@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/coolcorners-be
-  DEPLOYMENT_REPO: fiservojta/coolcornersdeployment
+  IMAGE_NAME: fiservojta/coolcorners-be
+  DEPLOYMENT_REPO: FiserVojta/coolcornersdeployment
   DEPLOYMENT_FILE: backend/deployment.yaml
 
 jobs:
