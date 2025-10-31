@@ -4,6 +4,7 @@ import com.lonework.corners.wander.model.Wander;
 import com.lonework.corners.wander.model.WanderListResponse;
 
 import java.util.List;
+import java.util.Set;
 
 
 public record UserDetailResponse(
@@ -15,7 +16,9 @@ public record UserDetailResponse(
         String discordId,
         Integer rating,
         List<WanderListResponse> wandersOrganized,
-        List<WanderListResponse> wandersAttended
+        List<WanderListResponse> wandersAttended,
+        Set<User> following,
+        Set<User> followers
 ) {
     public UserDetailResponse(User user, List<WanderListResponse> wandersAttended,  List<WanderListResponse> wandersOrganized) {
         this(
@@ -27,7 +30,9 @@ public record UserDetailResponse(
                 null,
                 null,
                 wandersOrganized,
-                wandersAttended
+                wandersAttended,
+                user.getFollowersOf(),
+                user.getFollowers()
         );
     }
 }

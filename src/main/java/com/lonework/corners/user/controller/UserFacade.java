@@ -4,6 +4,7 @@ import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
+import com.lonework.corners.user.model.UserFollowRequest;
 import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.service.UserService;
 import jakarta.inject.Inject;
@@ -11,8 +12,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
-
-import java.util.List;
 
 
 @ApplicationScope
@@ -35,14 +34,15 @@ public class UserFacade {
 
 
     @Transactional
-    public void followUser(String myEmail, Long userId ) {
+    public User followUser(String myEmail, UserFollowRequest userFollowRequest) {
         var user = userService.getUser(myEmail);
-        var userFriend = userService.getUser(userId);
-
-        user.addFriend(userFriend);
-
+        for (var userId : userFollowRequest.userIds()) {
+            var userFriend = userService.getUser(userId);
+            user.addFollower(userFriend);
+            saveUser(userFriend);
+        }
         saveUser(user);
-        saveUser(userFriend);
+        return user;
     }
 
     public void saveUser(User user) {

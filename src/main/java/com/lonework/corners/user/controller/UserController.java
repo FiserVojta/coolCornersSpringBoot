@@ -1,6 +1,7 @@
 package com.lonework.corners.user.controller;
 
 import com.lonework.corners.user.model.User;
+import com.lonework.corners.user.model.UserFollowRequest;
 import com.lonework.corners.user.service.UserService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
@@ -10,6 +11,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,11 +41,10 @@ public class UserController {
     }
 
 
-    @GetMapping("/{userId}/follow")
-    public ResponseEntity followUser(@AuthenticationPrincipal Jwt jwt, @PathVariable("userId") Long userId)
+    @PostMapping("/follow")
+    public ResponseEntity<User> followUser(@AuthenticationPrincipal Jwt jwt, @RequestBody UserFollowRequest request)
     {
-        userFacade.followUser(jwt.getClaimAsString("email"), userId);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(userFacade.followUser(jwt.getClaimAsString("email"), request));
     }
 
 }

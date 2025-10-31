@@ -55,7 +55,7 @@ public class User {
 
     @ManyToMany
     @JoinTable(
-            name = "user_friends",
+            name = "corneruser_friends",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
@@ -65,6 +65,19 @@ public class User {
     @ManyToMany(mappedBy = "friends")
     @JsonBackReference
     private Set<User> friendOf = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "corneruser_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id")
+    )
+    private Set<User> followers = new HashSet<>();
+
+
+    @ManyToMany(mappedBy = "followers")
+    @JsonBackReference
+    private Set<User> followersOf = new HashSet<>();
 
     public User() {
     }
@@ -138,14 +151,37 @@ public class User {
     }
     
     public Set<User> getFriends() { return friends; }
+
     public void setFriends(Set<User> friends) { this.friends = friends; }
 
     public Set<User> getFriendOf() { return friendOf; }
+
     public void setFriendOf(Set<User> friendOf) { this.friendOf = friendOf; }
 
     public void addFriend(User p) {
         friends.add(p);
         p.getFriendOf().add(this);
+    }
+
+    public Set<User> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<User> followers) {
+        this.followers = followers;
+    }
+
+    public Set<User> getFollowersOf() {
+        return followersOf;
+    }
+
+    public void setFollowersOf(Set<User> followersOf) {
+        this.followersOf = followersOf;
+    }
+
+    public void addFollower(User user) {
+        followers.add(user);
+        user.getFriendOf().add(this);
     }
 
     @Override
