@@ -17,6 +17,7 @@ public record UserDetailResponse(
         Integer rating,
         List<WanderListResponse> wandersOrganized,
         List<WanderListResponse> wandersAttended,
+        //TO DO fix naming convention
         Set<User> following,
         Set<User> followers
 ) {
@@ -31,8 +32,8 @@ public record UserDetailResponse(
                 null,
                 wandersOrganized,
                 wandersAttended,
-                user.getFollowersOf(),
-                user.getFollowers()
+                user.getFollowers(),
+                user.getFollowersOf()
         );
     }
 }
