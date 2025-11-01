@@ -37,7 +37,7 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<User> getMe(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(userService.getUser(jwt.getClaimAsString(jwt.getClaimAsString("email"))));
+        return ResponseEntity.ok(userService.getUser(jwt.getClaimAsString("email")));
     }
 
 
@@ -45,6 +45,12 @@ public class UserController {
     public ResponseEntity<User> followUser(@AuthenticationPrincipal Jwt jwt, @RequestBody UserFollowRequest request)
     {
         return ResponseEntity.ok(userFacade.followUser(jwt.getClaimAsString("email"), request));
+    }
+
+    @PostMapping("/unfollow")
+    public ResponseEntity<User> unfollowUser(@AuthenticationPrincipal Jwt jwt, @RequestBody UserFollowRequest request)
+    {
+        return ResponseEntity.ok(userFacade.unFollowUser(jwt.getClaimAsString("email"), request));
     }
 
 }

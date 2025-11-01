@@ -184,6 +184,11 @@ public class User {
         user.getFriendOf().add(this);
     }
 
+    public void removeFollower(User user) {
+        followers.remove(user);
+        user.getFriendOf().remove(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof User user)) {return false;}

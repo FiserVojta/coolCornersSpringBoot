@@ -10,6 +10,7 @@ import com.lonework.corners.user.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
 
@@ -38,7 +39,25 @@ public class UserFacade {
         var user = userService.getUser(myEmail);
         for (var userId : userFollowRequest.userIds()) {
             var userFriend = userService.getUser(userId);
+            if(user == userFriend) {
+                throw new RuntimeException("Can't follow this yourself");
+            }
             user.addFollower(userFriend);
+            saveUser(userFriend);
+        }
+        saveUser(user);
+        return user;
+    }
+
+    @Transactional
+    public User unFollowUser(String myEmail, UserFollowRequest userFollowRequest) {
+        var user = userService.getUser(myEmail);
+        for (var userId : userFollowRequest.userIds()) {
+            var userFriend = userService.getUser(userId);
+            if(user == userFriend) {
+                throw new RuntimeException("Can't follow this yourself");
+            }
+            user.removeFollower(userFriend);
             saveUser(userFriend);
         }
         saveUser(user);
