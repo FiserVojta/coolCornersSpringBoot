@@ -3,7 +3,6 @@ package com.lonework.corners.comment.model;
 public class CommentCreateRequest {
     private String name;
     private String value;
-    private String title;
     private String author;
 
     public CommentCreateRequest() {
@@ -23,14 +22,6 @@ public class CommentCreateRequest {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getAuthor() {

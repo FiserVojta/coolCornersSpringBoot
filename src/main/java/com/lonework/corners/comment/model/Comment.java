@@ -29,8 +29,6 @@ public class Comment {
 
     private String value;
 
-    private String title;
-
     private String author;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -76,14 +74,6 @@ public class Comment {
 
     public void setValue(String value) {
         this.value = value;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
     }
 
     public String getAuthor() {

@@ -136,7 +136,6 @@ public class PlaceService {
     public Comment commentPlace(CommentCreateRequest request, long placeId, String email) {
         Comment comment = new Comment();
         comment.setAuthor(email);
-        comment.setTitle(request.getTitle());
         comment.setName(email);
         comment.setValue(request.getValue());
         comment.setPlace(entityManager.find(Place.class, placeId));
