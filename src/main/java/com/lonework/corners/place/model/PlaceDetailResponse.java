@@ -19,7 +19,8 @@ public record PlaceDetailResponse(
         String openingHours,
         List<Tag> tags,
         List<Comment> comments,
-        Category category
+        Category category,
+        String createdBy
 ) {
 
     public PlaceDetailResponse(Place place, SimpleFeature feature) {
@@ -34,7 +35,8 @@ public record PlaceDetailResponse(
                 place.getOpeningHours(),
                 place.getTags(),
                 place.getComments(),
-                place.getCategory()
+                place.getCategory(),
+                place.getCreatedBy()
         );
     }
 }
