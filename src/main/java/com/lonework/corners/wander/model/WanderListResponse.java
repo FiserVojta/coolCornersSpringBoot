@@ -2,14 +2,14 @@ package com.lonework.corners.wander.model;
 
 import com.lonework.corners.user.model.User;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
 public record WanderListResponse(Long id,
                                  Integer signed,
                                  Integer capacity,
-                                 ZonedDateTime date,
+                                 LocalDateTime date,
                                  Long duration,
                                  String category,
                                  List<String> tags,

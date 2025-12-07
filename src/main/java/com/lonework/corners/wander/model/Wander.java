@@ -18,7 +18,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,7 +45,7 @@ public class Wander {
     private Integer capacity;
 
     @Column(name = "start_time")
-    private ZonedDateTime startTime;
+    private LocalDateTime startTime;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "wander_has_wanderers",
@@ -135,11 +135,11 @@ public class Wander {
         this.capacity = capacity;
     }
 
-    public ZonedDateTime getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(ZonedDateTime startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 

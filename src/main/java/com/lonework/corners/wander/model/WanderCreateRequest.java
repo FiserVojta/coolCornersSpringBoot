@@ -2,14 +2,14 @@ package com.lonework.corners.wander.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
 public record WanderCreateRequest(
         @JsonProperty String description,
         @JsonProperty Integer capacity,
-        @JsonProperty ZonedDateTime startTime,
+        @JsonProperty LocalDateTime startTime,
         @JsonProperty List<Long> wanderers,
         @JsonProperty List<Long> tags,
         @JsonProperty Long category,

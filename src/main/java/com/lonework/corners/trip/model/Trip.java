@@ -13,6 +13,7 @@ import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.wander.model.WanderPart;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -50,6 +51,7 @@ public class Trip {
 
     private String creator;
 
+    @Column(name = "created_by")
     private String createdBy;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
@@ -186,5 +188,21 @@ public class Trip {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public List<WanderPart> getWanderparts() {
+        return wanderparts;
+    }
+
+    public void setWanderparts(List<WanderPart> wanderparts) {
+        this.wanderparts = wanderparts;
     }
 }

@@ -18,7 +18,22 @@
 	<properties>
 		<java.version>21</java.version>
 		<jackson.version>2.15.0</jackson.version>
+		<aws.sdk.version>2.20.26</aws.sdk.version>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- AWS SDK BOM to manage all AWS dependencies -->
+			<dependency>
+				<groupId>software.amazon.awssdk</groupId>
+				<artifactId>bom</artifactId>
+				<version>${aws.sdk.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<!-- Spring Boot Starter Dependencies -->
 		<dependency>
@@ -141,9 +156,17 @@
 			<artifactId>hibernate-spatial</artifactId>
 			<version>6.6.5.Final</version>
 		</dependency>
+
+		<!-- AWS S3 SDK - version managed by BOM above -->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+		</dependency>
+
+		<!-- Spring Boot Starter -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
+			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 
 	</dependencies>
