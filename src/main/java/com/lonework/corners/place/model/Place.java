@@ -81,7 +81,7 @@ public class Place {
 
 
     @ManyToMany(mappedBy = "places", cascade = CascadeType.PERSIST)
-    @JsonBackReference
+    @JsonBackReference("trip-places")
     private List<Trip> trips = new ArrayList<>();
 
     @Column(columnDefinition = "geometry(Point, 4326)")

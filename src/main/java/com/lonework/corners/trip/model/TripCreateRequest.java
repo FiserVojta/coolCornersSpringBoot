@@ -1,9 +1,10 @@
 package com.lonework.corners.trip.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.lonework.corners.place.model.DTO.GooglePlaceCreateRequest;
 import org.locationtech.jts.geom.Geometry;
+
+import java.util.List;
 
 
 public class TripCreateRequest {
@@ -34,6 +35,9 @@ public class TripCreateRequest {
 
     @JsonProperty
     private Geometry geometry;
+
+    @JsonProperty
+    private List<GooglePlaceCreateRequest> googlePlaces;
 
     public TripCreateRequest() {
     }
@@ -108,5 +112,13 @@ public class TripCreateRequest {
 
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
+    }
+
+    public List<GooglePlaceCreateRequest> getGooglePlaces() {
+        return googlePlaces;
+    }
+
+    public void setGooglePlaces(List<GooglePlaceCreateRequest> googlePlaces) {
+        this.googlePlaces = googlePlaces;
     }
 }

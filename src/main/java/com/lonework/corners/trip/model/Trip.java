@@ -1,16 +1,13 @@
 package com.lonework.corners.trip.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
-import com.lonework.corners.tag.model.Tag;
+import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.Place;
+import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.wander.model.WanderPart;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -24,6 +21,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import org.locationtech.jts.geom.Geometry;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -44,7 +44,7 @@ public class Trip {
     @ManyToOne
     @JoinColumn(name = "category_id")
     @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Category category;
 
     private String image;
@@ -59,7 +59,7 @@ public class Trip {
             joinColumns = @JoinColumn(name = "trip_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Tag> tags = new ArrayList<>();
 
     @ManyToMany(mappedBy = "trips")
@@ -71,13 +71,21 @@ public class Trip {
     @JoinTable(name = "trip_has_place",
             joinColumns = @JoinColumn(name = "trip_id"),
             inverseJoinColumns = @JoinColumn(name = "place_id"))
-    @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonManagedReference("trip-places")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Place> places;
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "trip_has_google_place",
+            joinColumns = @JoinColumn(name = "trip_id"),
+            inverseJoinColumns = @JoinColumn(name = "place_id"))
+    @JsonManagedReference("trip-google-places")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private List<GooglePlace> googlePlaces;
 
     @OneToMany(mappedBy = "trip")
     @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Comment> comments;
 
     private Geometry geometry;
@@ -85,7 +93,7 @@ public class Trip {
     public Trip() {
     }
 
-    public Trip(TripCreateRequest tripCreateRequest, String createdBy){
+    public Trip(TripCreateRequest tripCreateRequest, String createdBy) {
         this.geometry = tripCreateRequest.getGeometry();
         this.name = tripCreateRequest.getName();
         this.duration = tripCreateRequest.getDuration();
@@ -204,5 +212,13 @@ public class Trip {
 
     public void setWanderparts(List<WanderPart> wanderparts) {
         this.wanderparts = wanderparts;
+    }
+
+    public List<GooglePlace> getGooglePlaces() {
+        return googlePlaces;
+    }
+
+    public void setGooglePlaces(List<GooglePlace> googlePlaces) {
+        this.googlePlaces = googlePlaces;
     }
 }

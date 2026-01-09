@@ -5,6 +5,7 @@ import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.trip.model.TripCommentRequest;
 import com.lonework.corners.trip.model.TripCreateRequest;
 import com.lonework.corners.trip.model.TripRateRequest;
+import com.lonework.corners.trip.model.TripUpdateRequest;
 import com.lonework.corners.trip.services.TripService;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,8 +61,18 @@ public class TripController {
     public void commentTrip(@RequestBody TripCommentRequest tripCommentRequest, @PathVariable Long tripId) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {
-            String email = jwt.getClaimAsString("email");
-            this.tripService.commentTrip(tripCommentRequest, tripId, email);
+            this.tripService.commentTrip(tripCommentRequest, tripId, jwt.getClaimAsString("email"));
+            return;
+        }
+        throw new RuntimeException("JWT token not found or invalid");
+    }
+
+    @CrossOrigin(origins = "*")
+    @PutMapping("/{tripId}")
+    public void updateTrip(@RequestBody TripUpdateRequest tripUpdateRequest, @PathVariable Long tripId) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            this.tripService.updateTrip(tripUpdateRequest, tripId, jwt.getClaimAsString("email"));
             return;
         }
         throw new RuntimeException("JWT token not found or invalid");

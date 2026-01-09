@@ -5,6 +5,7 @@ import com.lonework.corners.comment.controller.CommentFacade;
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
+import com.lonework.corners.place.controller.PlaceFacade;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.place.model.DTO.PlaceListRequest;
@@ -16,6 +17,7 @@ import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
 import com.lonework.corners.trip.model.TripDetailResponse;
 import com.lonework.corners.place.services.PlaceService;
+import com.lonework.corners.trip.model.TripUpdateRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -44,6 +46,9 @@ public class TripService {
     @Autowired
     CommentFacade commentFacade;
 
+    @Autowired
+    PlaceFacade placeFacade;
+
     public Trip crateTrip(TripCreateRequest tripCreateRequest, String createdBy) {
         Trip trip = new Trip(tripCreateRequest, createdBy);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
@@ -55,6 +60,11 @@ public class TripService {
                     .map(id -> placeService.getPlaceById(id))
                     .toList());
         }
+        if(tripCreateRequest.getGooglePlaces() != null && !tripCreateRequest.getGooglePlaces().isEmpty()) {
+            trip.setGooglePlaces(placeFacade.getCreateGooglePlaces(tripCreateRequest.getGooglePlaces()));
+
+        }
+
         return entityManager.merge(trip);
     }
 
@@ -114,6 +124,15 @@ public class TripService {
         }
         var comment = new Comment(tripCommentRequest, trip, createBy);
         commentFacade.createComment(comment);
+    }
+
+    public void updateTrip(TripUpdateRequest tripCommentRequest, Long tripId, String createBy) {
+        var trip = entityManager.find(Trip.class, tripId);
+        if (trip == null) {
+            throw new EntityNotFoundException("Trip not found");
+        }
+        trip.setDescription(tripCommentRequest.description());
+        entityManager.merge(trip);
     }
 
     private Double countTripRating(Long tripId) {
