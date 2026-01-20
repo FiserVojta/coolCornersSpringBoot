@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
+import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.tag.model.Tag;
@@ -82,6 +83,14 @@ public class Trip {
     @JsonManagedReference("trip-google-places")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<GooglePlace> googlePlaces;
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "trip_has_corner_file",
+            joinColumns = @JoinColumn(name = "trip_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_id"))
+    @JsonManagedReference("trip-corner-files")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private List<CornerFile> cornerFiles;
 
     @OneToMany(mappedBy = "trip")
     @JsonManagedReference
@@ -220,5 +229,13 @@ public class Trip {
 
     public void setGooglePlaces(List<GooglePlace> googlePlaces) {
         this.googlePlaces = googlePlaces;
+    }
+
+    public List<CornerFile> getCornerFiles() {
+        return cornerFiles;
+    }
+
+    public void setCornerFiles(List<CornerFile> cornerFiles) {
+        this.cornerFiles = cornerFiles;
     }
 }

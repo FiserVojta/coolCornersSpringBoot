@@ -21,7 +21,7 @@ public class FileController {
 
     @PostMapping("")
     public ResponseEntity uploadFile(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal Jwt jwt) {
-        fileFacade.uploadFile(file, jwt.getClaimAsString("email"));
-        return ResponseEntity.ok().build();
+        var response = fileFacade.uploadFile(file, jwt.getClaimAsString("email"));
+        return ResponseEntity.ok(response);
     }
 }

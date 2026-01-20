@@ -1,6 +1,9 @@
 package com.lonework.corners.files.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.lonework.corners.common.model.EntityStatus;
+import com.lonework.corners.trip.model.Trip;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,9 +11,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -38,6 +44,10 @@ public class CornerFile {
 
     @Column
     private ZonedDateTime createdAt;
+
+    @ManyToMany(mappedBy = "cornerFiles", cascade = CascadeType.PERSIST)
+    @JsonBackReference("trip-corner-files")
+    private List<Trip> trips = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -109,5 +119,13 @@ public class CornerFile {
                 .add("entityStatus=" + entityStatus)
                 .add("createdAt=" + createdAt)
                 .toString();
+    }
+
+    public List<Trip> getTrips() {
+        return trips;
+    }
+
+    public void setTrips(List<Trip> trips) {
+        this.trips = trips;
     }
 }

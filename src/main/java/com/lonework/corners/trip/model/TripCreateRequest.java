@@ -1,6 +1,7 @@
 package com.lonework.corners.trip.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.lonework.corners.files.model.DTO.CornerFileCreateLinkRequest;
 import com.lonework.corners.place.model.DTO.GooglePlaceCreateRequest;
 import org.locationtech.jts.geom.Geometry;
 
@@ -35,6 +36,9 @@ public class TripCreateRequest {
 
     @JsonProperty
     private Geometry geometry;
+
+    @JsonProperty
+    private List<CornerFileCreateLinkRequest> files;
 
     @JsonProperty
     private List<GooglePlaceCreateRequest> googlePlaces;
@@ -112,6 +116,14 @@ public class TripCreateRequest {
 
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
+    }
+
+    public List<CornerFileCreateLinkRequest> getFiles() {
+        return files;
+    }
+
+    public void setFiles(List<CornerFileCreateLinkRequest> files) {
+        this.files = files;
     }
 
     public List<GooglePlaceCreateRequest> getGooglePlaces() {

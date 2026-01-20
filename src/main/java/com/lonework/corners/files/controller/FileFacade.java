@@ -3,9 +3,8 @@ package com.lonework.corners.files.controller;
 import com.lonework.corners.common.model.EntityStatus;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.files.model.CornerFile;
-import com.lonework.corners.files.model.DTO.CornerListFile;
+import com.lonework.corners.files.model.DTO.CornerFileList;
 import com.lonework.corners.spaces.controller.SpacesFacade;
-import com.lonework.corners.spaces.services.DigitalOceanSpacesService;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -16,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -31,7 +31,7 @@ public class FileFacade {
     SpacesFacade spacesFacade;
 
     @Transactional
-    public void uploadFile(MultipartFile file, String createdBy) {
+    public CornerFile uploadFile(MultipartFile file, String createdBy) {
         try {
             String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
             String fileUrl = spacesFacade.uploadFile(
@@ -48,8 +48,9 @@ public class FileFacade {
             cornerFile.setName(fileName);
             cornerFile.setEntityStatus(EntityStatus.ACTIVE);
             entityManager.persist(cornerFile);
+            return cornerFile;
         } catch (IOException e) {
-
+            throw new RuntimeException(e);
         }
     }
 
@@ -59,8 +60,16 @@ public class FileFacade {
         return spacesFacade.downloadFile(url);
     }
 
-    public PagedResult<CornerListFile> getFiles() {
-        var files = entityManager.createQuery("select c.id, c.url from CornerFile c", CornerListFile.class).getResultList();
+    public CornerFile getFileMetadata(Long fileId) {
+        return entityManager.find(CornerFile.class, fileId);
+    }
+
+    public PagedResult<CornerFileList> getFiles() {
+        var files = entityManager.createQuery("select c.id, c.url, c.name from CornerFile c", CornerFileList.class).getResultList();
         return new PagedResult<>(files, 1L);
+    }
+
+    public List<CornerFileList> getCornerFilesList(List<CornerFile> files) {
+        return files.stream().map(CornerFileList::new).toList();
     }
 }

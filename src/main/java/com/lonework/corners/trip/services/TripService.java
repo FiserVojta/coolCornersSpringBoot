@@ -5,8 +5,11 @@ import com.lonework.corners.comment.controller.CommentFacade;
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
+import com.lonework.corners.files.controller.FileFacade;
+import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.place.controller.PlaceFacade;
 import com.lonework.corners.place.model.Place;
+import com.lonework.corners.tag.controller.TagFacade;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.place.model.DTO.PlaceListRequest;
 import com.lonework.corners.trip.model.TripCommentRequest;
@@ -28,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +53,12 @@ public class TripService {
     @Autowired
     PlaceFacade placeFacade;
 
+    @Autowired
+    TagFacade tagFacade;
+
+    @Autowired
+    FileFacade fileFacade;
+
     public Trip crateTrip(TripCreateRequest tripCreateRequest, String createdBy) {
         Trip trip = new Trip(tripCreateRequest, createdBy);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
@@ -62,7 +72,13 @@ public class TripService {
         }
         if(tripCreateRequest.getGooglePlaces() != null && !tripCreateRequest.getGooglePlaces().isEmpty()) {
             trip.setGooglePlaces(placeFacade.getCreateGooglePlaces(tripCreateRequest.getGooglePlaces()));
-
+        }
+        if(tripCreateRequest.getFiles() != null && !tripCreateRequest.getFiles().isEmpty()) {
+            List<CornerFile> files = new ArrayList<>();
+            for (var file : tripCreateRequest.getFiles()) {
+                files.add(fileFacade.getFileMetadata(file.fileId()));
+            }
+            trip.setCornerFiles(files);
         }
 
         return entityManager.merge(trip);
@@ -117,21 +133,23 @@ public class TripService {
     }
 
 
-    public void commentTrip(TripCommentRequest tripCommentRequest, Long tripId, String createBy) {
+    public void commentTrip(TripCommentRequest tripCommentRequest, Long tripId, String createdBy) {
         var trip = entityManager.find(Trip.class, tripId);
         if (trip == null) {
             throw new EntityNotFoundException("Trip not found");
         }
-        var comment = new Comment(tripCommentRequest, trip, createBy);
+        var comment = new Comment(tripCommentRequest, trip, createdBy);
         commentFacade.createComment(comment);
     }
 
-    public void updateTrip(TripUpdateRequest tripCommentRequest, Long tripId, String createBy) {
+    public void updateTrip(TripUpdateRequest tripUpdateRequest, Long tripId, String createdBy) {
         var trip = entityManager.find(Trip.class, tripId);
         if (trip == null) {
             throw new EntityNotFoundException("Trip not found");
         }
-        trip.setDescription(tripCommentRequest.description());
+        trip.setDescription(tripUpdateRequest.description());
+        trip.setGooglePlaces(placeFacade.getCreateGooglePlaces(tripUpdateRequest.googlePlaces()));
+        trip.setTags(tagFacade.getTagsById(tripUpdateRequest.tags()));
         entityManager.merge(trip);
     }
 
@@ -146,7 +164,8 @@ public class TripService {
         return new TripDetailResponse(
                 trip,
                 getPlacesDetailResponse(trip.getPlaces()),
-                null);
+                null,
+                fileFacade.getCornerFilesList(trip.getCornerFiles()));
     }
 
     private List<PlaceSimpleResponse> getPlacesDetailResponse(List<Place> places) {

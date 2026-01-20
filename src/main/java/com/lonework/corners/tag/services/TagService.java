@@ -38,4 +38,6 @@ public class TagService {
         return entityManager.createQuery("SELECT t FROM Tag t", Tag.class).getResultList();
     }
 
+
+
 }
