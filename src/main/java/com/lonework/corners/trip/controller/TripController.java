@@ -2,10 +2,10 @@ package com.lonework.corners.trip.controller;
 
 import com.lonework.corners.place.model.DTO.PlaceListRequest;
 import com.lonework.corners.trip.model.Trip;
-import com.lonework.corners.trip.model.TripCommentRequest;
-import com.lonework.corners.trip.model.TripCreateRequest;
-import com.lonework.corners.trip.model.TripRateRequest;
-import com.lonework.corners.trip.model.TripUpdateRequest;
+import com.lonework.corners.trip.model.DTO.TripCommentRequest;
+import com.lonework.corners.trip.model.DTO.TripCreateRequest;
+import com.lonework.corners.trip.model.DTO.TripRateRequest;
+import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
 import com.lonework.corners.trip.services.TripService;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;

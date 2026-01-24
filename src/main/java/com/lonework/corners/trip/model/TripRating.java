@@ -1,5 +1,6 @@
 package com.lonework.corners.trip.model;
 
+import com.lonework.corners.trip.model.DTO.TripRateRequest;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +10,6 @@ import jakarta.persistence.Id;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.StringJoiner;
-import java.util.UUID;
 
 
 @Entity

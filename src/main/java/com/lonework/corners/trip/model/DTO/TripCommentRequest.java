@@ -1,4 +1,4 @@
-package com.lonework.corners.trip.model;
+package com.lonework.corners.trip.model.DTO;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

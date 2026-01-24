@@ -12,15 +12,15 @@ import com.lonework.corners.place.model.Place;
 import com.lonework.corners.tag.controller.TagFacade;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.place.model.DTO.PlaceListRequest;
-import com.lonework.corners.trip.model.TripCommentRequest;
-import com.lonework.corners.trip.model.TripCreateRequest;
-import com.lonework.corners.trip.model.TripRateRequest;
+import com.lonework.corners.trip.model.DTO.TripCommentRequest;
+import com.lonework.corners.trip.model.DTO.TripCreateRequest;
+import com.lonework.corners.trip.model.DTO.TripRateRequest;
 import com.lonework.corners.trip.model.TripRating;
 import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
-import com.lonework.corners.trip.model.TripDetailResponse;
+import com.lonework.corners.trip.model.DTO.TripDetailResponse;
 import com.lonework.corners.place.services.PlaceService;
-import com.lonework.corners.trip.model.TripUpdateRequest;
+import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -142,14 +142,23 @@ public class TripService {
         commentFacade.createComment(comment);
     }
 
+    @Transactional
     public void updateTrip(TripUpdateRequest tripUpdateRequest, Long tripId, String createdBy) {
         var trip = entityManager.find(Trip.class, tripId);
         if (trip == null) {
             throw new EntityNotFoundException("Trip not found");
         }
+        trip.setCategory(entityManager.find(Category.class, tripUpdateRequest.categoryId()));
         trip.setDescription(tripUpdateRequest.description());
         trip.setGooglePlaces(placeFacade.getCreateGooglePlaces(tripUpdateRequest.googlePlaces()));
         trip.setTags(tagFacade.getTagsById(tripUpdateRequest.tags()));
+        if(tripUpdateRequest.files() != null && !tripUpdateRequest.files().isEmpty()) {
+            List<CornerFile> files = new ArrayList<>();
+            for (var file : tripUpdateRequest.files()) {
+                files.add(fileFacade.getFileMetadata(file.fileId()));
+            }
+            trip.setCornerFiles(files);
+        }
         entityManager.merge(trip);
     }
 

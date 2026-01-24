@@ -1,4 +1,4 @@
-package com.lonework.corners.trip.model;
+package com.lonework.corners.trip.model.DTO;
 
 import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
@@ -6,9 +6,9 @@ import com.lonework.corners.files.model.DTO.CornerFileList;
 import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
 import com.lonework.corners.tag.model.Tag;
+import com.lonework.corners.trip.model.Trip;
 import org.geotools.api.feature.simple.SimpleFeature;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

@@ -1,4 +1,4 @@
-package com.lonework.corners.trip.model;
+package com.lonework.corners.trip.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lonework.corners.files.model.DTO.CornerFileCreateLinkRequest;

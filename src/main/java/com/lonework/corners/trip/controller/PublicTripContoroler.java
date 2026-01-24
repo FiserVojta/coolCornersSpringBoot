@@ -3,7 +3,7 @@ package com.lonework.corners.trip.controller;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.trip.model.Trip;
-import com.lonework.corners.trip.model.TripDetailResponse;
+import com.lonework.corners.trip.model.DTO.TripDetailResponse;
 import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.trip.services.TripService;
 import jakarta.annotation.security.PermitAll;

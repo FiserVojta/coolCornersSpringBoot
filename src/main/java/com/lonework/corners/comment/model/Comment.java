@@ -2,11 +2,10 @@ package com.lonework.corners.comment.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
-import com.lonework.corners.trip.model.TripCommentRequest;
+import com.lonework.corners.trip.model.DTO.TripCommentRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;

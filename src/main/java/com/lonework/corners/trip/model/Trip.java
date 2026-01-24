@@ -9,6 +9,7 @@ import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.tag.model.Tag;
+import com.lonework.corners.trip.model.DTO.TripCreateRequest;
 import com.lonework.corners.wander.model.WanderPart;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
