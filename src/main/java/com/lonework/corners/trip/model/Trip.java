@@ -22,6 +22,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.ArrayList;
@@ -99,6 +100,14 @@ public class Trip {
     private List<Comment> comments;
 
     private Geometry geometry;
+
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "background_image_id")
+    private CornerFile backgroundImage;
+
+    public CornerFile getBackgroundImage() {return backgroundImage;}
+
+    public void setBackgroundImage(CornerFile backgroundFile) {this.backgroundImage = backgroundFile;}
 
     public Trip() {
     }

@@ -2,6 +2,7 @@ package com.lonework.corners.trip.model.DTO;
 
 import com.lonework.corners.category.model.Category;
 import com.lonework.corners.comment.model.Comment;
+import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.files.model.DTO.CornerFileList;
 import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
@@ -25,7 +26,8 @@ public record TripDetailResponse(Long id,
                                  List<GooglePlace> googlePlaces,
                                  String createdBy,
                                  Category category,
-                                 List<CornerFileList> files) {
+                                 List<CornerFileList> files,
+                                 CornerFile backgroundImage) {
     public TripDetailResponse(Trip trip, List<PlaceSimpleResponse> places, SimpleFeature feature, List<CornerFileList> files) {
         this(
                 trip.getId(),
@@ -41,7 +43,8 @@ public record TripDetailResponse(Long id,
                 trip.getGooglePlaces(),
                 trip.getCreatedBy(),
                 trip.getCategory(),
-                files
+                files,
+                trip.getBackgroundImage()
         );
     }
 

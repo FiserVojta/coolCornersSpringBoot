@@ -11,5 +11,6 @@ public record TripUpdateRequest(List<Long> placeIds,
                                 String description,
                                 List<Long> tags,
                                 List<GooglePlaceCreateRequest> googlePlaces,
-                                 List<CornerFileCreateLinkRequest> files) {
+                                List<CornerFileCreateLinkRequest> files,
+                                CornerFileCreateLinkRequest backgroundImage) {
 }

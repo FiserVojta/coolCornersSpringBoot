@@ -99,23 +99,49 @@ public class TripService {
 
     public PagedResult<Trip> findTripByParameters(TripSearchRequest tripSearchRequest, PagingQueryParams pagingQueryParams) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+
+        // Build predicates list
+        List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
+
+        // Data query
         CriteriaQuery<Trip> cq = cb.createQuery(Trip.class);
         Root<Trip> tripRoot = cq.from(Trip.class);
+
         if (tripSearchRequest.getCategories() != null && !tripSearchRequest.getCategories().isEmpty()) {
-            var categoryPredicate = tripRoot.get("category").get("id").in(tripSearchRequest.getCategories());
-            cq.where(categoryPredicate);
+            predicates.add(tripRoot.get("category").get("id").in(tripSearchRequest.getCategories()));
         }
         if (tripSearchRequest.getTags() != null && !tripSearchRequest.getTags().isEmpty()) {
-            var tagPredicate = tripRoot.get("tags").get("id").in(tripSearchRequest.getTags());
-            cq.where(tagPredicate);
+            predicates.add(tripRoot.get("tags").get("id").in(tripSearchRequest.getTags()));
         }
+
+        if (!predicates.isEmpty()) {
+            cq.where(cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
+        }
+        var page = pagingQueryParams.page() != null ? pagingQueryParams.page() : 0;
+        var size =pagingQueryParams.size() != null ? pagingQueryParams.size() : 10;
         var data = entityManager.createQuery(cq)
-                .setFirstResult(pagingQueryParams.page() != null ? pagingQueryParams.page() : 0)
-                .setMaxResults(pagingQueryParams.size() != null ? pagingQueryParams.size() : 10)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
                 .getResultList();
 
-       long total = entityManager.createQuery("SELECT COUNT(w) FROM Trip w", Long.class)
-                .getSingleResult();
+        // Count query with same predicates
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Trip> countRoot = countQuery.from(Trip.class);
+        countQuery.select(cb.count(countRoot));
+
+        List<jakarta.persistence.criteria.Predicate> countPredicates = new ArrayList<>();
+        if (tripSearchRequest.getCategories() != null && !tripSearchRequest.getCategories().isEmpty()) {
+            countPredicates.add(countRoot.get("category").get("id").in(tripSearchRequest.getCategories()));
+        }
+        if (tripSearchRequest.getTags() != null && !tripSearchRequest.getTags().isEmpty()) {
+            countPredicates.add(countRoot.get("tags").get("id").in(tripSearchRequest.getTags()));
+        }
+
+        if (!countPredicates.isEmpty()) {
+            countQuery.where(cb.and(countPredicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
+        }
+
+        long total = entityManager.createQuery(countQuery).getSingleResult();
         return new PagedResult<>(data, total);
     }
 
@@ -158,6 +184,9 @@ public class TripService {
                 files.add(fileFacade.getFileMetadata(file.fileId()));
             }
             trip.setCornerFiles(files);
+        }
+        if(tripUpdateRequest.backgroundImage() != null) {
+            trip.setBackgroundImage(fileFacade.getFileMetadata(tripUpdateRequest.backgroundImage().fileId()));
         }
         entityManager.merge(trip);
     }
