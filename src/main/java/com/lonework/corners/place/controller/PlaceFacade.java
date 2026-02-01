@@ -41,7 +41,6 @@ public class PlaceFacade {
         entity.setId(googlePlaceCreateRequest.placeId());
         entity.setName(googlePlaceCreateRequest.name());
         entity.setGeometry(googlePlaceCreateRequest.geometry());
-        entityManager.merge(entity);
-        return entity;
+        return entityManager.merge(entity);
     }
 }
