@@ -23,6 +23,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.locationtech.jts.geom.Geometry;
 
 import java.util.ArrayList;
@@ -30,6 +33,9 @@ import java.util.List;
 
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
 public class Trip {
 
     @Id
@@ -105,13 +111,6 @@ public class Trip {
     @JoinColumn(name = "background_image_id")
     private CornerFile backgroundImage;
 
-    public CornerFile getBackgroundImage() {return backgroundImage;}
-
-    public void setBackgroundImage(CornerFile backgroundFile) {this.backgroundImage = backgroundFile;}
-
-    public Trip() {
-    }
-
     public Trip(TripCreateRequest tripCreateRequest, String createdBy) {
         this.geometry = tripCreateRequest.getGeometry();
         this.name = tripCreateRequest.getName();
@@ -119,133 +118,5 @@ public class Trip {
         this.description = tripCreateRequest.getDescription();
         this.creator = tripCreateRequest.getAuthor();
         this.createdBy = createdBy;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Double getRating() {
-        return rating;
-    }
-
-    public void setRating(Double rating) {
-        this.rating = rating;
-    }
-
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getCreator() {
-        return creator;
-    }
-
-    public void setCreator(String author) {
-        this.creator = author;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<Place> getPlaces() {
-        return places;
-    }
-
-    public void setPlaces(List<Place> places) {
-        this.places = places;
-    }
-
-    public Geometry getGeometry() {
-        return geometry;
-    }
-
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public List<WanderPart> getWanderparts() {
-        return wanderparts;
-    }
-
-    public void setWanderparts(List<WanderPart> wanderparts) {
-        this.wanderparts = wanderparts;
-    }
-
-    public List<GooglePlace> getGooglePlaces() {
-        return googlePlaces;
-    }
-
-    public void setGooglePlaces(List<GooglePlace> googlePlaces) {
-        this.googlePlaces = googlePlaces;
-    }
-
-    public List<CornerFile> getCornerFiles() {
-        return cornerFiles;
-    }
-
-    public void setCornerFiles(List<CornerFile> cornerFiles) {
-        this.cornerFiles = cornerFiles;
     }
 }

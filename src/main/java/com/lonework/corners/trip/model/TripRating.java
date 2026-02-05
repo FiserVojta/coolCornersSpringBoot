@@ -6,13 +6,21 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.ZonedDateTime;
-import java.util.Objects;
-import java.util.StringJoiner;
 
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class TripRating {
 
     @Id
@@ -31,77 +39,10 @@ public class TripRating {
     @Column
     private ZonedDateTime createdAt;
 
-    public TripRating() {
-    }
-
     public TripRating(TripRateRequest tripRateRequest, Long tripId) {
         this.tripId = tripId;
         this.author = tripRateRequest.createdBy();
         this.rating = tripRateRequest.rating();
         this.createdAt = ZonedDateTime.now();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getTripId() {
-        return tripId;
-    }
-
-    public void setTripId(Long tripId) {
-        this.tripId = tripId;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
-    public Integer getRating() {
-        return rating;
-    }
-
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof TripRating that)) {return false;}
-        return Objects.equals(id, that.id) && Objects.equals(tripId, that.tripId) && Objects.equals(author, that.author) && Objects.equals(
-                rating,
-                that.rating) && Objects.equals(createdAt, that.createdAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, tripId, author, rating, createdAt);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", TripRating.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
-                .add("tripId=" + tripId)
-                .add("author='" + author + "'")
-                .add("rating=" + rating)
-                .add("createdAt=" + createdAt)
-                .toString();
     }
 }
