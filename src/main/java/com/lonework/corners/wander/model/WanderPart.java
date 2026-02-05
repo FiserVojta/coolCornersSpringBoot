@@ -1,12 +1,10 @@
 package com.lonework.corners.wander.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,14 +16,21 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 @Entity
 @Table(name = "wanderpart")
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(exclude = {"places", "trips", "wander"})
 public class WanderPart {
 
     @Id
@@ -57,9 +62,6 @@ public class WanderPart {
     @JsonIgnore
     private Wander wander;
 
-    public WanderPart() {
-    }
-
     public WanderPart(WanderCreateRequest.WanderPartCreateRequest wanderPartCreateRequest) {
         this.places = new ArrayList<>();
         this.trips = new ArrayList<>();
@@ -78,58 +80,5 @@ public class WanderPart {
             });
         }
         this.order = wanderPartCreateRequest.order();
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof WanderPart that)) {return false;}
-        return Objects.equals(id, that.id) && Objects.equals(places, that.places) && Objects.equals(trips, that.trips) && Objects.equals(order,
-                that.order) && Objects.equals(wander, that.wander);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, places, trips, order, wander);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public List<Place> getPlaces() {
-        return places;
-    }
-
-    public void setPlaces(List<Place> places) {
-        this.places = places;
-    }
-
-    public List<Trip> getTrips() {
-        return trips;
-    }
-
-    public void setTrips(List<Trip> trips) {
-        this.trips = trips;
-    }
-
-    public Integer getOrder() {
-        return order;
-    }
-
-    public void setOrder(Integer order) {
-        this.order = order;
-    }
-
-    public Wander getWander() {
-        return wander;
-    }
-
-    public void setWander(Wander wander) {
-        this.wander = wander;
     }
 }

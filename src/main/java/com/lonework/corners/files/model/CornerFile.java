@@ -13,16 +13,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
 
 
 @Entity
 @Table(name = "cornerfile")
+@Getter
+@Setter
+@EqualsAndHashCode(exclude = "trips")
+@ToString(exclude = "trips")
 public class CornerFile {
 
     @Id
@@ -48,84 +54,4 @@ public class CornerFile {
     @ManyToMany(mappedBy = "cornerFiles", cascade = CascadeType.PERSIST)
     @JsonBackReference("trip-corner-files")
     private List<Trip> trips = new ArrayList<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public EntityStatus getEntityStatus() {
-        return entityStatus;
-    }
-
-    public void setEntityStatus(EntityStatus entityStatus) {
-        this.entityStatus = entityStatus;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof CornerFile file)) {return false;}
-        return Objects.equals(id, file.id) && Objects.equals(name, file.name) && Objects.equals(url, file.url) && Objects.equals(createdBy,
-                file.createdBy) && entityStatus == file.entityStatus && Objects.equals(createdAt, file.createdAt);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, url, createdBy, entityStatus, createdAt);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", CornerFile.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
-                .add("name='" + name + "'")
-                .add("url='" + url + "'")
-                .add("createdBy='" + createdBy + "'")
-                .add("entityStatus=" + entityStatus)
-                .add("createdAt=" + createdAt)
-                .toString();
-    }
-
-    public List<Trip> getTrips() {
-        return trips;
-    }
-
-    public void setTrips(List<Trip> trips) {
-        this.trips = trips;
-    }
 }

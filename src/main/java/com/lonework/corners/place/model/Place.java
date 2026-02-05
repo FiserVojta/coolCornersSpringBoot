@@ -2,8 +2,6 @@ package com.lonework.corners.place.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -26,11 +24,21 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.locationtech.jts.geom.Geometry;
 
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(exclude = {"comments", "tags", "wanderparts", "trips"})
+@ToString(exclude = {"comments", "tags", "wanderparts", "trips"})
 public class Place {
 
     @Id
@@ -88,9 +96,6 @@ public class Place {
     @JdbcTypeCode(org.hibernate.type.SqlTypes.GEOMETRY)
     private Geometry geometry;
 
-    public Place() {
-    }
-
     public Place(PlaceCreateRequest placeRequest, String createdBy) {
         this.name = placeRequest.getName();
         this.description = placeRequest.getDescription();
@@ -100,144 +105,5 @@ public class Place {
         this.phoneNumber = placeRequest.getPhoneNumber();
         this.geometry = placeRequest.getGeometry();
         this.createdBy = createdBy;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public String getOpeningHours() {
-        return openingHours;
-    }
-
-    public void setOpeningHours(String openingHours) {
-        this.openingHours = openingHours;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public List<Tag> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-
-    public List<Trip> getTrips() {
-        return trips;
-    }
-
-    public void setTrips(List<Trip> trips) {
-        this.trips = trips;
-    }
-
-    public Geometry getGeometry() {
-        return geometry;
-    }
-
-    public void setGeometry(Geometry geometry) {
-        this.geometry = geometry;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {return true;}
-        if (!(o instanceof Place place)) {return false;}
-        return Objects.equals(id, place.id) && Objects.equals(name, place.name) && Objects.equals(description, place.description)
-                && Objects.equals(phoneNumber, place.phoneNumber) && Objects.equals(price, place.price) && Objects.equals(openingHours,
-                place.openingHours) && Objects.equals(image, place.image) && Objects.equals(comments, place.comments) && Objects.equals(category,
-                place.category) && Objects.equals(tags, place.tags) && Objects.equals(trips, place.trips) && Objects.equals(geometry, place.geometry)
-                && Objects.equals(createdBy, place.createdBy);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name, description, phoneNumber, price, openingHours, image, comments, category, tags, trips, geometry);
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Place.class.getSimpleName() + "[", "]")
-                .add("id=" + id)
-                .add("name='" + name + "'")
-                .add("description='" + description + "'")
-                .add("phoneNumber='" + phoneNumber + "'")
-                .add("price=" + price)
-                .add("openingHours='" + openingHours + "'")
-                .add("image='" + image + "'")
-                .add("comments=" + comments)
-                .add("category=" + category)
-                .add("tags=" + tags)
-                .add("trips=" + trips)
-                .add("geometry=" + geometry)
-                .add("createdBy=" + createdBy)
-                .toString();
     }
 }
