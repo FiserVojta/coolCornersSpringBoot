@@ -42,7 +42,7 @@ public class WanderPart {
             joinColumns = @JoinColumn(name = "wanderpart_id"),
             inverseJoinColumns = @JoinColumn(name = "place_id"))
     @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Place> places = new ArrayList<>();
 
     @ManyToMany
@@ -50,7 +50,7 @@ public class WanderPart {
             joinColumns = @JoinColumn(name = "wanderpart_id"),
             inverseJoinColumns = @JoinColumn(name = "trip_id"))
     @JsonManagedReference
-    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private List<Trip> trips = new ArrayList<>();
 
     @Column(name = "\"order\"")
@@ -62,23 +62,7 @@ public class WanderPart {
     @JsonIgnore
     private Wander wander;
 
-    public WanderPart(WanderCreateRequest.WanderPartCreateRequest wanderPartCreateRequest) {
-        this.places = new ArrayList<>();
-        this.trips = new ArrayList<>();
-        if (wanderPartCreateRequest.places() != null) {
-            wanderPartCreateRequest.places().forEach(placeId -> {
-                Place place = new Place();
-                place.setId(placeId);
-                this.places.add(place);
-            });
-        }
-        if (wanderPartCreateRequest.trips() != null) {
-            wanderPartCreateRequest.trips().forEach(tripId -> {
-                Trip trip = new Trip();
-                trip.setId(tripId);
-                this.trips.add(trip);
-            });
-        }
-        this.order = wanderPartCreateRequest.order();
-    }
+    @Column(name = "name")
+    private String name;
+
 }

@@ -9,6 +9,8 @@ import com.lonework.corners.user.model.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,6 +55,10 @@ public class Wander {
 
     @Column(name = "start_time")
     private LocalDateTime startTime;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "wander_type")
+    private WanderType wanderType;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "wander_has_wanderers",

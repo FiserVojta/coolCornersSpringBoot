@@ -10,16 +10,10 @@ public record WanderCreateRequest(
         @JsonProperty String description,
         @JsonProperty Integer capacity,
         @JsonProperty LocalDateTime startTime,
+        @JsonProperty WanderType wanderType,
         @JsonProperty List<Long> wanderers,
         @JsonProperty List<Long> tags,
         @JsonProperty Long category,
         @JsonProperty List<WanderPartCreateRequest> wanderParts
 ) {
-
-    public record WanderPartCreateRequest(
-            @JsonProperty List<Long> places,
-            @JsonProperty List<Long> trips,
-            @JsonProperty Integer order
-    ) {
-    }
 }

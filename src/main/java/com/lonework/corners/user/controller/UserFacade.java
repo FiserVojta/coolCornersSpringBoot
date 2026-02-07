@@ -9,10 +9,13 @@ import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.annotation.ApplicationScope;
+
+import java.util.List;
 
 
 @ApplicationScope
@@ -62,6 +65,14 @@ public class UserFacade {
         }
         saveUser(user);
         return user;
+    }
+
+    public List<User> getUsersByIds(List<Long> ids) {
+        List<User> users = userService.getUsersByIds(ids);
+        if (users.size() != ids.size()) {
+            throw new EntityNotFoundException("Some users were not found");
+        }
+        return users;
     }
 
     public void saveUser(User user) {

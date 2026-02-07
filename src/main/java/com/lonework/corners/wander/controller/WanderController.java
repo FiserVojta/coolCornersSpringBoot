@@ -27,9 +27,8 @@ public class WanderController {
     @PutMapping("/{wanderId}")
     public ResponseEntity<Wander> updateWander(
             @PathVariable Long wanderId,
-            @RequestBody WanderCreateRequest wanderCreateRequest,
-            @AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(wanderService.updateWander(wanderId, wanderCreateRequest, jwt.getClaimAsString("email")));
+            @RequestBody WanderCreateRequest wanderCreateRequest) {
+        return ResponseEntity.ok(wanderService.updateWander(wanderId, wanderCreateRequest));
     }
     
     @PostMapping("/{wanderId}/join")

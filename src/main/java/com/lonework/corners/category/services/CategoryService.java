@@ -2,7 +2,6 @@ package com.lonework.corners.category.services;
 
 import com.lonework.corners.category.model.Category;
 import com.lonework.corners.category.model.CategorySearchParameters;
-import com.lonework.corners.place.model.Place;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -10,6 +9,8 @@ import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -35,5 +36,9 @@ public class CategoryService {
         query.select(root).where(categoryPredicate);
 
         return entityManager.createQuery(query).getResultList();
+    }
+
+    public Category getCategoryById(Long id) {
+        return entityManager.find(Category.class, id);
     }
 }

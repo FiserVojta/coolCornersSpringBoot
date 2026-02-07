@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 
 @Service
@@ -81,5 +82,11 @@ public class UserService {
 
     public User getUser(Long id){
         return entityManager.find(User.class, id);
+    }
+
+    public List<User> getUsersByIds(List<Long> ids) {
+        return entityManager.createQuery("SELECT u FROM User u WHERE u.id IN :ids", User.class)
+                .setParameter("ids", ids)
+                .getResultList();
     }
 }
