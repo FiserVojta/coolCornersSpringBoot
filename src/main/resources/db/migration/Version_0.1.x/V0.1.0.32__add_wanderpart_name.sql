@@ -1,0 +1,1 @@
+ALTER TABLE wanderpart ADD COLUMN name VARCHAR(255);
