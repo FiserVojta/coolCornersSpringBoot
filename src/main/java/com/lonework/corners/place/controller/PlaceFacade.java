@@ -27,6 +27,16 @@ public class PlaceFacade {
         return list;
     }
 
+    public List<Place> findPlacesByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return entityManager
+                .createQuery("SELECT p FROM Place p WHERE p.id IN :ids", Place.class)
+                .setParameter("ids", ids)
+                .getResultList();
+    }
+
     @Transactional
     public GooglePlace createGooglePlace(GooglePlaceCreateRequest googlePlaceCreateRequest) {
         var entity = entityManager
