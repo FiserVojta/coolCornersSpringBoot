@@ -7,7 +7,6 @@ import com.lonework.corners.event.model.EventSearchParameters;
 import com.lonework.corners.event.service.EventService;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,14 +21,12 @@ public class PublicEventController {
     @Autowired
     EventService eventService;
 
-    @CrossOrigin(origins = "*")
     @GetMapping(path = "/{id}")
     @PermitAll
     public Event getEvent(@PathVariable("id") Long id) {
         return eventService.getEvent(id);
     }
 
-    @CrossOrigin(origins = "*")
     @GetMapping("")
     @PermitAll
     public PagedResult<Event> findEvent(@ModelAttribute EventSearchParameters eventSearchParameters, PagingQueryParams queryParams) {

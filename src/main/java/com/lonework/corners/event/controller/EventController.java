@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,20 +28,17 @@ public class EventController {
     @Autowired
     EventService eventService;
 
-    @CrossOrigin(origins = "*")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
     @PermitAll
     public Event createEvent(@RequestBody EventCreateRequest eventCreateRequest, @AuthenticationPrincipal Jwt jwt) {
         return eventService.createEvent(eventCreateRequest, jwt.getClaimAsString("email"));
     }
 
-    @CrossOrigin(origins = "*")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{id}")
     public Event updateEvent(@PathVariable("id") Long id, @RequestBody EventCreateRequest eventCreateRequest) {
         return eventService.updatedEvent(eventCreateRequest, id);
     }
 
-    @CrossOrigin(origins = "*")
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable("id") Long id) {
         eventService.deleteEvent(id);

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +29,6 @@ public class PlaceController {
     private PlaceService placeService;
 
 
-    @CrossOrigin(origins = "*")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
     public Place createPlace(@RequestBody PlaceCreateRequest placeRequest) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -41,7 +39,6 @@ public class PlaceController {
         throw new RuntimeException("JWT token not found or invalid");
     }
 
-    @CrossOrigin(origins = "*")
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{placeId}")
     public Place updatePlace(@RequestBody PlaceCreateRequest placeRequest, @PathVariable("placeId") Long placeId) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -54,7 +51,6 @@ public class PlaceController {
 
 
 
-    @CrossOrigin(origins = "*")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{placeId}/comment")
     public Comment commentPlace(@RequestBody CommentCreateRequest commentCreateRequest,
             @PathVariable("placeId") Long placeId) {
@@ -68,22 +64,11 @@ public class PlaceController {
 
     }
 
-    @CrossOrigin(origins = "*")
     @PatchMapping("/{placeId}/rate")
     public void ratePlace(@RequestBody PlaceRateRequest placeRateRequest, @PathVariable Long placeId) {
         this.placeService.ratePlace(placeRateRequest, placeId);
         new Response().setMessage("Place rated successfully");
     }
 
-//    @CrossOrigin(origins = "/v1/*")
-//    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
-//    public ResponseEntity<String> createPlace(@RequestBody PlaceCreateRequest feature) {
-//        // Process the feature as needed, e.g., save to database
-//        // For simplicity, we are just returning the feature as a GeoJSON string
-//
-//
-//
-//        return new ResponseEntity<>(null, HttpStatus.CREATED);
-//    }
 
 }

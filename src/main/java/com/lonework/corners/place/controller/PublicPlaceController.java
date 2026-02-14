@@ -14,7 +14,6 @@ import jakarta.annotation.security.PermitAll;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,14 +30,12 @@ public class PublicPlaceController {
     @Autowired
     private PlaceService placeService;
 
-    @CrossOrigin(origins = "*")
     @GetMapping("/{id}")
     @PermitAll
     public PlaceDetailResponse getPlaceById(@PathVariable("id") Long id) {
         return this.placeService.getPlaceResponse(id);
     }
 
-    @CrossOrigin(origins = "*")
     @GetMapping()
     @PermitAll
     public PagedResult<Place> fetchPlace(PlaceSearchRequest placeSearchRequest, PagingQueryParams pagingQueryParams) {
@@ -47,15 +44,5 @@ public class PublicPlaceController {
     }
 
 
-//    @CrossOrigin(origins = "/v1/*")
-//    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
-//    public ResponseEntity<String> createPlace(@RequestBody PlaceCreateRequest feature) {
-//        // Process the feature as needed, e.g., save to database
-//        // For simplicity, we are just returning the feature as a GeoJSON string
-//
-//
-//
-//        return new ResponseEntity<>(null, HttpStatus.CREATED);
-//    }
 
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,20 +22,17 @@ public class TagContoller {
     @Autowired
     private TagService tagService;
 
-    @CrossOrigin(origins = "*")
     @PostMapping("/fetch")
     public Iterable<Tag> getAllTagsForPlaces(@RequestBody TagSearchRequest tagSearch) {
 
         return this.tagService.getTagsWithRequest(tagSearch);
     }
 
-    @CrossOrigin(origins = "*")
     @PostMapping("")
     public Tag createTag(@RequestBody TagCreateRequest tag) {
         return this.tagService.createTag(tag);
     }
 
-    @CrossOrigin(origins = "*")
     @GetMapping("")
     public List<Tag> getAllTags() {
         return this.tagService.getAllTags();
