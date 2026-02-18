@@ -4,6 +4,7 @@ import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.wander.model.WanderDetailResponse;
 import com.lonework.corners.wander.model.WanderListResponse;
+import com.lonework.corners.wander.model.WanderQueryParam;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class WanderPublicController {
 
     @GetMapping("")
     @PermitAll
-    public ResponseEntity<PagedResult<WanderListResponse>> getAllWanders(PagingQueryParams queryParams) {
-        return ResponseEntity.ok(wanderFacade.getWanderListResponse(queryParams));
+    public ResponseEntity<PagedResult<WanderListResponse>> getAllWanders(PagingQueryParams queryParams, WanderQueryParam filterParams) {
+        return ResponseEntity.ok(wanderFacade.getWanderListResponse(queryParams, filterParams));
     }
 }

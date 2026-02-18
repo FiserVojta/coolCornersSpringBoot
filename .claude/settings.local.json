@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(bash ./mvnw compile -q:*)",
-      "Bash(mvn compile:*)"
+      "Bash(mvn compile:*)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

@@ -12,9 +12,15 @@ import com.lonework.corners.wander.model.WanderCreateRequest;
 import com.lonework.corners.wander.model.WanderDetailResponse;
 import com.lonework.corners.wander.model.WanderListResponse;
 import com.lonework.corners.wander.model.WanderPart;
+import com.lonework.corners.wander.model.WanderQueryParam;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
@@ -86,22 +92,64 @@ public class WanderService {
         return wander;
     }
 
-    public PagedResult<WanderListResponse> getWanders(PagingQueryParams queryParams) {
+    public PagedResult<WanderListResponse> getWanders(PagingQueryParams queryParams, WanderQueryParam filterParams) {
 
-        long total = entityManager.createQuery("SELECT COUNT(w) FROM Wander w", Long.class)
-                .getSingleResult();
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 
-        var wanders = entityManager.createQuery("SELECT w FROM Wander w", Wander.class)
+        // Count query
+        CriteriaQuery<Long> countCq = cb.createQuery(Long.class);
+        Root<Wander> countRoot = countCq.from(Wander.class);
+        countCq.select(cb.count(countRoot));
+        Predicate[] countPredicates = buildFilterPredicates(cb, countRoot, filterParams);
+        if (countPredicates.length > 0) {
+            countCq.where(countPredicates);
+        }
+        long total = entityManager.createQuery(countCq).getSingleResult();
+
+        // Data query
+        CriteriaQuery<Wander> dataCq = cb.createQuery(Wander.class);
+        Root<Wander> dataRoot = dataCq.from(Wander.class);
+        dataCq.select(dataRoot).distinct(true);
+        Predicate[] dataPredicates = buildFilterPredicates(cb, dataRoot, filterParams);
+        if (dataPredicates.length > 0) {
+            dataCq.where(dataPredicates);
+        }
+
+        var wanders = entityManager.createQuery(dataCq)
                 .setFirstResult(queryParams.page() != null ? queryParams.page() : 0)
                 .setMaxResults(queryParams.size() != null ? queryParams.size() : 10)
                 .getResultStream()
                 .map(WanderListResponse::new)
                 .toList();
 
-        return new PagedResult<>(
-                wanders,
-                total
-        );
+        return new PagedResult<>(wanders, total);
+    }
+
+    private Predicate[] buildFilterPredicates(CriteriaBuilder cb, Root<Wander> root, WanderQueryParam filterParams) {
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (filterParams.startsFrom() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("startTime"), filterParams.startsFrom()));
+        }
+        if (filterParams.startsUntil() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.get("startTime"), filterParams.startsUntil()));
+        }
+        if (filterParams.createdBy() != null) {
+            predicates.add(cb.equal(root.get("createdBy").get("id"), filterParams.createdBy()));
+        }
+        if (filterParams.categories() != null && !filterParams.categories().isEmpty()) {
+            CriteriaBuilder.In<Object> inClause = cb.in(root.get("category").get("id"));
+            for (Long catId : filterParams.categories()) {
+                inClause.value(catId);
+            }
+            predicates.add(inClause);
+        }
+        if (filterParams.tags() != null && !filterParams.tags().isEmpty()) {
+            Join<Object, Object> tagJoin = root.join("tags");
+            predicates.add(tagJoin.get("id").in(filterParams.tags()));
+        }
+
+        return predicates.toArray(new Predicate[0]);
     }
 
     public Wander getWander(Long id) {

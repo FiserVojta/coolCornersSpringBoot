@@ -5,6 +5,7 @@ import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.wander.model.Wander;
 import com.lonework.corners.wander.model.WanderDetailResponse;
 import com.lonework.corners.wander.model.WanderListResponse;
+import com.lonework.corners.wander.model.WanderQueryParam;
 import com.lonework.corners.wander.service.WanderService;
 import jakarta.inject.Inject;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,8 @@ public class WanderFacade {
         return new WanderDetailResponse(wanderService.getWander(id));
     }
 
-    public PagedResult<WanderListResponse> getWanderListResponse(PagingQueryParams queryParams) {
-        return wanderService.getWanders(queryParams);
+    public PagedResult<WanderListResponse> getWanderListResponse(PagingQueryParams queryParams, WanderQueryParam filterParams) {
+        return wanderService.getWanders(queryParams, filterParams);
     }
 
     public List<WanderListResponse> getWanderListResponse(List<Wander> wanders) {
