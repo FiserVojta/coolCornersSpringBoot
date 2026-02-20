@@ -1,6 +1,7 @@
 package com.lonework.corners.wander.model;
 
 import com.lonework.corners.category.model.Category;
+import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.user.model.User;
 
@@ -18,7 +19,8 @@ public record WanderDetailResponse(Long id,
                                    List<Tag> tags,
                                    User createdBy,
                                    String name,
-                                   List<WanderPart> wanderParts) {
+                                   List<WanderPart> wanderParts,
+                                   CornerFile backgroundImage) {
 
     public WanderDetailResponse(Wander wander){
         this(
@@ -32,8 +34,8 @@ public record WanderDetailResponse(Long id,
                 wander.getTags(),
                 wander.getCreatedBy(),
                 null,
-                wander.getWanderParts()
-
+                wander.getWanderParts(),
+                wander.getBackgroundImage()
         );
     }
 }

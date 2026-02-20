@@ -1,6 +1,7 @@
 package com.lonework.corners.wander.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.lonework.corners.files.model.DTO.CornerFileCreateLinkRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +15,7 @@ public record WanderCreateRequest(
         @JsonProperty List<Long> wanderers,
         @JsonProperty List<Long> tags,
         @JsonProperty Long category,
-        @JsonProperty List<WanderPartCreateRequest> wanderParts
+        @JsonProperty List<WanderPartCreateRequest> wanderParts,
+        @JsonProperty CornerFileCreateLinkRequest backgroundImage
 ) {
 }

@@ -1,5 +1,6 @@
 package com.lonework.corners.wander.model;
 
+import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.user.model.User;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,8 @@ public record WanderListResponse(Long id,
                                  String category,
                                  List<String> tags,
                                  User createdBy,
-                                 String name
+                                 String name,
+                                 CornerFile backgroundImage
 ) {
     public WanderListResponse(Wander wander) {
         this(
@@ -26,7 +28,8 @@ public record WanderListResponse(Long id,
                 wander.getCategory() != null ? wander.getCategory().getName() : null,
                 wander.getTags().stream().map(tag -> tag.getName()).toList(),
                 wander.getCreatedBy(),
-                null
+                null,
+                wander.getBackgroundImage()
 
         );
     }

@@ -1,6 +1,7 @@
 package com.lonework.corners.wander.service;
 
 import com.lonework.corners.category.controller.CategoryFacade;
+import com.lonework.corners.files.controller.FileFacade;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.tag.controller.TagFacade;
@@ -44,6 +45,9 @@ public class WanderService {
     CategoryFacade categoryFacade;
 
     @Inject
+    FileFacade fileFacade;
+
+    @Inject
     TagFacade tagFacade;
 
     @Inject
@@ -75,6 +79,10 @@ public class WanderService {
 
         if (wanderCreateRequest.wanderers() != null && !wanderCreateRequest.wanderers().isEmpty()) {
             wander.setWanderers(userFacade.getUsersByIds(wanderCreateRequest.wanderers()));
+        }
+
+        if (wanderCreateRequest.backgroundImage() != null) {
+            wander.setBackgroundImage(fileFacade.getFileMetadata(wanderCreateRequest.backgroundImage().fileId()));
         }
 
         wander.setWanderParts(new ArrayList<>());
@@ -186,6 +194,12 @@ public class WanderService {
             wander.setWanderers(userFacade.getUsersByIds(wanderCreateRequest.wanderers()));
         } else {
             wander.setWanderers(new ArrayList<>());
+        }
+
+        if (wanderCreateRequest.backgroundImage() != null) {
+            wander.setBackgroundImage(fileFacade.getFileMetadata(wanderCreateRequest.backgroundImage().fileId()));
+        } else {
+            wander.setBackgroundImage(null);
         }
 
         // Remove old wander parts

@@ -4,6 +4,7 @@ package com.lonework.corners.wander.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.lonework.corners.category.model.Category;
+import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.user.model.User;
 import jakarta.persistence.CascadeType;
@@ -18,6 +19,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -82,6 +84,10 @@ public class Wander {
     @JsonManagedReference
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Category category;
+
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "background_image_id")
+    private CornerFile backgroundImage;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "wander_has_parts",
