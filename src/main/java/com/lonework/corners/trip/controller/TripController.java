@@ -6,7 +6,6 @@ import com.lonework.corners.trip.model.DTO.TripCommentRequest;
 import com.lonework.corners.trip.model.DTO.TripCreateRequest;
 import com.lonework.corners.trip.model.DTO.TripRateRequest;
 import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
-import com.lonework.corners.trip.services.TripService;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,14 +26,14 @@ import java.util.Optional;
 public class TripController {
 
     @Autowired
-    private TripService tripService;
+    private TripFacade tripFacade;
 
     @PostMapping("")
     public Trip createTrip(@RequestBody TripCreateRequest tripRequest) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {
             String email = jwt.getClaimAsString("email");
-            return tripService.crateTrip(tripRequest, email);
+            return tripFacade.createTrip(tripRequest, email);
         }
         throw new RuntimeException("JWT token not found or invalid");
 
@@ -43,12 +42,12 @@ public class TripController {
     @PostMapping("/add-places/{id}")
     public Optional<Trip> addPlacesToTrip(@RequestBody PlaceListRequest placeListRequest, @PathVariable Long id) {
 
-        return this.tripService.addPlacesToTrip(placeListRequest, id);
+        return tripFacade.addPlacesToTrip(placeListRequest, id);
     }
 
     @PatchMapping("/{tripId}/rate")
     public void rateTrip(@RequestBody TripRateRequest tripRateRequest, @PathVariable Long tripId) {
-        this.tripService.rateTrip(tripRateRequest, tripId);
+        tripFacade.rateTrip(tripRateRequest, tripId);
         new Response().setMessage("Trip rated successfully");
     }
 
@@ -56,7 +55,7 @@ public class TripController {
     public void commentTrip(@RequestBody TripCommentRequest tripCommentRequest, @PathVariable Long tripId) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {
-            this.tripService.commentTrip(tripCommentRequest, tripId, jwt.getClaimAsString("email"));
+            tripFacade.commentTrip(tripCommentRequest, tripId, jwt.getClaimAsString("email"));
             return;
         }
         throw new RuntimeException("JWT token not found or invalid");
@@ -66,7 +65,7 @@ public class TripController {
     public void updateTrip(@RequestBody TripUpdateRequest tripUpdateRequest, @PathVariable Long tripId) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {
-            this.tripService.updateTrip(tripUpdateRequest, tripId, jwt.getClaimAsString("email"));
+            tripFacade.updateTrip(tripUpdateRequest, tripId, jwt.getClaimAsString("email"));
             return;
         }
         throw new RuntimeException("JWT token not found or invalid");

@@ -7,19 +7,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lonework.corners.location.model.Country;
-import com.lonework.corners.location.services.CountryService;
 
 @RestController
 @RequestMapping("/public/country")
 public class CountryControler {
 
     @Autowired
-    private CountryService stateService;
+    private CountryFacade countryFacade;
 
     @GetMapping("")
     @PermitAll
     public Iterable<Country> getAllCountries() {
-        return this.stateService.getAllCountries();
+        return countryFacade.getAllCountries();
     }
 
 }

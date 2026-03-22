@@ -7,7 +7,6 @@ import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.tag.controller.TagFacade;
 import com.lonework.corners.user.controller.UserFacade;
 import com.lonework.corners.user.model.User;
-import com.lonework.corners.user.service.UserService;
 import com.lonework.corners.wander.model.Wander;
 import com.lonework.corners.wander.model.WanderCreateRequest;
 import com.lonework.corners.wander.model.WanderDetailResponse;
@@ -39,9 +38,6 @@ public class WanderService {
     EntityManager entityManager;
 
     @Inject
-    UserService userService;
-
-    @Inject
     CategoryFacade categoryFacade;
 
     @Inject
@@ -64,7 +60,7 @@ public class WanderService {
         wander.setStartTime(wanderCreateRequest.startTime());
         wander.setWanderType(wanderCreateRequest.wanderType());
 
-        User creator = userService.getUser(createdBy);
+        User creator = userFacade.getUser(createdBy);
         if (creator == null) {
             throw new EntityNotFoundException("User not found with email: " + createdBy);
         }
@@ -235,7 +231,7 @@ public class WanderService {
         }
 
         // Find the user
-        User user = userService.getUser(userEmail);
+        User user = userFacade.getUser(userEmail);
         if (user == null) {
             throw new EntityNotFoundException("User not found with email: " + userEmail);
         }
@@ -273,7 +269,7 @@ public class WanderService {
         }
 
         // Find the user
-        User user = userService.getUser(userEmail);
+        User user = userFacade.getUser(userEmail);
         if (user == null) {
             throw new EntityNotFoundException("User not found with email: " + userEmail);
         }

@@ -7,23 +7,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lonework.corners.location.model.City;
-import com.lonework.corners.location.services.CityService;
 
 @RestController
 @RequestMapping("/city")
 public class CityControler {
 
     @Autowired
-    private CityService cityService;
+    private CityFacade cityFacade;
 
     @GetMapping("")
     public Iterable<City> getAllCities() {
-        return this.cityService.getAllCities();
+        return cityFacade.getAllCities();
     }
 
     @GetMapping("/country/{countryId}")
     public Iterable<City> getAllCitiesByCountryId(@PathVariable("countryId") Long countryId) {
-        System.out.println("here" + countryId);
-        return this.cityService.findAllByCountryId(countryId);
+        return cityFacade.findAllByCountryId(countryId);
     }
 }

@@ -19,7 +19,6 @@ import com.lonework.corners.trip.model.TripRating;
 import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
 import com.lonework.corners.trip.model.DTO.TripDetailResponse;
-import com.lonework.corners.place.services.PlaceService;
 import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,9 +44,6 @@ public class TripService {
     EntityManager entityManager;
 
     @Autowired
-    PlaceService placeService;
-
-    @Autowired
     CommentFacade commentFacade;
 
     @Autowired
@@ -67,7 +63,7 @@ public class TripService {
                 .toList());
         if (tripCreateRequest.getPlaceIds() != null && !tripCreateRequest.getPlaceIds().isEmpty()) {
             trip.setPlaces(tripCreateRequest.getPlaceIds().stream()
-                    .map(id -> placeService.getPlaceById(id))
+                    .map(placeFacade::getPlaceById)
                     .toList());
         }
         if(tripCreateRequest.getGooglePlaces() != null && !tripCreateRequest.getGooglePlaces().isEmpty()) {
@@ -218,7 +214,7 @@ public class TripService {
                 place.getName(),
                 place.getImage(),
                 null,
-                placeService.getPlaceFeature(place)
+                placeFacade.getPlaceFeature(place)
         );
     }
 

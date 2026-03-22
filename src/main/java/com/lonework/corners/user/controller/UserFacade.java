@@ -36,6 +36,10 @@ public class UserFacade {
         return userService.getUserDetail(email);
     }
 
+    public User getUser(String email) {
+        return userService.getUser(email);
+    }
+
 
     @Transactional
     public User followUser(String myEmail, UserFollowRequest userFollowRequest) {

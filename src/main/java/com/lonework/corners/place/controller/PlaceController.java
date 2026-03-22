@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lonework.corners.place.services.PlaceService;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.comment.model.CommentCreateRequest;
 import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
@@ -26,7 +25,7 @@ import com.lonework.corners.place.model.DTO.PlaceCreateRequest;
 public class PlaceController {
 
     @Autowired
-    private PlaceService placeService;
+    private PlaceFacade placeFacade;
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "")
@@ -34,7 +33,7 @@ public class PlaceController {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {
             String email = jwt.getClaimAsString("email");
-            return placeService.createPlace(placeRequest, email);
+            return placeFacade.createPlace(placeRequest, email);
         }
         throw new RuntimeException("JWT token not found or invalid");
     }
@@ -44,7 +43,7 @@ public class PlaceController {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {
             String email = jwt.getClaimAsString("email");
-            return placeService.updatePlace(placeRequest, email, placeId);
+            return placeFacade.updatePlace(placeRequest, email, placeId);
         }
         throw new RuntimeException("JWT token not found or invalid");
     }
@@ -57,7 +56,7 @@ public class PlaceController {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {
             String email = jwt.getClaimAsString("email");
-            return placeService.commentPlace(commentCreateRequest, placeId, email);
+            return placeFacade.commentPlace(commentCreateRequest, placeId, email);
         }
 
         throw new RuntimeException("JWT token not found or invalid");
@@ -66,7 +65,7 @@ public class PlaceController {
 
     @PatchMapping("/{placeId}/rate")
     public void ratePlace(@RequestBody PlaceRateRequest placeRateRequest, @PathVariable Long placeId) {
-        this.placeService.ratePlace(placeRateRequest, placeId);
+        placeFacade.ratePlace(placeRateRequest, placeId);
         new Response().setMessage("Place rated successfully");
     }
 

@@ -3,6 +3,7 @@ package com.lonework.corners.wander.controller;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.wander.model.Wander;
+import com.lonework.corners.wander.model.WanderCreateRequest;
 import com.lonework.corners.wander.model.WanderDetailResponse;
 import com.lonework.corners.wander.model.WanderListResponse;
 import com.lonework.corners.wander.model.WanderQueryParam;
@@ -23,6 +24,26 @@ public class WanderFacade {
 
     public WanderDetailResponse getWander(Long id) {
         return new WanderDetailResponse(wanderService.getWander(id));
+    }
+
+    public Wander createWander(WanderCreateRequest wanderCreateRequest, String email) {
+        return wanderService.createWander(wanderCreateRequest, email);
+    }
+
+    public Wander updateWander(Long wanderId, WanderCreateRequest wanderCreateRequest) {
+        return wanderService.updateWander(wanderId, wanderCreateRequest);
+    }
+
+    public Wander joinWander(Long wanderId, String email) {
+        return wanderService.joinWander(wanderId, email);
+    }
+
+    public Wander leaveWander(Long wanderId, String email) {
+        return wanderService.leaveWander(wanderId, email);
+    }
+
+    public void deleteWander(Long wanderId) {
+        wanderService.deleteWander(wanderId);
     }
 
     public PagedResult<WanderListResponse> getWanderListResponse(PagingQueryParams queryParams, WanderQueryParam filterParams) {
