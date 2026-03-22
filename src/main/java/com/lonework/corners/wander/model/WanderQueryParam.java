@@ -11,6 +11,7 @@ public record WanderQueryParam(
         @Param("startsUntil") LocalDateTime startsUntil,
         @Param("createdBy") Long createdBy,
         @Param("categories") List<Long> categories,
-        @Param("tags") List<Long> tags
+        @Param("tags") List<Long> tags,
+        @Param("tags") List<String> participants
 ) {
 }

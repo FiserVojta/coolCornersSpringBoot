@@ -107,11 +107,11 @@ public class TripService {
         CriteriaQuery<Trip> cq = cb.createQuery(Trip.class);
         Root<Trip> tripRoot = cq.from(Trip.class);
 
-        if (tripSearchRequest.getCategories() != null && !tripSearchRequest.getCategories().isEmpty()) {
-            predicates.add(tripRoot.get("category").get("id").in(tripSearchRequest.getCategories()));
+        if (tripSearchRequest.categories() != null && !tripSearchRequest.categories().isEmpty()) {
+            predicates.add(tripRoot.get("category").get("id").in(tripSearchRequest.categories()));
         }
-        if (tripSearchRequest.getTags() != null && !tripSearchRequest.getTags().isEmpty()) {
-            predicates.add(tripRoot.get("tags").get("id").in(tripSearchRequest.getTags()));
+        if (tripSearchRequest.tags() != null && !tripSearchRequest.tags().isEmpty()) {
+            predicates.add(tripRoot.get("tags").get("id").in(tripSearchRequest.tags()));
         }
 
         if (!predicates.isEmpty()) {
@@ -130,11 +130,11 @@ public class TripService {
         countQuery.select(cb.count(countRoot));
 
         List<jakarta.persistence.criteria.Predicate> countPredicates = new ArrayList<>();
-        if (tripSearchRequest.getCategories() != null && !tripSearchRequest.getCategories().isEmpty()) {
-            countPredicates.add(countRoot.get("category").get("id").in(tripSearchRequest.getCategories()));
+        if (tripSearchRequest.categories() != null && !tripSearchRequest.categories().isEmpty()) {
+            countPredicates.add(countRoot.get("category").get("id").in(tripSearchRequest.categories()));
         }
-        if (tripSearchRequest.getTags() != null && !tripSearchRequest.getTags().isEmpty()) {
-            countPredicates.add(countRoot.get("tags").get("id").in(tripSearchRequest.getTags()));
+        if (tripSearchRequest.tags() != null && !tripSearchRequest.tags().isEmpty()) {
+            countPredicates.add(countRoot.get("tags").get("id").in(tripSearchRequest.tags()));
         }
 
         if (!countPredicates.isEmpty()) {

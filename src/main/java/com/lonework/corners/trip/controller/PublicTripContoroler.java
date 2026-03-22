@@ -9,10 +9,12 @@ import com.lonework.corners.trip.services.TripService;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 
 @RestController
@@ -31,8 +33,10 @@ public class PublicTripContoroler {
 
     @GetMapping("")
     @PermitAll
-    public PagedResult<Trip> findTrip(@ModelAttribute TripSearchRequest tripSearchRequest, PagingQueryParams queryParams) {
-        return this.tripService.findTripByParameters(tripSearchRequest, queryParams);
+    public PagedResult<Trip> findTrip(@RequestParam(required = false) List<Long> categories,
+                                      @RequestParam(required = false) List<Long> tags,
+                                      PagingQueryParams queryParams) {
+        return this.tripService.findTripByParameters(new TripSearchRequest(categories, tags, ""), queryParams);
     }
 }
 
