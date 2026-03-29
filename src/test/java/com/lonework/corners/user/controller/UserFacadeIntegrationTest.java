@@ -6,6 +6,10 @@ import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserFollowRequest;
 import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.model.UserSearchParameters;
+import com.lonework.corners.trip.controller.TripFacade;
+import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.category.model.Category;
+import com.lonework.corners.category.model.CategoryType;
 import com.lonework.corners.support.FacadeIntegrationTestSupport;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -23,6 +27,9 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
 
     @Autowired
     private UserFacade userFacade;
+
+    @Autowired
+    private TripFacade tripFacade;
 
     @Test
     void getUserListReturnsPersistedUsers() {
@@ -83,6 +90,26 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertEquals(user.getId(), foundUser.getId());
         assertEquals("detail@example.com", detail.email());
         assertEquals("Detail User", detail.displayName());
+    }
+
+    @Test
+    void getUserTripsReturnsTripsMarkedDoneByUser() {
+        User user = createUser("detail@example.com", "Detail User");
+        Category category = createCategory("Trip Category", CategoryType.TRIP);
+        Trip completedTrip = createTrip("Completed Trip", category, List.of(), List.of(), "integration@example.com");
+        Trip otherTrip = createTrip("Other Trip", category, List.of(), List.of(), "integration@example.com");
+        flushAndClear();
+
+        tripFacade.markTripDone(completedTrip.getId(), user.getEmail());
+        flushAndClear();
+
+        List<Trip> trips = userFacade.getUserTrips(user.getEmail()).stream()
+                .sorted(Comparator.comparing(Trip::getName))
+                .toList();
+
+        assertEquals(1, trips.size());
+        assertEquals(completedTrip.getId(), trips.getFirst().getId());
+        assertEquals("Completed Trip", trips.getFirst().getName());
     }
 
     @Test

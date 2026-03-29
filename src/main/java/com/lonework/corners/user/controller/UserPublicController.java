@@ -2,6 +2,7 @@ package com.lonework.corners.user.controller;
 
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
+import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.model.UserSearchParameters;
@@ -26,6 +27,11 @@ public class UserPublicController {
     @GetMapping("/{email}")
     public ResponseEntity<UserDetailResponse> getUser(@PathVariable("email") String email) {
         return ResponseEntity.ok(userFacade.getUserDetail(email));
+    }
+
+    @GetMapping("/{email}/trips")
+    public ResponseEntity<List<Trip>> getUserTrips(@PathVariable("email") String email) {
+        return ResponseEntity.ok(userFacade.getUserTrips(email));
     }
 
     @GetMapping("")

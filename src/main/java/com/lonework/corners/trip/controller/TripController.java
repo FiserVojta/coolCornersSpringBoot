@@ -4,10 +4,12 @@ import com.lonework.corners.place.model.DTO.PlaceListRequest;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.trip.model.DTO.TripCommentRequest;
 import com.lonework.corners.trip.model.DTO.TripCreateRequest;
+import com.lonework.corners.trip.model.DTO.TripDetailResponse;
 import com.lonework.corners.trip.model.DTO.TripRateRequest;
 import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -67,6 +69,15 @@ public class TripController {
         if (authentication.getPrincipal() instanceof Jwt jwt) {
             tripFacade.updateTrip(tripUpdateRequest, tripId, jwt.getClaimAsString("email"));
             return;
+        }
+        throw new RuntimeException("JWT token not found or invalid");
+    }
+
+    @PostMapping("/{tripId}/done")
+    public ResponseEntity<TripDetailResponse> markTripDone(@PathVariable Long tripId) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            return ResponseEntity.ok(tripFacade.markTripDone(tripId, jwt.getClaimAsString("email")));
         }
         throw new RuntimeException("JWT token not found or invalid");
     }

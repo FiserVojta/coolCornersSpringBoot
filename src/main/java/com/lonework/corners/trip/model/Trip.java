@@ -10,6 +10,7 @@ import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.trip.model.DTO.TripCreateRequest;
+import com.lonework.corners.user.model.User;
 import com.lonework.corners.wander.model.WanderPart;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -110,6 +111,14 @@ public class Trip {
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "background_image_id")
     private CornerFile backgroundImage;
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "corneruser_completed_trip",
+            joinColumns = @JoinColumn(name = "trip_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonManagedReference("user-completed-trips")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private List<User> completedByUsers = new ArrayList<>();
 
     public Trip(TripCreateRequest tripCreateRequest, String createdBy) {
         this.geometry = tripCreateRequest.getGeometry();

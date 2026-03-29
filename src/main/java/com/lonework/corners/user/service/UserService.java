@@ -7,6 +7,7 @@ import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.model.UserSearchParameters;
+import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.wander.controller.WanderFacade;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -101,6 +102,14 @@ public class UserService {
 
     public User getUser(Long id){
         return entityManager.find(User.class, id);
+    }
+
+    public List<Trip> getUserTrips(String email) {
+        User user = getUser(email);
+        if (user == null) {
+            return List.of();
+        }
+        return user.getCompletedTrips();
     }
 
     public List<User> getUsersByIds(List<Long> ids) {

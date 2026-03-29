@@ -52,6 +52,10 @@ public class TripFacade {
         return tripService.findTripById(id);
     }
 
+    public TripDetailResponse markTripDone(Long tripId, String email) {
+        return tripService.markTripDone(tripId, email);
+    }
+
     public PagedResult<Trip> findTripByParameters(TripSearchRequest tripSearchRequest, PagingQueryParams queryParams) {
         return tripService.findTripByParameters(tripSearchRequest, queryParams);
     }

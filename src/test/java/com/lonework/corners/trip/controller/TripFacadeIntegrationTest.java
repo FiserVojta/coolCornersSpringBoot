@@ -7,10 +7,12 @@ import com.lonework.corners.place.model.Place;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.trip.model.DTO.TripCommentRequest;
 import com.lonework.corners.trip.model.DTO.TripCreateRequest;
+import com.lonework.corners.trip.model.DTO.TripDetailResponse;
 import com.lonework.corners.trip.model.DTO.TripRateRequest;
 import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.trip.model.TripRating;
+import com.lonework.corners.user.model.User;
 import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.support.FacadeIntegrationTestSupport;
 import org.junit.jupiter.api.Test;
@@ -92,6 +94,26 @@ class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertEquals(4.0, rating);
         assertEquals(1, ratings.size());
         assertEquals(4, ratings.getFirst().getRating());
+    }
+
+    @Test
+    void markTripDonePersistsCompletedTripForUser() {
+        Category category = createCategory("Trip Category", CategoryType.TRIP);
+        User user = createUser("done@example.com", "Done User");
+        Trip trip = createTrip("Finished Trip", category, List.of(), List.of(), "integration@example.com");
+        flushAndClear();
+
+        TripDetailResponse updatedTrip = tripFacade.markTripDone(trip.getId(), user.getEmail());
+        flushAndClear();
+
+        Trip persistedTrip = entityManager.find(Trip.class, trip.getId());
+        User persistedUser = entityManager.find(User.class, user.getId());
+
+        assertEquals(trip.getId(), updatedTrip.id());
+        assertEquals(1, persistedTrip.getCompletedByUsers().size());
+        assertEquals(user.getId(), persistedTrip.getCompletedByUsers().getFirst().getId());
+        assertEquals(1, persistedUser.getCompletedTrips().size());
+        assertEquals(trip.getId(), persistedUser.getCompletedTrips().getFirst().getId());
     }
 
     @Test

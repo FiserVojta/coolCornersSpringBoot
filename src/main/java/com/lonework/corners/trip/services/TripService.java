@@ -20,6 +20,8 @@ import com.lonework.corners.trip.model.TripSearchRequest;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
 import com.lonework.corners.trip.model.DTO.TripDetailResponse;
 import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
+import com.lonework.corners.user.controller.UserFacade;
+import com.lonework.corners.user.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -55,6 +57,9 @@ public class TripService {
     @Autowired
     FileFacade fileFacade;
 
+    @Autowired
+    UserFacade userFacade;
+
     public Trip crateTrip(TripCreateRequest tripCreateRequest, String createdBy) {
         Trip trip = new Trip(tripCreateRequest, createdBy);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
@@ -82,6 +87,29 @@ public class TripService {
 
     public TripDetailResponse findTripById(long id) {
         return getTripDetailResponse(entityManager.find(Trip.class, id));
+    }
+
+    public TripDetailResponse markTripDone(Long tripId, String userEmail) {
+        Trip trip = entityManager.find(Trip.class, tripId);
+        if (trip == null) {
+            throw new EntityNotFoundException("Trip not found");
+        }
+
+        User user = userFacade.getUser(userEmail);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found");
+        }
+
+        if (trip.getCompletedByUsers() == null) {
+            trip.setCompletedByUsers(new ArrayList<>());
+        }
+
+        if (trip.getCompletedByUsers().stream().noneMatch(existingUser -> existingUser.getId().equals(user.getId()))) {
+            trip.getCompletedByUsers().add(user);
+            entityManager.merge(trip);
+        }
+
+        return getTripDetailResponse(trip);
     }
 
     public Optional<Trip> addPlacesToTrip(PlaceListRequest placeListRequest, Long tripId) {

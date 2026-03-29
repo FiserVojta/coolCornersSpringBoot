@@ -7,6 +7,7 @@ import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserFollowRequest;
 import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.model.UserSearchParameters;
+import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.user.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -39,6 +40,10 @@ public class UserFacade {
 
     public User getUser(String email) {
         return userService.getUser(email);
+    }
+
+    public List<Trip> getUserTrips(String email) {
+        return userService.getUserTrips(email);
     }
 
 

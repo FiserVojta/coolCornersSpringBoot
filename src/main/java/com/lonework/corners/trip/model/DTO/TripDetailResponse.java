@@ -8,6 +8,7 @@ import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.PlaceSimpleResponse;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.user.model.UserListResponse;
 import org.geotools.api.feature.simple.SimpleFeature;
 
 import java.util.List;
@@ -27,7 +28,8 @@ public record TripDetailResponse(Long id,
                                  String createdBy,
                                  Category category,
                                  List<CornerFileList> files,
-                                 CornerFile backgroundImage) {
+                                 CornerFile backgroundImage,
+                                 List<UserListResponse> completedByUsers) {
     public TripDetailResponse(Trip trip, List<PlaceSimpleResponse> places, SimpleFeature feature, List<CornerFileList> files) {
         this(
                 trip.getId(),
@@ -44,7 +46,8 @@ public record TripDetailResponse(Long id,
                 trip.getCreatedBy(),
                 trip.getCategory(),
                 files,
-                trip.getBackgroundImage()
+                trip.getBackgroundImage(),
+                trip.getCompletedByUsers() == null ? List.of() : trip.getCompletedByUsers().stream().map(UserListResponse::new).toList()
         );
     }
 

@@ -30,7 +30,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"wanders", "wandersOrganized", "friends", "friendOf", "followers", "followersOf"})
+@EqualsAndHashCode(exclude = {"wanders", "wandersOrganized", "friends", "friendOf", "followers", "followersOf", "completedTrips"})
 public class User {
 
     @Id
@@ -84,6 +84,10 @@ public class User {
     @ManyToMany(mappedBy = "followers")
     @JsonBackReference
     private Set<User> followersOf = new HashSet<>();
+
+    @ManyToMany(mappedBy = "completedByUsers")
+    @JsonBackReference("user-completed-trips")
+    private List<com.lonework.corners.trip.model.Trip> completedTrips = new ArrayList<>();
 
     public User(Long id) {
         this.id = id;
