@@ -93,35 +93,45 @@ class EventFacadeIntegrationTest extends PostgresIntegrationTest {
     }
 
     @Test
-    void findEventByParametersReturnsPersistedActiveEvents() {
-        Category category = createCategory();
-        eventFacade.createEvent(createEventCreateRequest(category.getId()), "integration-author@example.com");
-        eventFacade.createEvent(createSecondEventCreateRequest(category.getId()), "integration-author@example.com");
+    void findEventByParametersReturnsEventsMatchingRequestedFilters() {
+        Category selectedCategory = createCategory("Selected Event Category");
+        Category otherCategory = createCategory("Other Event Category");
+        Event matchingEvent = eventFacade.createEvent(createEventCreateRequest(selectedCategory.getId()), "integration-author@example.com");
+        eventFacade.createEvent(createSecondEventCreateRequest(selectedCategory.getId()), "other-author@example.com");
+        eventFacade.createEvent(createDifferentCategoryEventCreateRequest(otherCategory.getId()), "integration-author@example.com");
+        flushAndClear();
+
+        eventFacade.deleteEvent(matchingEvent.getId());
+        eventFacade.createEvent(createEventCreateRequest(selectedCategory.getId()), "integration-author@example.com");
         flushAndClear();
 
         PagedResult<Event> result = eventFacade.findEventByParameters(
-                createEventSearchParameters(),
+                createEventSearchParameters(selectedCategory.getId()),
                 createPagingQueryParams()
         );
 
-        assertEquals(2L, result.totalItems);
-        assertEquals(2, result.data.size());
+        assertEquals(1L, result.totalItems);
+        assertEquals(1, result.data.size());
         List<String> names = result.data.stream()
                 .map(Event::getName)
                 .sorted(Comparator.naturalOrder())
                 .toList();
-        assertEquals(List.of("Night Walk", "Sunrise Walk"), names);
+        assertEquals(List.of("Sunrise Walk"), names);
     }
 
-    private Category createCategory() {
+    private Category createCategory(String name) {
         Category category = new Category();
         category.setId(nextCategoryId());
-        category.setName("Integration Event Category");
+        category.setName(name);
         category.setMain(true);
-        category.setTitle("Integration Event Category");
+        category.setTitle(name);
         category.setCategoryType(CategoryType.EVENT);
         entityManager.persist(category);
         return category;
+    }
+
+    private Category createCategory() {
+        return createCategory("Integration Event Category");
     }
 
     private Long nextCategoryId() {
@@ -175,10 +185,26 @@ class EventFacadeIntegrationTest extends PostgresIntegrationTest {
         );
     }
 
-    private static EventSearchParameters createEventSearchParameters() {
+    private static EventCreateRequest createDifferentCategoryEventCreateRequest(Long categoryId) {
+        return new EventCreateRequest(
+                "Harbor Meetup",
+                "Different category event",
+                "Harbor",
+                ZonedDateTime.parse("2026-03-23T19:30:00Z"),
+                "19:30",
+                "ignored-by-service@example.com",
+                18,
+                75,
+                10.0,
+                categoryId
+        );
+    }
+
+    private static EventSearchParameters createEventSearchParameters(Long categoryId) {
         EventSearchParameters searchParameters = new EventSearchParameters();
         searchParameters.setCreatedBy("integration-author@example.com");
         searchParameters.setPlace("unused");
+        searchParameters.setCategories(List.of(categoryId));
         return searchParameters;
     }
 

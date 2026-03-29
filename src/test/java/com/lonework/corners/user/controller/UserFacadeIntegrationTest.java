@@ -1,9 +1,11 @@
 package com.lonework.corners.user.controller;
 
+import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserFollowRequest;
 import com.lonework.corners.user.model.UserListResponse;
+import com.lonework.corners.user.model.UserSearchParameters;
 import com.lonework.corners.support.FacadeIntegrationTestSupport;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -28,12 +30,45 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         createUser("bob@example.com", "Bob");
         flushAndClear();
 
-        List<UserListResponse> users = userFacade.getUserList(createPagingQueryParams()).data.stream()
+        List<UserListResponse> users = userFacade.getUserList(new UserSearchParameters(null), createPagingQueryParams()).data.stream()
                 .sorted(Comparator.comparing(UserListResponse::email))
                 .toList();
 
         assertEquals(2, users.size());
         assertEquals(List.of("anna@example.com", "bob@example.com"), users.stream().map(UserListResponse::email).toList());
+    }
+
+    @Test
+    void getUserListFiltersUsersBySearchText() {
+        createUser("anna@example.com", "Anna");
+        createUser("bob@example.com", "Bob");
+        createUser("annika@example.com", "Annika");
+        flushAndClear();
+
+        UserSearchParameters userSearchParameters = new UserSearchParameters("ann");
+
+        var result = userFacade.getUserList(userSearchParameters, createPagingQueryParams());
+        List<UserListResponse> users = result.data.stream()
+                .sorted(Comparator.comparing(UserListResponse::email))
+                .toList();
+
+        assertEquals(2, result.totalItems);
+        assertEquals(List.of("anna@example.com", "annika@example.com"), users.stream().map(UserListResponse::email).toList());
+    }
+
+    @Test
+    void getUserListUsesPageNumberAsOffsetMultiplier() {
+        createUser("anna@example.com", "Anna");
+        createUser("bob@example.com", "Bob");
+        createUser("cara@example.com", "Cara");
+        createUser("david@example.com", "David");
+        createUser("eva@example.com", "Eva");
+        flushAndClear();
+
+        var result = userFacade.getUserList(new UserSearchParameters(null), new PagingQueryParams(1, 2, null, null));
+
+        assertEquals(5, result.totalItems);
+        assertEquals(List.of("cara@example.com", "david@example.com"), result.data.stream().map(UserListResponse::email).toList());
     }
 
     @Test

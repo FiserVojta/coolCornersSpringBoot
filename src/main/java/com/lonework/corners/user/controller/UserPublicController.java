@@ -4,9 +4,11 @@ import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserListResponse;
+import com.lonework.corners.user.model.UserSearchParameters;
 import jakarta.inject.Inject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +29,8 @@ public class UserPublicController {
     }
 
     @GetMapping("")
-    public ResponseEntity<PagedResult<UserListResponse>> getUserList(PagingQueryParams queryParams) {
-        return ResponseEntity.ok(userFacade.getUserList(queryParams));
+    public ResponseEntity<PagedResult<UserListResponse>> getUserList(@ModelAttribute UserSearchParameters userSearchParameters,
+                                                                     PagingQueryParams queryParams) {
+        return ResponseEntity.ok(userFacade.getUserList(userSearchParameters, queryParams));
     }
 }
