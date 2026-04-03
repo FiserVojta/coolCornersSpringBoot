@@ -1,19 +1,17 @@
 package com.lonework.corners.wander.service;
 
-import com.lonework.corners.category.controller.CategoryFacade;
-import com.lonework.corners.files.controller.FileFacade;
+import com.lonework.corners.category.api.CategoryOperations;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
-import com.lonework.corners.tag.controller.TagFacade;
-import com.lonework.corners.user.controller.UserFacade;
+import com.lonework.corners.files.api.FileOperations;
+import com.lonework.corners.tag.api.TagOperations;
+import com.lonework.corners.user.api.UserOperations;
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.wander.model.Wander;
 import com.lonework.corners.wander.model.WanderCreateRequest;
-import com.lonework.corners.wander.model.WanderDetailResponse;
 import com.lonework.corners.wander.model.WanderListResponse;
 import com.lonework.corners.wander.model.WanderPart;
 import com.lonework.corners.wander.model.WanderQueryParam;
-import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -34,23 +32,28 @@ import java.util.List;
 @Transactional
 public class WanderService {
 
-    @Inject
-    EntityManager entityManager;
+    private final EntityManager entityManager;
+    private final CategoryOperations categoryOperations;
+    private final FileOperations fileOperations;
+    private final TagOperations tagOperations;
+    private final UserOperations userOperations;
+    private final WanderPartService wanderPartService;
 
-    @Inject
-    CategoryFacade categoryFacade;
-
-    @Inject
-    FileFacade fileFacade;
-
-    @Inject
-    TagFacade tagFacade;
-
-    @Inject
-    UserFacade userFacade;
-
-    @Inject
-    WanderPartService wanderPartService;
+    public WanderService(
+            EntityManager entityManager,
+            CategoryOperations categoryOperations,
+            FileOperations fileOperations,
+            TagOperations tagOperations,
+            UserOperations userOperations,
+            WanderPartService wanderPartService
+    ) {
+        this.entityManager = entityManager;
+        this.categoryOperations = categoryOperations;
+        this.fileOperations = fileOperations;
+        this.tagOperations = tagOperations;
+        this.userOperations = userOperations;
+        this.wanderPartService = wanderPartService;
+    }
 
     public Wander createWander(WanderCreateRequest wanderCreateRequest, String createdBy) {
         Wander wander = new Wander();
@@ -60,25 +63,22 @@ public class WanderService {
         wander.setStartTime(wanderCreateRequest.startTime());
         wander.setWanderType(wanderCreateRequest.wanderType());
 
-        User creator = userFacade.getUser(createdBy);
-        if (creator == null) {
-            throw new EntityNotFoundException("User not found with email: " + createdBy);
-        }
+        User creator = userOperations.getRequiredUserByEmail(createdBy);
         wander.setCreatedBy(creator);
 
         if (wanderCreateRequest.category() != null) {
-            wander.setCategory(categoryFacade.getCategoryById(wanderCreateRequest.category()));
+            wander.setCategory(categoryOperations.getCategoryById(wanderCreateRequest.category()));
         }
         if (wanderCreateRequest.tags() != null && !wanderCreateRequest.tags().isEmpty()) {
-            wander.setTags(tagFacade.getTagsById(wanderCreateRequest.tags()));
+            wander.setTags(tagOperations.getTagsById(wanderCreateRequest.tags()));
         }
 
         if (wanderCreateRequest.wanderers() != null && !wanderCreateRequest.wanderers().isEmpty()) {
-            wander.setWanderers(userFacade.getUsersByIds(wanderCreateRequest.wanderers()));
+            wander.setWanderers(userOperations.getUsersByIds(wanderCreateRequest.wanderers()));
         }
 
         if (wanderCreateRequest.backgroundImage() != null) {
-            wander.setBackgroundImage(fileFacade.getFileMetadata(wanderCreateRequest.backgroundImage().fileId()));
+            wander.setBackgroundImage(fileOperations.getFileMetadata(wanderCreateRequest.backgroundImage().fileId()));
         }
 
         wander.setWanderParts(new ArrayList<>());
@@ -175,25 +175,25 @@ public class WanderService {
         wander.setWanderType(wanderCreateRequest.wanderType());
 
         if (wanderCreateRequest.category() != null) {
-            wander.setCategory(categoryFacade.getCategoryById(wanderCreateRequest.category()));
+            wander.setCategory(categoryOperations.getCategoryById(wanderCreateRequest.category()));
         } else {
             wander.setCategory(null);
         }
 
         if (wanderCreateRequest.tags() != null && !wanderCreateRequest.tags().isEmpty()) {
-            wander.setTags(tagFacade.getTagsById(wanderCreateRequest.tags()));
+            wander.setTags(tagOperations.getTagsById(wanderCreateRequest.tags()));
         } else {
             wander.setTags(new ArrayList<>());
         }
 
         if (wanderCreateRequest.wanderers() != null && !wanderCreateRequest.wanderers().isEmpty()) {
-            wander.setWanderers(userFacade.getUsersByIds(wanderCreateRequest.wanderers()));
+            wander.setWanderers(userOperations.getUsersByIds(wanderCreateRequest.wanderers()));
         } else {
             wander.setWanderers(new ArrayList<>());
         }
 
         if (wanderCreateRequest.backgroundImage() != null) {
-            wander.setBackgroundImage(fileFacade.getFileMetadata(wanderCreateRequest.backgroundImage().fileId()));
+            wander.setBackgroundImage(fileOperations.getFileMetadata(wanderCreateRequest.backgroundImage().fileId()));
         } else {
             wander.setBackgroundImage(null);
         }
@@ -231,10 +231,7 @@ public class WanderService {
         }
 
         // Find the user
-        User user = userFacade.getUser(userEmail);
-        if (user == null) {
-            throw new EntityNotFoundException("User not found with email: " + userEmail);
-        }
+        User user = userOperations.getRequiredUserByEmail(userEmail);
 
         // Check if user is already a wanderer
         if (wander.getWanderers() != null && wander.getWanderers().contains(user)) {
@@ -269,10 +266,7 @@ public class WanderService {
         }
 
         // Find the user
-        User user = userFacade.getUser(userEmail);
-        if (user == null) {
-            throw new EntityNotFoundException("User not found with email: " + userEmail);
-        }
+        User user = userOperations.getRequiredUserByEmail(userEmail);
 
         // Check if user is a wanderer
         if (wander.getWanderers() == null || !wander.getWanderers().contains(user)) {

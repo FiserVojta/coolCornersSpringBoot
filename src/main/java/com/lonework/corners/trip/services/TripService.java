@@ -1,26 +1,26 @@
 package com.lonework.corners.trip.services;
 
 import com.lonework.corners.category.model.Category;
-import com.lonework.corners.comment.controller.CommentFacade;
+import com.lonework.corners.comment.api.CommentOperations;
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
-import com.lonework.corners.files.controller.FileFacade;
+import com.lonework.corners.files.api.FileOperations;
 import com.lonework.corners.files.model.CornerFile;
-import com.lonework.corners.place.controller.PlaceFacade;
-import com.lonework.corners.place.model.Place;
-import com.lonework.corners.tag.controller.TagFacade;
-import com.lonework.corners.trip.model.Trip;
+import com.lonework.corners.place.api.PlaceOperations;
 import com.lonework.corners.place.model.DTO.PlaceListRequest;
+import com.lonework.corners.place.model.Place;
+import com.lonework.corners.place.model.PlaceSimpleResponse;
+import com.lonework.corners.tag.api.TagOperations;
 import com.lonework.corners.trip.model.DTO.TripCommentRequest;
 import com.lonework.corners.trip.model.DTO.TripCreateRequest;
+import com.lonework.corners.trip.model.DTO.TripDetailResponse;
 import com.lonework.corners.trip.model.DTO.TripRateRequest;
+import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
+import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.trip.model.TripRating;
 import com.lonework.corners.trip.model.TripSearchRequest;
-import com.lonework.corners.place.model.PlaceSimpleResponse;
-import com.lonework.corners.trip.model.DTO.TripDetailResponse;
-import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
-import com.lonework.corners.user.controller.UserFacade;
+import com.lonework.corners.user.api.UserOperations;
 import com.lonework.corners.user.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,7 +28,6 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
@@ -42,23 +41,28 @@ import java.util.Optional;
 @Transactional
 public class TripService {
 
-    @Autowired
-    EntityManager entityManager;
+    private final EntityManager entityManager;
+    private final CommentOperations commentOperations;
+    private final PlaceOperations placeOperations;
+    private final TagOperations tagOperations;
+    private final FileOperations fileOperations;
+    private final UserOperations userOperations;
 
-    @Autowired
-    CommentFacade commentFacade;
-
-    @Autowired
-    PlaceFacade placeFacade;
-
-    @Autowired
-    TagFacade tagFacade;
-
-    @Autowired
-    FileFacade fileFacade;
-
-    @Autowired
-    UserFacade userFacade;
+    public TripService(
+            EntityManager entityManager,
+            CommentOperations commentOperations,
+            PlaceOperations placeOperations,
+            TagOperations tagOperations,
+            FileOperations fileOperations,
+            UserOperations userOperations
+    ) {
+        this.entityManager = entityManager;
+        this.commentOperations = commentOperations;
+        this.placeOperations = placeOperations;
+        this.tagOperations = tagOperations;
+        this.fileOperations = fileOperations;
+        this.userOperations = userOperations;
+    }
 
     public Trip createTrip(TripCreateRequest tripCreateRequest, String createdBy) {
         Trip trip = new Trip(tripCreateRequest, createdBy);
@@ -68,16 +72,16 @@ public class TripService {
                 .toList());
         if (tripCreateRequest.getPlaceIds() != null && !tripCreateRequest.getPlaceIds().isEmpty()) {
             trip.setPlaces(tripCreateRequest.getPlaceIds().stream()
-                    .map(placeFacade::getPlaceById)
+                    .map(placeOperations::getPlaceById)
                     .toList());
         }
         if(tripCreateRequest.getGooglePlaces() != null && !tripCreateRequest.getGooglePlaces().isEmpty()) {
-            trip.setGooglePlaces(placeFacade.getCreateGooglePlaces(tripCreateRequest.getGooglePlaces()));
+            trip.setGooglePlaces(placeOperations.getOrCreateGooglePlaces(tripCreateRequest.getGooglePlaces()));
         }
         if(tripCreateRequest.getFiles() != null && !tripCreateRequest.getFiles().isEmpty()) {
             List<CornerFile> files = new ArrayList<>();
             for (var file : tripCreateRequest.getFiles()) {
-                files.add(fileFacade.getFileMetadata(file.fileId()));
+                files.add(fileOperations.getFileMetadata(file.fileId()));
             }
             trip.setCornerFiles(files);
         }
@@ -95,10 +99,7 @@ public class TripService {
             throw new EntityNotFoundException("Trip not found");
         }
 
-        User user = userFacade.getUser(userEmail);
-        if (user == null) {
-            throw new EntityNotFoundException("User not found");
-        }
+        User user = userOperations.getRequiredUserByEmail(userEmail);
 
         if (trip.getCompletedByUsers() == null) {
             trip.setCompletedByUsers(new ArrayList<>());
@@ -128,7 +129,7 @@ public class TripService {
             updatedPlaces.addAll(trip.getPlaces());
         }
 
-        List<Place> placesToAdd = placeFacade.findPlacesByIds(placeIds);
+        List<Place> placesToAdd = placeOperations.findPlacesByIds(placeIds);
         for (Place place : placesToAdd) {
             boolean alreadyLinked = updatedPlaces.stream()
                     .anyMatch(existingPlace -> existingPlace.getId().equals(place.getId()));
@@ -209,7 +210,7 @@ public class TripService {
             throw new EntityNotFoundException("Trip not found");
         }
         var comment = new Comment(tripCommentRequest, trip, createdBy);
-        commentFacade.createComment(comment);
+        commentOperations.createComment(comment);
     }
 
     @Transactional
@@ -220,17 +221,17 @@ public class TripService {
         }
         trip.setCategory(entityManager.find(Category.class, tripUpdateRequest.categoryId()));
         trip.setDescription(tripUpdateRequest.description());
-        trip.setGooglePlaces(placeFacade.getCreateGooglePlaces(tripUpdateRequest.googlePlaces()));
-        trip.setTags(tagFacade.getTagsById(tripUpdateRequest.tags()));
+        trip.setGooglePlaces(placeOperations.getOrCreateGooglePlaces(tripUpdateRequest.googlePlaces()));
+        trip.setTags(tagOperations.getTagsById(tripUpdateRequest.tags()));
         if(tripUpdateRequest.files() != null && !tripUpdateRequest.files().isEmpty()) {
             List<CornerFile> files = new ArrayList<>();
             for (var file : tripUpdateRequest.files()) {
-                files.add(fileFacade.getFileMetadata(file.fileId()));
+                files.add(fileOperations.getFileMetadata(file.fileId()));
             }
             trip.setCornerFiles(files);
         }
         if(tripUpdateRequest.backgroundImage() != null) {
-            trip.setBackgroundImage(fileFacade.getFileMetadata(tripUpdateRequest.backgroundImage().fileId()));
+            trip.setBackgroundImage(fileOperations.getFileMetadata(tripUpdateRequest.backgroundImage().fileId()));
         }
         entityManager.merge(trip);
     }
@@ -247,7 +248,7 @@ public class TripService {
                 trip,
                 getPlacesDetailResponse(trip.getPlaces()),
                 null,
-                fileFacade.getCornerFilesList(trip.getCornerFiles()));
+                fileOperations.getCornerFilesList(trip.getCornerFiles()));
     }
 
     private List<PlaceSimpleResponse> getPlacesDetailResponse(List<Place> places) {
@@ -262,7 +263,7 @@ public class TripService {
                 place.getName(),
                 place.getImage(),
                 null,
-                placeFacade.getPlaceFeature(place)
+                placeOperations.getPlaceFeature(place)
         );
     }
 

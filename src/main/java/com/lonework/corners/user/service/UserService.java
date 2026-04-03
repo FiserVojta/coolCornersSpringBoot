@@ -3,13 +3,12 @@ package com.lonework.corners.user.service;
 
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
+import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.model.UserSearchParameters;
-import com.lonework.corners.trip.model.Trip;
-import com.lonework.corners.wander.controller.WanderFacade;
-import jakarta.inject.Inject;
+import com.lonework.corners.wander.api.WanderOperations;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -30,11 +29,13 @@ import java.util.Locale;
 @Transactional
 public class UserService {
 
-    @Inject
-    EntityManager entityManager;
+    private final EntityManager entityManager;
+    private final WanderOperations wanderOperations;
 
-    @Inject
-    WanderFacade wanderFacade;
+    public UserService(EntityManager entityManager, WanderOperations wanderOperations) {
+        this.entityManager = entityManager;
+        this.wanderOperations = wanderOperations;
+    }
 
     public User getUser(String email) {
         return entityManager.createQuery("select u from User u where u.email = :email", User.class)
@@ -51,8 +52,8 @@ public class UserService {
                 .getSingleResult();
 
         return new UserDetailResponse(user,
-                wanderFacade.getWanderListResponse(user.getWanders()),
-                wanderFacade.getWanderListResponse(user.getWandersOrganized()));
+                wanderOperations.getWanderListResponse(user.getWanders()),
+                wanderOperations.getWanderListResponse(user.getWandersOrganized()));
     }
 
     public PagedResult<UserListResponse> getUserList(UserSearchParameters userSearchParameters, PagingQueryParams queryParams) {

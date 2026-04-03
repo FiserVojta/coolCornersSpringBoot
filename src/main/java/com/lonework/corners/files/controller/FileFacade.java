@@ -4,7 +4,7 @@ import com.lonework.corners.common.model.EntityStatus;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.files.model.DTO.CornerFileList;
-import com.lonework.corners.spaces.controller.SpacesFacade;
+import com.lonework.corners.spaces.api.SpacesOperations;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
@@ -28,13 +28,13 @@ public class FileFacade {
     EntityManager entityManager;
 
     @Inject
-    SpacesFacade spacesFacade;
+    SpacesOperations spacesOperations;
 
     @Transactional
     public CornerFile uploadFile(MultipartFile file, String createdBy) {
         try {
             String fileName = UUID.randomUUID() + "-" + file.getOriginalFilename();
-            String fileUrl = spacesFacade.uploadFile(
+            String fileUrl = spacesOperations.uploadFile(
                     fileName,
                     file.getInputStream(),
                     file.getSize(),
@@ -57,7 +57,7 @@ public class FileFacade {
 
     public InputStream getFile(Long fileId) {
         var url = entityManager.find(CornerFile.class, fileId).getName();
-        return spacesFacade.downloadFile(url);
+        return spacesOperations.downloadFile(url);
     }
 
     public CornerFile getFileMetadata(Long fileId) {
