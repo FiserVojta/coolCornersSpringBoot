@@ -1,13 +1,13 @@
 package com.lonework.corners.location.model;
 
-public class locationRange {
+public class LocationRange {
 
     private double maxLatitude;
     private double minLatitude;
     private double maxLongitude;
     private double minLongitude;
 
-    public locationRange() {
+    public LocationRange() {
     }
 
     public double getMaxLatitude() {

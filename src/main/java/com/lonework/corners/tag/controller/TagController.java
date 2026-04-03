@@ -15,7 +15,7 @@ import com.lonework.corners.tag.model.TagSearchRequest;
 
 @RestController
 @RequestMapping("/public/tags")
-public class TagContoller {
+public class TagController {
 
     @Autowired
     private TagFacade tagFacade;

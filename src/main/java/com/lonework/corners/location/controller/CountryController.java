@@ -10,7 +10,7 @@ import com.lonework.corners.location.model.Country;
 
 @RestController
 @RequestMapping("/public/country")
-public class CountryControler {
+public class CountryController {
 
     @Autowired
     private CountryFacade countryFacade;

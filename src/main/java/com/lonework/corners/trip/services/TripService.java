@@ -60,7 +60,7 @@ public class TripService {
     @Autowired
     UserFacade userFacade;
 
-    public Trip crateTrip(TripCreateRequest tripCreateRequest, String createdBy) {
+    public Trip createTrip(TripCreateRequest tripCreateRequest, String createdBy) {
         Trip trip = new Trip(tripCreateRequest, createdBy);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
         trip.setTags(tripCreateRequest.getTags().stream()
@@ -113,12 +113,32 @@ public class TripService {
     }
 
     public Optional<Trip> addPlacesToTrip(PlaceListRequest placeListRequest, Long tripId) {
-
-        for (Long placeId : placeListRequest.getPlaceIds()) {
-
-
+        Trip trip = entityManager.find(Trip.class, tripId);
+        if (trip == null) {
+            return Optional.empty();
         }
-        return Optional.ofNullable(entityManager.find(Trip.class, tripId));
+
+        List<Long> placeIds = placeListRequest.getPlaceIds();
+        if (placeIds == null || placeIds.isEmpty()) {
+            return Optional.of(trip);
+        }
+
+        List<Place> updatedPlaces = new ArrayList<>();
+        if (trip.getPlaces() != null) {
+            updatedPlaces.addAll(trip.getPlaces());
+        }
+
+        List<Place> placesToAdd = placeFacade.findPlacesByIds(placeIds);
+        for (Place place : placesToAdd) {
+            boolean alreadyLinked = updatedPlaces.stream()
+                    .anyMatch(existingPlace -> existingPlace.getId().equals(place.getId()));
+            if (!alreadyLinked) {
+                updatedPlaces.add(place);
+            }
+        }
+
+        trip.setPlaces(updatedPlaces);
+        return Optional.of(entityManager.merge(trip));
     }
 
     public PagedResult<Trip> findTripByParameters(TripSearchRequest tripSearchRequest, PagingQueryParams pagingQueryParams) {

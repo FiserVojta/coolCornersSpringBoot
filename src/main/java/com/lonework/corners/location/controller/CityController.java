@@ -10,7 +10,7 @@ import com.lonework.corners.location.model.City;
 
 @RestController
 @RequestMapping("/city")
-public class CityControler {
+public class CityController {
 
     @Autowired
     private CityFacade cityFacade;

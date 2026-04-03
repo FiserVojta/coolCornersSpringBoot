@@ -29,7 +29,7 @@ public class TripFacade {
     TripService tripService;
 
     public Trip createTrip(TripCreateRequest tripRequest, String email) {
-        return tripService.crateTrip(tripRequest, email);
+        return tripService.createTrip(tripRequest, email);
     }
 
     public Optional<Trip> addPlacesToTrip(PlaceListRequest placeListRequest, Long id) {

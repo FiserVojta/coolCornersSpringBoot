@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/public/trips")
-public class PublicTripContoroler {
+public class PublicTripController {
 
 
     @Autowired
@@ -38,5 +38,4 @@ public class PublicTripContoroler {
         return tripFacade.findTripByParameters(new TripSearchRequest(categories, tags, ""), queryParams);
     }
 }
-
 

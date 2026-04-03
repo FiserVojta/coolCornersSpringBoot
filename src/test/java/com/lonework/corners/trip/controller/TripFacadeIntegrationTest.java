@@ -4,6 +4,7 @@ import com.lonework.corners.category.model.Category;
 import com.lonework.corners.category.model.CategoryType;
 import com.lonework.corners.comment.model.Comment;
 import com.lonework.corners.place.model.Place;
+import com.lonework.corners.place.model.DTO.PlaceListRequest;
 import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.trip.model.DTO.TripCommentRequest;
 import com.lonework.corners.trip.model.DTO.TripCreateRequest;
@@ -70,6 +71,30 @@ class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertEquals("Updated description", updatedTrip.getDescription());
         assertEquals(1, updatedTrip.getTags().size());
         assertEquals("citybreak", updatedTrip.getTags().getFirst().getName());
+    }
+
+    @Test
+    void addPlacesToTripPersistsNewPlaceLinksWithoutDroppingExistingOnes() {
+        Category category = createCategory("Trip Category", CategoryType.TRIP);
+        Category placeCategory = createCategory("Place Category", CategoryType.PLACE);
+        Place existingPlace = createPlace("Existing Place", placeCategory, List.of(), "integration@example.com");
+        Place newPlace = createPlace("New Place", placeCategory, List.of(), "integration@example.com");
+        Trip trip = createTrip("Trip With Places", category, List.of(), List.of(existingPlace), "integration@example.com");
+        flushAndClear();
+
+        PlaceListRequest request = new PlaceListRequest();
+        request.setPlaceIds(List.of(existingPlace.getId(), newPlace.getId()));
+
+        Trip updatedTrip = tripFacade.addPlacesToTrip(request, trip.getId()).orElseThrow();
+        flushAndClear();
+
+        Trip persistedTrip = entityManager.find(Trip.class, updatedTrip.getId());
+
+        assertEquals(2, persistedTrip.getPlaces().size());
+        assertEquals(
+                List.of(existingPlace.getId(), newPlace.getId()),
+                persistedTrip.getPlaces().stream().map(Place::getId).sorted().toList()
+        );
     }
 
     @Test
