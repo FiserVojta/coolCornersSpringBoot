@@ -29,8 +29,8 @@ public class TagService {
     @Transactional
     public Tag createTag(TagCreateRequest tagCreateRequest) {
         Tag tag = new Tag();
-        tag.setCreator(tagCreateRequest.creator);
-        tag.setName(tagCreateRequest.name);
+        tag.setCreator(tagCreateRequest.creator());
+        tag.setName(tagCreateRequest.name());
         return entityManager.merge(tag);
     }
 

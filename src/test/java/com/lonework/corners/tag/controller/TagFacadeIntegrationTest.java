@@ -21,9 +21,7 @@ class TagFacadeIntegrationTest extends FacadeIntegrationTestSupport {
 
     @Test
     void createTagPersistsTag() {
-        TagCreateRequest request = new TagCreateRequest();
-        request.setName("waterfall");
-        request.setCreator("integration@example.com");
+        TagCreateRequest request = new TagCreateRequest("waterfall", "integration@example.com");
 
         Tag createdTag = tagFacade.createTag(request);
         flushAndClear();

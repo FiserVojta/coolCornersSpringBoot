@@ -82,8 +82,7 @@ class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         Trip trip = createTrip("Trip With Places", category, List.of(), List.of(existingPlace), "integration@example.com");
         flushAndClear();
 
-        PlaceListRequest request = new PlaceListRequest();
-        request.setPlaceIds(List.of(existingPlace.getId(), newPlace.getId()));
+        PlaceListRequest request = new PlaceListRequest(List.of(existingPlace.getId(), newPlace.getId()));
 
         Trip updatedTrip = tripFacade.addPlacesToTrip(request, trip.getId()).orElseThrow();
         flushAndClear();
@@ -162,15 +161,18 @@ class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
     }
 
     private TripCreateRequest createTripCreateRequest(Long categoryId, List<Long> tagIds, List<Long> placeIds, String name) {
-        TripCreateRequest request = new TripCreateRequest();
-        request.setCategoryId(categoryId);
-        request.setTags(tagIds);
-        request.setPlaceIds(placeIds);
-        request.setName(name);
-        request.setAuthor("integration@example.com");
-        request.setDescription(name + " description");
-        request.setDuration(180);
-        request.setGeometry(createPoint(14.5, 50.15));
-        return request;
+        return new TripCreateRequest(
+                placeIds,
+                categoryId,
+                tagIds,
+                name,
+                "integration@example.com",
+                name + " description",
+                180,
+                null,
+                createPoint(14.5, 50.15),
+                null,
+                null
+        );
     }
 }

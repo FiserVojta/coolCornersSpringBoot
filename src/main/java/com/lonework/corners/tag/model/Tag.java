@@ -44,8 +44,8 @@ public class Tag {
     private Set<Wander> wanders = new HashSet<>();
 
     public Tag(TagCreateRequest tagCreateRequest) {
-        this.name = tagCreateRequest.getName();
-        this.creator = tagCreateRequest.getCreator();
+        this.name = tagCreateRequest.name();
+        this.creator = tagCreateRequest.creator();
     }
 
     public Tag(Long id) {

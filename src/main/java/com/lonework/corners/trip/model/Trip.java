@@ -121,11 +121,11 @@ public class Trip {
     private List<User> completedByUsers = new ArrayList<>();
 
     public Trip(TripCreateRequest tripCreateRequest, String createdBy) {
-        this.geometry = tripCreateRequest.getGeometry();
-        this.name = tripCreateRequest.getName();
-        this.duration = tripCreateRequest.getDuration();
-        this.description = tripCreateRequest.getDescription();
-        this.creator = tripCreateRequest.getAuthor();
+        this.geometry = tripCreateRequest.geometry();
+        this.name = tripCreateRequest.name();
+        this.duration = tripCreateRequest.duration();
+        this.description = tripCreateRequest.description();
+        this.creator = tripCreateRequest.author();
         this.createdBy = createdBy;
     }
 }

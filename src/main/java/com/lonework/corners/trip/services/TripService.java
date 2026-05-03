@@ -66,21 +66,21 @@ public class TripService {
 
     public Trip createTrip(TripCreateRequest tripCreateRequest, String createdBy) {
         Trip trip = new Trip(tripCreateRequest, createdBy);
-        trip.setCategory(entityManager.find(Category.class, tripCreateRequest.getCategoryId()));
-        trip.setTags(tripCreateRequest.getTags().stream()
+        trip.setCategory(entityManager.find(Category.class, tripCreateRequest.categoryId()));
+        trip.setTags(tripCreateRequest.tags().stream()
                 .map(id -> entityManager.find(com.lonework.corners.tag.model.Tag.class, id))
                 .toList());
-        if (tripCreateRequest.getPlaceIds() != null && !tripCreateRequest.getPlaceIds().isEmpty()) {
-            trip.setPlaces(tripCreateRequest.getPlaceIds().stream()
+        if (tripCreateRequest.placeIds() != null && !tripCreateRequest.placeIds().isEmpty()) {
+            trip.setPlaces(tripCreateRequest.placeIds().stream()
                     .map(placeOperations::getPlaceById)
                     .toList());
         }
-        if(tripCreateRequest.getGooglePlaces() != null && !tripCreateRequest.getGooglePlaces().isEmpty()) {
-            trip.setGooglePlaces(placeOperations.getOrCreateGooglePlaces(tripCreateRequest.getGooglePlaces()));
+        if(tripCreateRequest.googlePlaces() != null && !tripCreateRequest.googlePlaces().isEmpty()) {
+            trip.setGooglePlaces(placeOperations.getOrCreateGooglePlaces(tripCreateRequest.googlePlaces()));
         }
-        if(tripCreateRequest.getFiles() != null && !tripCreateRequest.getFiles().isEmpty()) {
+        if(tripCreateRequest.files() != null && !tripCreateRequest.files().isEmpty()) {
             List<CornerFile> files = new ArrayList<>();
-            for (var file : tripCreateRequest.getFiles()) {
+            for (var file : tripCreateRequest.files()) {
                 files.add(fileOperations.getFileMetadata(file.fileId()));
             }
             trip.setCornerFiles(files);
@@ -119,7 +119,7 @@ public class TripService {
             return Optional.empty();
         }
 
-        List<Long> placeIds = placeListRequest.getPlaceIds();
+        List<Long> placeIds = placeListRequest.placeIds();
         if (placeIds == null || placeIds.isEmpty()) {
             return Optional.of(trip);
         }

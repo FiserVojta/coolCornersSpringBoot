@@ -28,9 +28,9 @@ public class CategoryService {
         Root<Category> root = query.from(Category.class);
 
         Predicate categoryPredicate = criteriaBuilder.conjunction();
-        if(categorySearchParameters.getType() != null){
+        if(categorySearchParameters.type() != null){
             categoryPredicate = criteriaBuilder.and(categoryPredicate,
-                    criteriaBuilder.equal(root.get("categoryType"), categorySearchParameters.getType()));
+                    criteriaBuilder.equal(root.get("categoryType"), categorySearchParameters.type()));
         }
 
         query.select(root).where(categoryPredicate);

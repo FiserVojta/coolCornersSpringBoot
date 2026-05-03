@@ -97,13 +97,13 @@ public class Place {
     private Geometry geometry;
 
     public Place(PlaceCreateRequest placeRequest, String createdBy) {
-        this.name = placeRequest.getName();
-        this.description = placeRequest.getDescription();
-        this.openingHours = placeRequest.getOpeningHours();
-        this.price = placeRequest.getPrice();
-        this.image = placeRequest.getImage();
-        this.phoneNumber = placeRequest.getPhoneNumber();
-        this.geometry = placeRequest.getGeometry();
+        this.name = placeRequest.name();
+        this.description = placeRequest.description();
+        this.openingHours = placeRequest.openingHours();
+        this.price = placeRequest.price();
+        this.image = placeRequest.image();
+        this.phoneNumber = placeRequest.phoneNumber();
+        this.geometry = placeRequest.geometry();
         this.createdBy = createdBy;
     }
 }

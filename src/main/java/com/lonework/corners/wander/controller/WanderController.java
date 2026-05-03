@@ -4,6 +4,7 @@ import com.lonework.corners.wander.model.Wander;
 import com.lonework.corners.wander.model.WanderCreateRequest;
 import jakarta.inject.Inject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class WanderController {
     }
     
     @PutMapping("/{wanderId}")
+    @PreAuthorize("hasRole('ADMIN') or @wanderSecurity.isOwner(#wanderId, authentication.token.claims['email'])")
     public ResponseEntity<Wander> updateWander(
             @PathVariable Long wanderId,
             @RequestBody WanderCreateRequest wanderCreateRequest) {
@@ -39,6 +41,7 @@ public class WanderController {
     }
     
     @DeleteMapping("/{wanderId}")
+    @PreAuthorize("hasRole('ADMIN') or @wanderSecurity.isOwner(#wanderId, authentication.token.claims['email'])")
     public ResponseEntity<Void> deleteWander(@PathVariable Long wanderId) {
         wanderFacade.deleteWander(wanderId);
         return ResponseEntity.noContent().build();

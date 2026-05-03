@@ -36,8 +36,7 @@ class CategoryFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         createCategory("Trip Category", CategoryType.TRIP);
         flushAndClear();
 
-        CategorySearchParameters searchParameters = new CategorySearchParameters();
-        searchParameters.setType(CategoryType.PLACE.name());
+        CategorySearchParameters searchParameters = new CategorySearchParameters(CategoryType.PLACE.name());
 
         List<Category> categories = (List<Category>) categoryFacade.getAllCategories(searchParameters);
 

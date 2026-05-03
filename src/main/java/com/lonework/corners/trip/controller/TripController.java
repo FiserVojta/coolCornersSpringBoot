@@ -10,6 +10,7 @@ import com.lonework.corners.trip.model.DTO.TripUpdateRequest;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,6 +43,7 @@ public class TripController {
     }
 
     @PostMapping("/add-places/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @tripSecurity.isOwner(#id, authentication.token.claims['email'])")
     public Optional<Trip> addPlacesToTrip(@RequestBody PlaceListRequest placeListRequest, @PathVariable Long id) {
 
         return tripFacade.addPlacesToTrip(placeListRequest, id);
@@ -64,6 +66,7 @@ public class TripController {
     }
 
     @PutMapping("/{tripId}")
+    @PreAuthorize("hasRole('ADMIN') or @tripSecurity.isOwner(#tripId, authentication.token.claims['email'])")
     public void updateTrip(@RequestBody TripUpdateRequest tripUpdateRequest, @PathVariable Long tripId) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {

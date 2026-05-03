@@ -87,17 +87,17 @@ public class PlaceService {
     private Predicate buildPredicate(CriteriaBuilder cb, Root<Place> root, PlaceSearchRequest request) {
         Predicate predicate = cb.conjunction();
 
-        if (request.getCategory() != null && !request.getCategory().isEmpty()) {
+        if (request.category() != null && !request.category().isEmpty()) {
             CriteriaBuilder.In<Long> categoryInClause = cb.in(root.join("category").get("id"));
-            for (Long categoryId : request.getCategory()) {
+            for (Long categoryId : request.category()) {
                 categoryInClause.value(categoryId);
             }
             predicate = cb.and(predicate, categoryInClause);
         }
 
-        if (request.getTags() != null && !request.getTags().isEmpty()) {
+        if (request.tags() != null && !request.tags().isEmpty()) {
             CriteriaBuilder.In<Long> tagsInClause = cb.in(root.join("tags").get("id"));
-            for (Long tagId : request.getTags()) {
+            for (Long tagId : request.tags()) {
                 tagsInClause.value(tagId);
             }
             predicate = cb.and(predicate, tagsInClause);
@@ -108,11 +108,11 @@ public class PlaceService {
 
     @Transactional
     public Place createPlace(PlaceCreateRequest placeRequest, String email) {
-        placeRequest.getGeometry().setSRID(4326);
+        placeRequest.geometry().setSRID(4326);
         Place place = new Place(placeRequest, email);
-        place.setCategory(entityManager.find(Category.class, placeRequest.getCategoryId()));
+        place.setCategory(entityManager.find(Category.class, placeRequest.categoryId()));
         place.setTags(entityManager.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class)
-                .setParameter("ids", placeRequest.getTags())
+                .setParameter("ids", placeRequest.tags())
                 .getResultList());
         entityManager.persist(place);
         return null;
@@ -120,12 +120,12 @@ public class PlaceService {
 
     @Transactional
     public Place updatePlace(PlaceCreateRequest placeRequest, String email, Long placeId) {
-        placeRequest.getGeometry().setSRID(4326);
+        placeRequest.geometry().setSRID(4326);
         Place place = new Place(placeRequest, email);
         place.setId(placeId);
-        place.setCategory(entityManager.find(Category.class, placeRequest.getCategoryId()));
+        place.setCategory(entityManager.find(Category.class, placeRequest.categoryId()));
         place.setTags(entityManager.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class)
-                .setParameter("ids", placeRequest.getTags())
+                .setParameter("ids", placeRequest.tags())
                 .getResultList());
         entityManager.merge(place);
         return null;
@@ -137,7 +137,7 @@ public class PlaceService {
         Comment comment = new Comment();
         comment.setAuthor(email);
         comment.setName(email);
-        comment.setValue(request.getValue());
+        comment.setValue(request.value());
         comment.setPlace(entityManager.find(Place.class, placeId));
         comment.setCreated(LocalDateTime.now());
         entityManager.persist(comment);

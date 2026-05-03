@@ -90,11 +90,11 @@ public class EventService {
         List<jakarta.persistence.criteria.Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(root.get("entityStatus"), EntityStatus.ACTIVE));
 
-        if (eventSearchParameters.getCreatedBy() != null && !eventSearchParameters.getCreatedBy().isBlank()) {
-            predicates.add(cb.equal(root.get("createdBy"), eventSearchParameters.getCreatedBy()));
+        if (eventSearchParameters.createdBy() != null && !eventSearchParameters.createdBy().isBlank()) {
+            predicates.add(cb.equal(root.get("createdBy"), eventSearchParameters.createdBy()));
         }
-        if (eventSearchParameters.getCategories() != null && !eventSearchParameters.getCategories().isEmpty()) {
-            predicates.add(root.get("category").get("id").in(eventSearchParameters.getCategories()));
+        if (eventSearchParameters.categories() != null && !eventSearchParameters.categories().isEmpty()) {
+            predicates.add(root.get("category").get("id").in(eventSearchParameters.categories()));
         }
 
         return predicates.toArray(new jakarta.persistence.criteria.Predicate[0]);

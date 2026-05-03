@@ -77,8 +77,7 @@ class PlaceFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         Place place = entityManager.createQuery("SELECT p FROM Place p WHERE p.name = :name", Place.class)
                 .setParameter("name", "Commented Place")
                 .getSingleResult();
-        CommentCreateRequest request = new CommentCreateRequest();
-        request.setValue("Strong coffee");
+        CommentCreateRequest request = new CommentCreateRequest(null, "Strong coffee", null);
 
         Comment comment = placeFacade.commentPlace(request, place.getId(), "integration@example.com");
         flushAndClear();
@@ -99,9 +98,7 @@ class PlaceFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         createPlace("Other Place", category, List.of(otherTag), "integration@example.com");
         flushAndClear();
 
-        PlaceSearchRequest request = new PlaceSearchRequest();
-        request.setCategory(List.of(category.getId()));
-        request.setTags(List.of(selectedTag.getId()));
+        PlaceSearchRequest request = new PlaceSearchRequest(null, List.of(selectedTag.getId()), List.of(category.getId()), null);
 
         List<Place> places = placeFacade.findPlacesByParameters(request, createPagingQueryParams()).data.stream()
                 .sorted(Comparator.comparing(Place::getName))
@@ -125,16 +122,18 @@ class PlaceFacadeIntegrationTest extends FacadeIntegrationTestSupport {
     }
 
     private PlaceCreateRequest createPlaceCreateRequest(Long categoryId, List<Long> tagIds, String name) {
-        PlaceCreateRequest request = new PlaceCreateRequest();
-        request.setName(name);
-        request.setDescription(name + " description");
-        request.setPhoneNumber("+420123123123");
-        request.setPrice(25.0);
-        request.setOpeningHours("09:00-18:00");
-        request.setImage(name + "-image");
-        request.setCategoryId(categoryId);
-        request.setTags(tagIds);
-        request.setGeometry(createPoint(14.4, 50.1));
-        return request;
+        return new PlaceCreateRequest(
+                name,
+                name + " description",
+                0.0,
+                "+420123123123",
+                25.0,
+                "09:00-18:00",
+                name + "-image",
+                null,
+                categoryId,
+                createPoint(14.4, 50.1),
+                tagIds
+        );
     }
 }

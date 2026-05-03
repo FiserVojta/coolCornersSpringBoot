@@ -5,6 +5,7 @@ import com.lonework.corners.place.model.DTO.PlaceRateRequest;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -39,6 +40,7 @@ public class PlaceController {
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{placeId}")
+    @PreAuthorize("hasRole('ADMIN') or @placeSecurity.isOwner(#placeId, authentication.token.claims['email'])")
     public Place updatePlace(@RequestBody PlaceCreateRequest placeRequest, @PathVariable("placeId") Long placeId) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof Jwt jwt) {
