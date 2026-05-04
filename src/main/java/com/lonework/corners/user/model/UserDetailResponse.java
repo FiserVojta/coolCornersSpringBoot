@@ -28,7 +28,7 @@ public record UserDetailResponse(
                 user.getName(),
                 user.getDisplayName(),
                 user.getCreatedAt().toString(),
-                null,
+                user.getDiscordId(),
                 null,
                 wandersOrganized,
                 wandersAttended,

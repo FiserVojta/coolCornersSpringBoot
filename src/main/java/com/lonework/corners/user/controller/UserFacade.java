@@ -7,6 +7,7 @@ import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserFollowRequest;
 import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.model.UserSearchParameters;
+import com.lonework.corners.user.model.UserUpdateRequest;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.user.service.UserService;
 import jakarta.inject.Inject;
@@ -44,6 +45,11 @@ public class UserFacade {
 
     public List<Trip> getUserTrips(String email) {
         return userService.getUserTrips(email);
+    }
+
+    @Transactional
+    public User updateUser(String email, UserUpdateRequest request) {
+        return userService.updateUser(email, request);
     }
 
 

@@ -8,8 +8,10 @@ import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserListResponse;
 import com.lonework.corners.user.model.UserSearchParameters;
+import com.lonework.corners.user.model.UserUpdateRequest;
 import com.lonework.corners.wander.api.WanderOperations;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -103,6 +105,18 @@ public class UserService {
 
     public User getUser(Long id){
         return entityManager.find(User.class, id);
+    }
+
+    public User updateUser(String email, UserUpdateRequest request) {
+        User user = getUser(email);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found");
+        }
+        String discordId = request.discordId() == null || request.discordId().isBlank()
+                ? null
+                : request.discordId().trim();
+        user.setDiscordId(discordId);
+        return entityManager.merge(user);
     }
 
     public List<Trip> getUserTrips(String email) {

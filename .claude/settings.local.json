@@ -3,7 +3,8 @@
     "allow": [
       "Bash(bash ./mvnw compile -q:*)",
       "Bash(mvn compile:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(./mvnw -q -DskipTests compile)"
     ]
   }
 }

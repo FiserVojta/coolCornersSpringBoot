@@ -48,6 +48,9 @@ public class User {
     @Column(name = "display_name")
     private String displayName;
 
+    @Column(name = "discord_id", unique = true)
+    private String discordId;
+
     @Column(name = "created_at")
     private ZonedDateTime createdAt = ZonedDateTime.now();
 
