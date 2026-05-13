@@ -158,6 +158,9 @@ public class TripService {
         if (tripSearchRequest.tags() != null && !tripSearchRequest.tags().isEmpty()) {
             predicates.add(tripRoot.get("tags").get("id").in(tripSearchRequest.tags()));
         }
+        if (tripSearchRequest.minRating() != null && tripSearchRequest.minRating() > 0) {
+            predicates.add(cb.greaterThanOrEqualTo(tripRoot.get("rating"), tripSearchRequest.minRating()));
+        }
 
         if (!predicates.isEmpty()) {
             cq.where(cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
@@ -180,6 +183,9 @@ public class TripService {
         }
         if (tripSearchRequest.tags() != null && !tripSearchRequest.tags().isEmpty()) {
             countPredicates.add(countRoot.get("tags").get("id").in(tripSearchRequest.tags()));
+        }
+        if (tripSearchRequest.minRating() != null && tripSearchRequest.minRating() > 0) {
+            countPredicates.add(cb.greaterThanOrEqualTo(countRoot.get("rating"), tripSearchRequest.minRating()));
         }
 
         if (!countPredicates.isEmpty()) {

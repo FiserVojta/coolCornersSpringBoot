@@ -5,7 +5,7 @@ public record UserListResponse(
         String email,
         String name,
         String displayName,
-        Integer rating
+        Double rating
 ) {
     public UserListResponse(User user) {
         this(
@@ -13,7 +13,7 @@ public record UserListResponse(
                 user.getEmail(),
                 user.getName(),
                 user.getDisplayName(),
-                null
+                user.getRating()
         );
     }
 }

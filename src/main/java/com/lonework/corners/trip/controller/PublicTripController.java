@@ -34,8 +34,9 @@ public class PublicTripController {
     @PermitAll
     public PagedResult<Trip> findTrip(@RequestParam(required = false) List<Long> categories,
                                       @RequestParam(required = false) List<Long> tags,
+                                      @RequestParam(required = false) Double minRating,
                                       PagingQueryParams queryParams) {
-        return tripFacade.findTripByParameters(new TripSearchRequest(categories, tags, ""), queryParams);
+        return tripFacade.findTripByParameters(new TripSearchRequest(categories, tags, "", minRating), queryParams);
     }
 }
 

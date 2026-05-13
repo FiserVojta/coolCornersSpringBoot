@@ -6,6 +6,7 @@ import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserFollowRequest;
 import com.lonework.corners.user.model.UserListResponse;
+import com.lonework.corners.user.model.UserRateRequest;
 import com.lonework.corners.user.model.UserSearchParameters;
 import com.lonework.corners.user.model.UserUpdateRequest;
 import com.lonework.corners.trip.model.Trip;
@@ -81,6 +82,11 @@ public class UserFacade {
         }
         saveUser(user);
         return user;
+    }
+
+    @Transactional
+    public Double rateUser(UserRateRequest request, Long userId) {
+        return userService.rateUser(request, userId);
     }
 
     public List<User> getUsersByIds(List<Long> ids) {

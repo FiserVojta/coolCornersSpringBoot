@@ -51,6 +51,9 @@ public class User {
     @Column(name = "discord_id", unique = true)
     private String discordId;
 
+    @Column
+    private Double rating;
+
     @Column(name = "created_at")
     private ZonedDateTime createdAt = ZonedDateTime.now();
 

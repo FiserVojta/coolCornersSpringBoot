@@ -150,7 +150,7 @@ class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         flushAndClear();
 
         List<Trip> trips = tripFacade.findTripByParameters(
-                        new TripSearchRequest(List.of(category.getId()), List.of(selectedTag.getId()), null),
+                        new TripSearchRequest(List.of(category.getId()), List.of(selectedTag.getId()), null, null),
                         createPagingQueryParams()
                 ).data.stream()
                 .sorted(Comparator.comparing(Trip::getName))
@@ -158,6 +158,55 @@ class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
 
         assertEquals(1, trips.size());
         assertEquals("Selected Trip", trips.getFirst().getName());
+    }
+
+    @Test
+    void findTripByParametersFiltersByMinRating() {
+        Category category = createCategory("Trip Category", CategoryType.TRIP);
+        Trip lowRated = createTrip("Low Rated Trip", category, List.of(), List.of(), "integration@example.com");
+        lowRated.setRating(2.5);
+        Trip midRated = createTrip("Mid Rated Trip", category, List.of(), List.of(), "integration@example.com");
+        midRated.setRating(4.0);
+        Trip highRated = createTrip("High Rated Trip", category, List.of(), List.of(), "integration@example.com");
+        highRated.setRating(4.7);
+        flushAndClear();
+
+        var result = tripFacade.findTripByParameters(
+                new TripSearchRequest(List.of(category.getId()), null, null, 4.0),
+                createPagingQueryParams()
+        );
+
+        List<Trip> trips = result.data.stream()
+                .sorted(Comparator.comparing(Trip::getName))
+                .toList();
+
+        assertEquals(2, trips.size());
+        assertEquals(2L, result.totalItems);
+        assertEquals("High Rated Trip", trips.getFirst().getName());
+        assertEquals("Mid Rated Trip", trips.get(1).getName());
+    }
+
+    @Test
+    void findTripByParametersIgnoresMinRatingWhenZeroOrNull() {
+        Category category = createCategory("Trip Category", CategoryType.TRIP);
+        Trip rated = createTrip("Rated Trip", category, List.of(), List.of(), "integration@example.com");
+        rated.setRating(3.0);
+        createTrip("Unrated Trip", category, List.of(), List.of(), "integration@example.com");
+        flushAndClear();
+
+        var resultZero = tripFacade.findTripByParameters(
+                new TripSearchRequest(List.of(category.getId()), null, null, 0.0),
+                createPagingQueryParams()
+        );
+        var resultNull = tripFacade.findTripByParameters(
+                new TripSearchRequest(List.of(category.getId()), null, null, null),
+                createPagingQueryParams()
+        );
+
+        assertEquals(2, resultZero.data.size());
+        assertEquals(2L, resultZero.totalItems);
+        assertEquals(2, resultNull.data.size());
+        assertEquals(2L, resultNull.totalItems);
     }
 
     private TripCreateRequest createTripCreateRequest(Long categoryId, List<Long> tagIds, List<Long> placeIds, String name) {

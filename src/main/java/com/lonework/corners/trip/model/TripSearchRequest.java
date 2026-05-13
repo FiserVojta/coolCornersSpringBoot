@@ -5,6 +5,7 @@ import java.util.List;
 public record TripSearchRequest(
         List<Long> categories,
         List<Long> tags,
-        String createdBy
+        String createdBy,
+        Double minRating
 ) {
 }

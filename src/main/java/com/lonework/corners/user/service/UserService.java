@@ -7,6 +7,8 @@ import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
 import com.lonework.corners.user.model.UserListResponse;
+import com.lonework.corners.user.model.UserRateRequest;
+import com.lonework.corners.user.model.UserRating;
 import com.lonework.corners.user.model.UserSearchParameters;
 import com.lonework.corners.user.model.UserUpdateRequest;
 import com.lonework.corners.wander.api.WanderOperations;
@@ -127,24 +129,49 @@ public class UserService {
         return user.getCompletedTrips();
     }
 
+    @Transactional
+    public Double rateUser(UserRateRequest request, Long userId) {
+        var user = entityManager.find(User.class, userId);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found");
+        }
+        entityManager.merge(new UserRating(request, userId));
+        user.setRating(countUserRating(userId));
+        entityManager.merge(user);
+        return user.getRating();
+    }
+
     public List<User> getUsersByIds(List<Long> ids) {
         return entityManager.createQuery("SELECT u FROM User u WHERE u.id IN :ids", User.class)
                 .setParameter("ids", ids)
                 .getResultList();
     }
 
+    private Double countUserRating(Long userId) {
+        return entityManager
+                .createQuery("SELECT AVG(ur.rating) FROM UserRating ur WHERE ur.userId = :userId", Double.class)
+                .setParameter("userId", userId)
+                .getSingleResult();
+    }
+
     private Predicate[] buildPredicates(UserSearchParameters userSearchParameters, CriteriaBuilder cb, Root<User> root) {
         List<Predicate> predicates = new ArrayList<>();
 
-        if (userSearchParameters != null
-                && userSearchParameters.search() != null
-                && !userSearchParameters.search().isBlank()) {
+        if (userSearchParameters == null) {
+            return predicates.toArray(new Predicate[0]);
+        }
+
+        if (userSearchParameters.search() != null && !userSearchParameters.search().isBlank()) {
             String searchPattern = "%" + userSearchParameters.search().trim().toLowerCase(Locale.ROOT) + "%";
             predicates.add(cb.or(
                     cb.like(cb.lower(root.get("name")), searchPattern),
                     cb.like(cb.lower(root.get("displayName")), searchPattern),
                     cb.like(cb.lower(root.get("email")), searchPattern)
             ));
+        }
+
+        if (userSearchParameters.minRating() != null && userSearchParameters.minRating() > 0) {
+            predicates.add(cb.greaterThanOrEqualTo(root.get("rating"), userSearchParameters.minRating()));
         }
 
         return predicates.toArray(new Predicate[0]);
