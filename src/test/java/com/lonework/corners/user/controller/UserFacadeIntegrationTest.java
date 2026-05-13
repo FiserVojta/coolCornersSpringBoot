@@ -37,7 +37,7 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         createUser("bob@example.com", "Bob");
         flushAndClear();
 
-        List<UserListResponse> users = userFacade.getUserList(new UserSearchParameters(null), createPagingQueryParams()).data.stream()
+        List<UserListResponse> users = userFacade.getUserList(new UserSearchParameters(null, null), createPagingQueryParams()).data.stream()
                 .sorted(Comparator.comparing(UserListResponse::email))
                 .toList();
 
@@ -52,7 +52,7 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         createUser("annika@example.com", "Annika");
         flushAndClear();
 
-        UserSearchParameters userSearchParameters = new UserSearchParameters("ann");
+        UserSearchParameters userSearchParameters = new UserSearchParameters("ann", null);
 
         var result = userFacade.getUserList(userSearchParameters, createPagingQueryParams());
         List<UserListResponse> users = result.data.stream()
@@ -72,7 +72,7 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         createUser("eva@example.com", "Eva");
         flushAndClear();
 
-        var result = userFacade.getUserList(new UserSearchParameters(null), new PagingQueryParams(1, 2, null, null));
+        var result = userFacade.getUserList(new UserSearchParameters(null, null), new PagingQueryParams(1, 2, null, null));
 
         assertEquals(5, result.totalItems);
         assertEquals(List.of("cara@example.com", "david@example.com"), result.data.stream().map(UserListResponse::email).toList());
