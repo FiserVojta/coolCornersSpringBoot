@@ -3,6 +3,7 @@ package com.lonework.corners.user.service;
 
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
+import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserDetailResponse;
@@ -114,10 +115,18 @@ public class UserService {
         if (user == null) {
             throw new EntityNotFoundException("User not found");
         }
-        String discordId = request.discordId() == null || request.discordId().isBlank()
-                ? null
-                : request.discordId().trim();
-        user.setDiscordId(discordId);
+        if (request.name() != null) {
+            String name = request.name().isBlank() ? null : request.name().trim();
+            user.setName(name);
+        }
+        if (request.displayName() != null) {
+            String displayName = request.displayName().isBlank() ? null : request.displayName().trim();
+            user.setDisplayName(displayName);
+        }
+        if (request.discordId() != null) {
+            String discordId = request.discordId().isBlank() ? null : request.discordId().trim();
+            user.setDiscordId(discordId);
+        }
         return entityManager.merge(user);
     }
 
@@ -127,6 +136,16 @@ public class UserService {
             return List.of();
         }
         return user.getCompletedTrips();
+    }
+
+    public List<Place> getUserPlaces(String email) {
+        if (email == null || email.isBlank()) {
+            return List.of();
+        }
+        return entityManager
+                .createQuery("select p from Place p where p.createdBy = :email order by p.id desc", Place.class)
+                .setParameter("email", email)
+                .getResultList();
     }
 
     @Transactional
