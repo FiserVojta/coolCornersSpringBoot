@@ -1,5 +1,6 @@
 package com.lonework.corners.user.controller;
 
+import com.lonework.corners.user.model.MeResponse;
 import com.lonework.corners.user.model.User;
 import com.lonework.corners.user.model.UserFollowRequest;
 import com.lonework.corners.user.model.UserRateRequest;
@@ -25,33 +26,32 @@ public class UserController {
     @Autowired
     private UserFacade userFacade;
 
-    @GetMapping("/{email}")
-    public ResponseEntity<User> getUser(@PathVariable("email") String email) {
-
-        return ResponseEntity.ok(userFacade.getUser(email));
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUser(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userFacade.getUser(id));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<User> getMe(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(userFacade.getUser(jwt.getClaimAsString("email")));
+    public ResponseEntity<MeResponse> getMe(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(new MeResponse(userFacade.getUser(jwt.getClaimAsString("email"))));
     }
 
     @PutMapping("/me")
-    public ResponseEntity<User> updateMe(@AuthenticationPrincipal Jwt jwt, @RequestBody UserUpdateRequest request) {
-        return ResponseEntity.ok(userFacade.updateUser(jwt.getClaimAsString("email"), request));
+    public ResponseEntity<MeResponse> updateMe(@AuthenticationPrincipal Jwt jwt, @RequestBody UserUpdateRequest request) {
+        return ResponseEntity.ok(new MeResponse(userFacade.updateUser(jwt.getClaimAsString("email"), request)));
     }
 
 
     @PostMapping("/follow")
-    public ResponseEntity<User> followUser(@AuthenticationPrincipal Jwt jwt, @RequestBody UserFollowRequest request)
+    public ResponseEntity<MeResponse> followUser(@AuthenticationPrincipal Jwt jwt, @RequestBody UserFollowRequest request)
     {
-        return ResponseEntity.ok(userFacade.followUser(jwt.getClaimAsString("email"), request));
+        return ResponseEntity.ok(new MeResponse(userFacade.followUser(jwt.getClaimAsString("email"), request)));
     }
 
     @PostMapping("/unfollow")
-    public ResponseEntity<User> unfollowUser(@AuthenticationPrincipal Jwt jwt, @RequestBody UserFollowRequest request)
+    public ResponseEntity<MeResponse> unfollowUser(@AuthenticationPrincipal Jwt jwt, @RequestBody UserFollowRequest request)
     {
-        return ResponseEntity.ok(userFacade.unFollowUser(jwt.getClaimAsString("email"), request));
+        return ResponseEntity.ok(new MeResponse(userFacade.unFollowUser(jwt.getClaimAsString("email"), request)));
     }
 
     @PatchMapping("/{userId}/rate")

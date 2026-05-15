@@ -55,7 +55,18 @@ public class UserService {
         var user = entityManager.createQuery("select u from User u where u.email = :email", User.class)
                 .setParameter("email", email)
                 .getSingleResult();
+        return buildUserDetail(user);
+    }
 
+    public UserDetailResponse getUserDetail(Long id) {
+        var user = entityManager.find(User.class, id);
+        if (user == null) {
+            throw new EntityNotFoundException("User not found");
+        }
+        return buildUserDetail(user);
+    }
+
+    private UserDetailResponse buildUserDetail(User user) {
         return new UserDetailResponse(user,
                 wanderOperations.getWanderListResponse(user.getWanders()),
                 wanderOperations.getWanderListResponse(user.getWandersOrganized()));
@@ -138,6 +149,14 @@ public class UserService {
         return user.getCompletedTrips();
     }
 
+    public List<Trip> getUserTrips(Long id) {
+        User user = getUser(id);
+        if (user == null) {
+            return List.of();
+        }
+        return user.getCompletedTrips();
+    }
+
     public List<Place> getUserPlaces(String email) {
         if (email == null || email.isBlank()) {
             return List.of();
@@ -146,6 +165,14 @@ public class UserService {
                 .createQuery("select p from Place p where p.createdBy = :email order by p.id desc", Place.class)
                 .setParameter("email", email)
                 .getResultList();
+    }
+
+    public List<Place> getUserPlaces(Long id) {
+        User user = getUser(id);
+        if (user == null || user.getEmail() == null) {
+            return List.of();
+        }
+        return getUserPlaces(user.getEmail());
     }
 
     @Transactional

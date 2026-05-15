@@ -38,11 +38,11 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         flushAndClear();
 
         List<UserListResponse> users = userFacade.getUserList(new UserSearchParameters(null, null), createPagingQueryParams()).data.stream()
-                .sorted(Comparator.comparing(UserListResponse::email))
+                .sorted(Comparator.comparing(UserListResponse::name))
                 .toList();
 
         assertEquals(2, users.size());
-        assertEquals(List.of("anna@example.com", "bob@example.com"), users.stream().map(UserListResponse::email).toList());
+        assertEquals(List.of("Anna", "Bob"), users.stream().map(UserListResponse::name).toList());
     }
 
     @Test
@@ -56,11 +56,11 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
 
         var result = userFacade.getUserList(userSearchParameters, createPagingQueryParams());
         List<UserListResponse> users = result.data.stream()
-                .sorted(Comparator.comparing(UserListResponse::email))
+                .sorted(Comparator.comparing(UserListResponse::name))
                 .toList();
 
         assertEquals(2, result.totalItems);
-        assertEquals(List.of("anna@example.com", "annika@example.com"), users.stream().map(UserListResponse::email).toList());
+        assertEquals(List.of("Anna", "Annika"), users.stream().map(UserListResponse::name).toList());
     }
 
     @Test
@@ -75,7 +75,7 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         var result = userFacade.getUserList(new UserSearchParameters(null, null), new PagingQueryParams(1, 2, null, null));
 
         assertEquals(5, result.totalItems);
-        assertEquals(List.of("cara@example.com", "david@example.com"), result.data.stream().map(UserListResponse::email).toList());
+        assertEquals(List.of("Cara", "David"), result.data.stream().map(UserListResponse::name).toList());
     }
 
     @Test
@@ -88,7 +88,7 @@ class UserFacadeIntegrationTest extends FacadeIntegrationTestSupport {
 
         assertNotNull(foundUser);
         assertEquals(user.getId(), foundUser.getId());
-        assertEquals("detail@example.com", detail.email());
+        assertEquals(user.getId(), detail.id());
         assertEquals("Detail User", detail.displayName());
     }
 

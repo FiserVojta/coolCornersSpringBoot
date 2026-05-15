@@ -1,6 +1,7 @@
 package com.lonework.corners.user.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lonework.corners.wander.model.Wander;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -40,6 +41,7 @@ public class User {
     @Column(name = "keycloak_id", unique = true, nullable = false)
     private String keycloakId;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String email;
 

@@ -41,16 +41,32 @@ public class UserFacade {
         return userService.getUserDetail(email);
     }
 
+    public UserDetailResponse getUserDetail(Long id) {
+        return userService.getUserDetail(id);
+    }
+
     public User getUser(String email) {
         return userService.getUser(email);
+    }
+
+    public User getUser(Long id) {
+        return userService.getUser(id);
     }
 
     public List<Trip> getUserTrips(String email) {
         return userService.getUserTrips(email);
     }
 
+    public List<Trip> getUserTrips(Long id) {
+        return userService.getUserTrips(id);
+    }
+
     public List<Place> getUserPlaces(String email) {
         return userService.getUserPlaces(email);
+    }
+
+    public List<Place> getUserPlaces(Long id) {
+        return userService.getUserPlaces(id);
     }
 
     @Transactional

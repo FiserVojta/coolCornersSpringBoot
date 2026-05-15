@@ -25,19 +25,19 @@ public class UserPublicController {
     @Inject
     UserFacade userFacade;
 
-    @GetMapping("/{email}")
-    public ResponseEntity<UserDetailResponse> getUser(@PathVariable("email") String email) {
-        return ResponseEntity.ok(userFacade.getUserDetail(email));
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDetailResponse> getUser(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userFacade.getUserDetail(id));
     }
 
-    @GetMapping("/{email}/trips")
-    public ResponseEntity<List<Trip>> getUserTrips(@PathVariable("email") String email) {
-        return ResponseEntity.ok(userFacade.getUserTrips(email));
+    @GetMapping("/{id}/trips")
+    public ResponseEntity<List<Trip>> getUserTrips(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userFacade.getUserTrips(id));
     }
 
-    @GetMapping("/{email}/places")
-    public ResponseEntity<List<Place>> getUserPlaces(@PathVariable("email") String email) {
-        return ResponseEntity.ok(userFacade.getUserPlaces(email));
+    @GetMapping("/{id}/places")
+    public ResponseEntity<List<Place>> getUserPlaces(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userFacade.getUserPlaces(id));
     }
 
     @GetMapping("")
