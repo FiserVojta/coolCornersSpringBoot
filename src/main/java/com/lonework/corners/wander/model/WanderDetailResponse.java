@@ -13,28 +13,30 @@ public record WanderDetailResponse(Long id,
                                    String description,
                                    Integer signed,
                                    Integer capacity,
-                                   LocalDateTime date,
+                                   LocalDateTime startTime,
                                    Long duration,
                                    Category category,
                                    List<Tag> tags,
                                    User createdBy,
                                    String name,
                                    List<WanderPart> wanderParts,
+                                   List<User> wanderers,
                                    CornerFile backgroundImage) {
 
     public WanderDetailResponse(Wander wander){
         this(
                 wander.getId(),
                 wander.getDescription(),
-                wander.getWanderers().size(),
+                wander.getWanderers() != null ? wander.getWanderers().size() : 0,
                 wander.getCapacity() != null ? wander.getCapacity() : 0,
                 wander.getStartTime(),
                 null,
-                 wander.getCategory(),
+                wander.getCategory(),
                 wander.getTags(),
                 wander.getCreatedBy(),
                 null,
                 wander.getWanderParts(),
+                wander.getWanderers(),
                 wander.getBackgroundImage()
         );
     }
