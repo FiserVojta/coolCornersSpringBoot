@@ -25,8 +25,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 @Service
@@ -83,11 +85,23 @@ public class UserService {
         dataQuery.where(buildPredicates(userSearchParameters, cb, dataRoot));
         dataQuery.orderBy(cb.asc(dataRoot.get("id")));
 
-        var users = entityManager.createQuery(dataQuery)
+        var pageUsers = entityManager.createQuery(dataQuery)
                 .setFirstResult(page * size)
                 .setMaxResults(size)
-                .getResultStream()
-                .map(UserListResponse::new)
+                .getResultList();
+
+        var ids = pageUsers.stream().map(User::getId).toList();
+        var trips = countByUserId("select u.id, size(u.completedTrips) from User u where u.id in :ids", ids);
+        var organized = countByUserId("select u.id, size(u.wandersOrganized) from User u where u.id in :ids", ids);
+        var attended = countByUserId("select u.id, size(u.wanders) from User u where u.id in :ids", ids);
+
+        var users = pageUsers.stream()
+                .map(u -> new UserListResponse(
+                        u,
+                        trips.getOrDefault(u.getId(), 0L),
+                        organized.getOrDefault(u.getId(), 0L),
+                        attended.getOrDefault(u.getId(), 0L)
+                ))
                 .toList();
 
         CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
@@ -97,6 +111,20 @@ public class UserService {
 
         long total = entityManager.createQuery(countQuery).getSingleResult();
         return new PagedResult<>(users, total);
+    }
+
+    private Map<Long, Long> countByUserId(String jpql, List<Long> ids) {
+        Map<Long, Long> result = new HashMap<>();
+        if (ids.isEmpty()) return result;
+        List<Object[]> rows = entityManager.createQuery(jpql, Object[].class)
+                .setParameter("ids", ids)
+                .getResultList();
+        for (Object[] row : rows) {
+            Long id = ((Number) row[0]).longValue();
+            Long count = row[1] == null ? 0L : ((Number) row[1]).longValue();
+            result.put(id, count);
+        }
+        return result;
     }
 
     public void ensureUserExists(String keycloakId, String email, String name) {
@@ -137,6 +165,10 @@ public class UserService {
         if (request.discordId() != null) {
             String discordId = request.discordId().isBlank() ? null : request.discordId().trim();
             user.setDiscordId(discordId);
+        }
+        if (request.introduction() != null) {
+            String introduction = request.introduction().isBlank() ? null : request.introduction().trim();
+            user.setIntroduction(introduction);
         }
         return entityManager.merge(user);
     }

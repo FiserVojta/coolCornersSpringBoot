@@ -53,6 +53,9 @@ public class User {
     @Column(name = "discord_id", unique = true)
     private String discordId;
 
+    @Column(columnDefinition = "TEXT")
+    private String introduction;
+
     @Column
     private Double rating;
 

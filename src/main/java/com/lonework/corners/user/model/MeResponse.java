@@ -10,6 +10,7 @@ public record MeResponse(
         String name,
         String displayName,
         String discordId,
+        String introduction,
         Double rating,
         ZonedDateTime createdAt,
         Set<User> followers
@@ -22,6 +23,7 @@ public record MeResponse(
                 user.getName(),
                 user.getDisplayName(),
                 user.getDiscordId(),
+                user.getIntroduction(),
                 user.getRating(),
                 user.getCreatedAt(),
                 user.getFollowers()
