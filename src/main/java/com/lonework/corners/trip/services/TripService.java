@@ -166,13 +166,14 @@ public class TripService {
             cq.where(cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
         }
 
-        String orderBy = tripSearchRequest.orderBy();
-        boolean ascending = "ASC".equalsIgnoreCase(tripSearchRequest.order());
+        com.lonework.corners.trip.model.TripSort sortBy = tripSearchRequest.sortBy();
+        boolean ascending = tripSearchRequest.sortDir() == com.lonework.corners.common.model.QueryOrder.ASC;
         jakarta.persistence.criteria.Expression<?> orderExpression = null;
-        if ("rating".equalsIgnoreCase(orderBy)) {
-            orderExpression = tripRoot.get("rating");
-        } else if ("completedCount".equalsIgnoreCase(orderBy)) {
-            orderExpression = cb.size(tripRoot.get("completedByUsers"));
+        if (sortBy != null) {
+            orderExpression = switch (sortBy) {
+                case RATING -> tripRoot.get("rating");
+                case COMPLETED_COUNT -> cb.size(tripRoot.get("completedByUsers"));
+            };
         }
         if (orderExpression != null) {
             cq.orderBy(ascending ? cb.asc(orderExpression) : cb.desc(orderExpression));

@@ -68,6 +68,14 @@ public class EventService {
         Root<Event> dataRoot = dataQuery.from(Event.class);
         dataQuery.where(buildPredicates(eventSearchParameters, cb, dataRoot));
 
+        if (eventSearchParameters.sortBy() != null) {
+            jakarta.persistence.criteria.Expression<?> orderExpression = switch (eventSearchParameters.sortBy()) {
+                case START_TIME -> dataRoot.get("startTime");
+            };
+            boolean ascending = eventSearchParameters.sortDir() == com.lonework.corners.common.model.QueryOrder.ASC;
+            dataQuery.orderBy(ascending ? cb.asc(orderExpression) : cb.desc(orderExpression));
+        }
+
         var data = entityManager.createQuery(dataQuery)
                 .setFirstResult(page * size)
                 .setMaxResults(size)

@@ -119,6 +119,14 @@ public class WanderService {
             dataCq.where(dataPredicates);
         }
 
+        if (filterParams.sortBy() != null) {
+            jakarta.persistence.criteria.Expression<?> orderExpression = switch (filterParams.sortBy()) {
+                case START_TIME -> dataRoot.get("startTime");
+            };
+            boolean ascending = filterParams.sortDir() == com.lonework.corners.common.model.QueryOrder.ASC;
+            dataCq.orderBy(ascending ? cb.asc(orderExpression) : cb.desc(orderExpression));
+        }
+
         var wanders = entityManager.createQuery(dataCq)
                 .setFirstResult(queryParams.page() != null ? queryParams.page() : 0)
                 .setMaxResults(queryParams.size() != null ? queryParams.size() : 10)

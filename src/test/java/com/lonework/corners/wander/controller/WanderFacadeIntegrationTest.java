@@ -113,7 +113,7 @@ class WanderFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         WanderDetailResponse detail = wanderFacade.getWander(wander.getId());
         List<WanderListResponse> wanders = wanderFacade.getWanderListResponse(
                 createPagingQueryParams(),
-                new WanderQueryParam(null, null, creator.getId(), List.of(category.getId()), List.of(), List.of())
+                new WanderQueryParam(null, null, creator.getId(), List.of(category.getId()), List.of(), List.of(), null, null)
         ).data;
 
         assertEquals("Listed wander", detail.description());

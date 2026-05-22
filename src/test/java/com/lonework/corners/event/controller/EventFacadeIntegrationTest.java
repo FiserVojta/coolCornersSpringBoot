@@ -201,7 +201,7 @@ class EventFacadeIntegrationTest extends PostgresIntegrationTest {
     }
 
     private static EventSearchParameters createEventSearchParameters(Long categoryId) {
-        return new EventSearchParameters("integration-author@example.com", "unused", List.of(categoryId));
+        return new EventSearchParameters("integration-author@example.com", "unused", List.of(categoryId), null, null);
     }
 
     private static PagingQueryParams createPagingQueryParams() {

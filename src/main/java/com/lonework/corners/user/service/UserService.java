@@ -83,7 +83,21 @@ public class UserService {
         Root<User> dataRoot = dataQuery.from(User.class);
         dataQuery.select(dataRoot);
         dataQuery.where(buildPredicates(userSearchParameters, cb, dataRoot));
-        dataQuery.orderBy(cb.asc(dataRoot.get("id")));
+
+        jakarta.persistence.criteria.Expression<?> sortExpression = null;
+        if (userSearchParameters != null && userSearchParameters.sortBy() != null) {
+            sortExpression = switch (userSearchParameters.sortBy()) {
+                case TRIPS_COMPLETED -> cb.size(dataRoot.get("completedTrips"));
+                case COTRAVELS_CREATED -> cb.size(dataRoot.get("wandersOrganized"));
+                case COTRAVELS_PARTICIPATED -> cb.size(dataRoot.get("wanders"));
+            };
+        }
+        if (sortExpression != null) {
+            boolean ascending = userSearchParameters.sortDir() == com.lonework.corners.common.model.QueryOrder.ASC;
+            dataQuery.orderBy(ascending ? cb.asc(sortExpression) : cb.desc(sortExpression));
+        } else {
+            dataQuery.orderBy(cb.asc(dataRoot.get("id")));
+        }
 
         var pageUsers = entityManager.createQuery(dataQuery)
                 .setFirstResult(page * size)
