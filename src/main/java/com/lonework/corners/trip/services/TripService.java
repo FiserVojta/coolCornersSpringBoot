@@ -165,6 +165,19 @@ public class TripService {
         if (!predicates.isEmpty()) {
             cq.where(cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0])));
         }
+
+        String orderBy = tripSearchRequest.orderBy();
+        boolean ascending = "ASC".equalsIgnoreCase(tripSearchRequest.order());
+        jakarta.persistence.criteria.Expression<?> orderExpression = null;
+        if ("rating".equalsIgnoreCase(orderBy)) {
+            orderExpression = tripRoot.get("rating");
+        } else if ("completedCount".equalsIgnoreCase(orderBy)) {
+            orderExpression = cb.size(tripRoot.get("completedByUsers"));
+        }
+        if (orderExpression != null) {
+            cq.orderBy(ascending ? cb.asc(orderExpression) : cb.desc(orderExpression));
+        }
+
         var page = pagingQueryParams.page() != null ? pagingQueryParams.page() : 0;
         var size =pagingQueryParams.size() != null ? pagingQueryParams.size() : 10;
         var data = entityManager.createQuery(cq)
