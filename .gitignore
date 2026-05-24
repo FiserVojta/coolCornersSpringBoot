@@ -7,3 +7,7 @@
 /dataSources/
 /dataSources.local.xml
 /target/*
+
+# Local environment files (contain secrets — never commit)
+.env
+.env.local

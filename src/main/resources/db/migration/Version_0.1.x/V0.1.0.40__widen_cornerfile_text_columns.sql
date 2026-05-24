@@ -1,0 +1,3 @@
+ALTER TABLE cornerfile
+    ALTER COLUMN name TYPE TEXT,
+    ALTER COLUMN url  TYPE TEXT;

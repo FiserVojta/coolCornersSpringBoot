@@ -31,7 +31,19 @@ public class DigitalOceanSpacesService {
                 .acl(ObjectCannedACL.PUBLIC_READ) // Make publicly accessible, remove if private
                 .build();
 
-        s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, contentLength));
+        try {
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, contentLength));
+        } catch (S3Exception e) {
+            String code = e.awsErrorDetails() != null ? e.awsErrorDetails().errorCode() : "n/a";
+            String msg = e.awsErrorDetails() != null ? e.awsErrorDetails().errorMessage() : "n/a";
+            throw new RuntimeException(
+                    "S3 upload failed: bucket=" + properties.getBucket()
+                            + " key=" + key
+                            + " status=" + e.statusCode()
+                            + " code=" + code
+                            + " message=" + msg,
+                    e);
+        }
 
         return getFileUrl(key);
     }
