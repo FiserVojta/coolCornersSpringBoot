@@ -3,6 +3,7 @@ package com.lonework.corners.user.service;
 
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
+import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.trip.model.Trip;
 import com.lonework.corners.user.model.User;
@@ -183,6 +184,13 @@ public class UserService {
         if (request.introduction() != null) {
             String introduction = request.introduction().isBlank() ? null : request.introduction().trim();
             user.setIntroduction(introduction);
+        }
+        if (request.profilePictureFileId() != null) {
+            CornerFile file = entityManager.find(CornerFile.class, request.profilePictureFileId());
+            if (file == null) {
+                throw new EntityNotFoundException("File not found");
+            }
+            user.setProfilePicture(file);
         }
         return entityManager.merge(user);
     }

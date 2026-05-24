@@ -13,6 +13,7 @@ public record MeResponse(
         String introduction,
         Double rating,
         ZonedDateTime createdAt,
+        String profilePictureUrl,
         Set<User> followers
 ) {
     public MeResponse(User user) {
@@ -26,6 +27,7 @@ public record MeResponse(
                 user.getIntroduction(),
                 user.getRating(),
                 user.getCreatedAt(),
+                user.getProfilePicture() != null ? user.getProfilePicture().getUrl() : null,
                 user.getFollowers()
         );
     }

@@ -4,6 +4,7 @@ public record UserUpdateRequest(
         String name,
         String displayName,
         String discordId,
-        String introduction
+        String introduction,
+        Long profilePictureFileId
 ) {
 }

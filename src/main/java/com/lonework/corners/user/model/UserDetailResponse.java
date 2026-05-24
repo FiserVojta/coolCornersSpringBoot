@@ -14,6 +14,7 @@ public record UserDetailResponse(
         String discordId,
         String introduction,
         Integer rating,
+        String profilePictureUrl,
         List<WanderListResponse> wandersOrganized,
         List<WanderListResponse> wandersAttended,
         //TO DO fix naming convention
@@ -29,6 +30,7 @@ public record UserDetailResponse(
                 user.getDiscordId(),
                 user.getIntroduction(),
                 null,
+                user.getProfilePicture() != null ? user.getProfilePicture().getUrl() : null,
                 wandersOrganized,
                 wandersAttended,
                 user.getFollowers(),

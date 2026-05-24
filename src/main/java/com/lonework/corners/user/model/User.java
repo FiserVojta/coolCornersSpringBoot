@@ -2,16 +2,19 @@ package com.lonework.corners.user.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.wander.model.Wander;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
@@ -31,7 +34,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"wanders", "wandersOrganized", "friends", "friendOf", "followers", "followersOf", "completedTrips"})
+@EqualsAndHashCode(exclude = {"wanders", "wandersOrganized", "friends", "friendOf", "followers", "followersOf", "completedTrips", "profilePicture"})
 public class User {
 
     @Id
@@ -61,6 +64,10 @@ public class User {
 
     @Column(name = "created_at")
     private ZonedDateTime createdAt = ZonedDateTime.now();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profile_picture_file_id")
+    private CornerFile profilePicture;
 
     @ManyToMany(mappedBy = "wanderers", cascade = CascadeType.PERSIST)
     @JsonBackReference

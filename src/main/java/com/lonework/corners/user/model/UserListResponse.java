@@ -6,6 +6,7 @@ public record UserListResponse(
         String displayName,
         Double rating,
         String createdAt,
+        String profilePictureUrl,
         Long tripsCompleted,
         Long cotravelsOrganized,
         Long cotravelsAttended
@@ -17,6 +18,7 @@ public record UserListResponse(
                 user.getDisplayName(),
                 user.getRating(),
                 user.getCreatedAt() != null ? user.getCreatedAt().toString() : null,
+                user.getProfilePicture() != null ? user.getProfilePicture().getUrl() : null,
                 tripsCompleted,
                 cotravelsOrganized,
                 cotravelsAttended
