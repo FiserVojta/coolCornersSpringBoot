@@ -28,6 +28,7 @@ public class DigitalOceanSpacesService {
                 .bucket(properties.getBucket())
                 .key(key)
                 .contentType(contentType)
+                .acl(ObjectCannedACL.PUBLIC_READ) // Make publicly accessible, remove if private
                 .build();
 
         try {
@@ -55,6 +56,7 @@ public class DigitalOceanSpacesService {
                 .bucket(properties.getBucket())
                 .key(key)
                 .contentType(contentType)
+                .acl(ObjectCannedACL.PUBLIC_READ)
                 .build();
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
