@@ -221,6 +221,7 @@ class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                 null,
                 createPoint(14.5, 50.15),
                 null,
+                null,
                 null
         );
     }

@@ -85,6 +85,9 @@ public class TripService {
             }
             trip.setCornerFiles(files);
         }
+        if(tripCreateRequest.backgroundImage() != null) {
+            trip.setBackgroundImage(fileOperations.getFileMetadata(tripCreateRequest.backgroundImage().fileId()));
+        }
 
         return entityManager.merge(trip);
     }

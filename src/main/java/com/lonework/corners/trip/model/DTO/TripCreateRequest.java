@@ -18,6 +18,7 @@ public record TripCreateRequest(
         @JsonProperty("Type") String type,
         Geometry geometry,
         List<CornerFileCreateLinkRequest> files,
-        List<GooglePlaceCreateRequest> googlePlaces
+        List<GooglePlaceCreateRequest> googlePlaces,
+        CornerFileCreateLinkRequest backgroundImage
 ) {
 }
