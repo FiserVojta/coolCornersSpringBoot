@@ -6,6 +6,7 @@ import org.locationtech.jts.geom.Geometry;
 public record GooglePlaceCreateRequest(
         String placeId,
         String name,
-        Geometry geometry
+        Geometry geometry,
+        Long categoryId
 ) {
 }

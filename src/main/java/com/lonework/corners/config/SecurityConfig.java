@@ -1,9 +1,11 @@
 package com.lonework.corners.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -11,9 +13,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +33,32 @@ public class SecurityConfig {
 
     @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:#{null}}")
     private String issuerUri;
+
+    @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri:#{null}}")
+    private String jwkSetUri;
+
+    /**
+     * JWT decoder with explicit connect/read timeouts on the JWK fetch.
+     *
+     * Spring's auto-configured decoder uses a RestTemplate with no timeouts, so a
+     * single stalled TLS connection to the keycloak JWK endpoint hangs forever and,
+     * because Nimbus' RemoteJWKSet.get() is synchronized, wedges every authenticated
+     * request behind it. Bounding the fetch makes a stalled keycloak fail fast and
+     * release the lock instead of taking down all authenticated traffic.
+     */
+    @Bean
+    @ConditionalOnProperty(name = "spring.security.oauth2.resourceserver.jwt.jwk-set-uri")
+    public JwtDecoder jwtDecoder() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofSeconds(5));
+        requestFactory.setReadTimeout(Duration.ofSeconds(5));
+
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
+                .restOperations(new RestTemplate(requestFactory))
+                .build();
+        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuerUri));
+        return decoder;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

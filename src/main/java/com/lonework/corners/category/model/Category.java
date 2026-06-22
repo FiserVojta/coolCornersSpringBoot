@@ -36,6 +36,14 @@ public class Category {
     @Column
     private String title;
 
+    /** Map glyph key (see corners-react mapyIcons.ts); null falls back to the 'default' glyph. */
+    @Column
+    private String icon;
+
+    /** Optional pin colour as hex (e.g. "#c2410c"); null uses the renderer default. */
+    @Column
+    private String color;
+
     @Enumerated(EnumType.STRING)
     @Column
     private CategoryType categoryType;

@@ -1,5 +1,6 @@
 package com.lonework.corners.place.api;
 
+import com.lonework.corners.category.model.Category;
 import com.lonework.corners.place.model.DTO.GooglePlaceCreateRequest;
 import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.Place;
@@ -64,6 +65,9 @@ public class PlaceDomainOperations implements PlaceOperations {
         entity.setId(request.placeId());
         entity.setName(request.name());
         entity.setGeometry(request.geometry());
+        entity.setCategory(request.categoryId() != null
+                ? entityManager.find(Category.class, request.categoryId())
+                : null);
         return entityManager.merge(entity);
     }
 }
