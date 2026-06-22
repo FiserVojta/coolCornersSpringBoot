@@ -111,7 +111,7 @@ class PlaceFacadeIntegrationTest extends FacadeIntegrationTestSupport {
     @Test
     void createGooglePlacePersistsAndFindsEntity() {
         GooglePlace googlePlace = placeFacade.createGooglePlace(
-                new GooglePlaceCreateRequest("google-1", "Google Place", createPoint(14.4, 50.1))
+                new GooglePlaceCreateRequest("google-1", "Google Place", createPoint(14.4, 50.1), null)
         );
         flushAndClear();
 
