@@ -11,6 +11,12 @@ public class DigitalOceanSpacesProperties {
     private String region;
     private String bucket;
     private String endpoint;
+    /**
+     * Whether to send the {@code public-read} canned ACL on uploads.
+     * DigitalOcean Spaces relies on this; Scaleway public buckets do not need it and may reject it.
+     * Defaults to {@code true} to preserve existing (DO/prod) behaviour.
+     */
+    private boolean publicReadAcl = true;
 
     // Getters and setters
     public String getAccessKey() {
@@ -51,5 +57,13 @@ public class DigitalOceanSpacesProperties {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
+    }
+
+    public boolean isPublicReadAcl() {
+        return publicReadAcl;
+    }
+
+    public void setPublicReadAcl(boolean publicReadAcl) {
+        this.publicReadAcl = publicReadAcl;
     }
 }

@@ -24,24 +24,32 @@ public class DigitalOceanSpacesService {
      * Upload a file to DigitalOcean Spaces
      */
     public String uploadFile(String key, InputStream inputStream, long contentLength, String contentType) {
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        PutObjectRequest.Builder builder = PutObjectRequest.builder()
                 .bucket(properties.getBucket())
                 .key(key)
-                .contentType(contentType)
-                .acl(ObjectCannedACL.PUBLIC_READ) // Make publicly accessible, remove if private
-                .build();
+                .contentType(contentType);
+        if (properties.isPublicReadAcl()) {
+            builder.acl(ObjectCannedACL.PUBLIC_READ); // Make publicly accessible; disabled for already-public buckets
+        }
+        PutObjectRequest putObjectRequest = builder.build();
 
         try {
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, contentLength));
         } catch (S3Exception e) {
             String code = e.awsErrorDetails() != null ? e.awsErrorDetails().errorCode() : "n/a";
             String msg = e.awsErrorDetails() != null ? e.awsErrorDetails().errorMessage() : "n/a";
+            String raw = e.awsErrorDetails() != null && e.awsErrorDetails().rawResponse() != null
+                    ? e.awsErrorDetails().rawResponse().asUtf8String()
+                    : "n/a";
             throw new RuntimeException(
                     "S3 upload failed: bucket=" + properties.getBucket()
+                            + " endpoint=" + properties.getEndpoint()
+                            + " region=" + properties.getRegion()
                             + " key=" + key
                             + " status=" + e.statusCode()
                             + " code=" + code
-                            + " message=" + msg,
+                            + " message=" + msg
+                            + " raw=" + raw,
                     e);
         }
 
@@ -52,12 +60,14 @@ public class DigitalOceanSpacesService {
      * Upload a file from byte array
      */
     public String uploadFile(String key, byte[] content, String contentType) {
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        PutObjectRequest.Builder builder = PutObjectRequest.builder()
                 .bucket(properties.getBucket())
                 .key(key)
-                .contentType(contentType)
-                .acl(ObjectCannedACL.PUBLIC_READ)
-                .build();
+                .contentType(contentType);
+        if (properties.isPublicReadAcl()) {
+            builder.acl(ObjectCannedACL.PUBLIC_READ);
+        }
+        PutObjectRequest putObjectRequest = builder.build();
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(content));
 
