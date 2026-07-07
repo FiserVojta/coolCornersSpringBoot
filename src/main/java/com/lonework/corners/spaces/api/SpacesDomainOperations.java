@@ -20,6 +20,11 @@ public class SpacesDomainOperations implements SpacesOperations {
     }
 
     @Override
+    public String uploadFile(String key, byte[] content, String contentType) {
+        return spacesService.uploadFile(key, content, contentType);
+    }
+
+    @Override
     public InputStream downloadFile(String key) {
         return spacesService.downloadFile(key);
     }

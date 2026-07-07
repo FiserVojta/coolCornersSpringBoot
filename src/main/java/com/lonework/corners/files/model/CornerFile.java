@@ -41,6 +41,14 @@ public class CornerFile {
     @Column
     private String url;
 
+    /** Public URL of the generated thumbnail; null for non-images or if generation failed. */
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl;
+
+    /** Storage key of the generated thumbnail; null when there is no thumbnail. */
+    @Column(name = "thumbnail_name")
+    private String thumbnailName;
+
     @Column
     private String createdBy;
 
