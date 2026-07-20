@@ -20,6 +20,8 @@ public record TravelDetailResponse(
         CornerFile coverImage,
         List<TravelPhotoResponse> photos,
         List<TravelPlaceResponse> places,
+        Double rating,
+        Integer myRating,
         ZonedDateTime createdAt
 ) {
     /**
@@ -27,6 +29,14 @@ public record TravelDetailResponse(
      *                          so it is never leaked to non-owners.
      */
     public static TravelDetailResponse from(Travel travel, boolean includeShareToken) {
+        return from(travel, includeShareToken, null);
+    }
+
+    /**
+     * @param myRating the current viewer's own rating of this travel, or null when they
+     *                 haven't rated it (anonymous/shared views always pass null).
+     */
+    public static TravelDetailResponse from(Travel travel, boolean includeShareToken, Integer myRating) {
         return new TravelDetailResponse(
                 travel.getId(),
                 travel.getTitle(),
@@ -44,6 +54,8 @@ public record TravelDetailResponse(
                 travel.getPlaces() != null
                         ? travel.getPlaces().stream().map(TravelPlaceResponse::from).toList()
                         : List.of(),
+                travel.getRating(),
+                myRating,
                 travel.getCreatedAt()
         );
     }

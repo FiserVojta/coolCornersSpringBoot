@@ -10,6 +10,7 @@ import com.lonework.corners.travel.model.TravelPhoto;
 import com.lonework.corners.travel.model.TravelPhotoRequest;
 import com.lonework.corners.travel.model.TravelPlace;
 import com.lonework.corners.travel.model.TravelPlaceRequest;
+import com.lonework.corners.travel.model.TravelRating;
 import com.lonework.corners.travel.model.TravelVisibility;
 import com.lonework.corners.user.api.UserOperations;
 import com.lonework.corners.user.model.User;
@@ -84,24 +85,40 @@ public class TravelService {
     }
 
     /**
-     * Returns a travel for an authenticated viewer, enforcing its visibility.
+     * Travels the viewer is allowed to see, newest first: their own, all PUBLIC ones,
+     * and FOLLOWERS ones from owners the viewer follows. An anonymous viewer
+     * (null email) gets PUBLIC travels only.
+     */
+    public List<Travel> getTravelsForViewer(String viewerEmail) {
+        if (viewerEmail == null) {
+            return entityManager.createQuery(
+                            "SELECT t FROM Travel t WHERE t.visibility = :publicVisibility ORDER BY t.createdAt DESC",
+                            Travel.class)
+                    .setParameter("publicVisibility", TravelVisibility.PUBLIC)
+                    .getResultList();
+        }
+        return entityManager.createQuery(
+                        "SELECT t FROM Travel t WHERE t.owner.email = :email"
+                                + " OR t.visibility = :publicVisibility"
+                                + " OR (t.visibility = :followersVisibility AND EXISTS ("
+                                + "SELECT f FROM User o JOIN o.followers f WHERE o = t.owner AND f.email = :email))"
+                                + " ORDER BY t.createdAt DESC",
+                        Travel.class)
+                .setParameter("email", viewerEmail)
+                .setParameter("publicVisibility", TravelVisibility.PUBLIC)
+                .setParameter("followersVisibility", TravelVisibility.FOLLOWERS)
+                .getResultList();
+    }
+
+    /**
+     * Returns a travel for a viewer, enforcing its visibility. An anonymous viewer
+     * (null email) only sees PUBLIC travels.
      * Throws {@link EntityNotFoundException} (404) when the viewer is not allowed to see it,
      * so the existence of private travels is never disclosed.
      */
     public Travel getTravelForViewer(Long travelId, String viewerEmail) {
         Travel travel = requireTravel(travelId);
         if (!canView(travel, viewerEmail)) {
-            throw new EntityNotFoundException("Travel not found with id: " + travelId);
-        }
-        return travel;
-    }
-
-    /**
-     * Returns a publicly listed travel by id (visibility PUBLIC only).
-     */
-    public Travel getPublicTravel(Long travelId) {
-        Travel travel = requireTravel(travelId);
-        if (travel.getVisibility() != TravelVisibility.PUBLIC) {
             throw new EntityNotFoundException("Travel not found with id: " + travelId);
         }
         return travel;
@@ -142,6 +159,29 @@ public class TravelService {
     }
 
     /**
+     * Travels of a given user that the viewer may see: all of them when the viewer is
+     * that user, PUBLIC + FOLLOWERS for a follower, PUBLIC only for strangers and
+     * anonymous viewers (null email).
+     */
+    public List<Travel> getUserTravelsForViewer(Long userId, String viewerEmail) {
+        if (viewerEmail == null) {
+            return getPublicUserTravels(userId);
+        }
+        return entityManager.createQuery(
+                        "SELECT t FROM Travel t WHERE t.owner.id = :userId AND (t.owner.email = :email"
+                                + " OR t.visibility = :publicVisibility"
+                                + " OR (t.visibility = :followersVisibility AND EXISTS ("
+                                + "SELECT f FROM User o JOIN o.followers f WHERE o = t.owner AND f.email = :email)))"
+                                + " ORDER BY t.createdAt DESC",
+                        Travel.class)
+                .setParameter("userId", userId)
+                .setParameter("email", viewerEmail)
+                .setParameter("publicVisibility", TravelVisibility.PUBLIC)
+                .setParameter("followersVisibility", TravelVisibility.FOLLOWERS)
+                .getResultList();
+    }
+
+    /**
      * Public travels of a given user (visibility PUBLIC only). Used by the anonymous public controller.
      */
     public List<Travel> getPublicUserTravels(Long userId) {
@@ -151,6 +191,65 @@ public class TravelService {
                 .setParameter("userId", userId)
                 .setParameter("visibility", TravelVisibility.PUBLIC)
                 .getResultList();
+    }
+
+    /**
+     * Upserts the viewer's rating (1-5) of a travel they can see and refreshes the
+     * travel's average rating. Visibility is enforced the same way as viewing, so a
+     * travel that is hidden from the viewer also cannot be rated (or probed) by them.
+     */
+    @Transactional
+    public Travel rateTravel(Long travelId, String viewerEmail, Integer rating) {
+        if (rating == null || rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+        Travel travel = getTravelForViewer(travelId, viewerEmail);
+
+        TravelRating existing = findViewerRating(travelId, viewerEmail);
+        if (existing == null) {
+            existing = new TravelRating();
+            existing.setTravelId(travelId);
+            existing.setAuthor(viewerEmail);
+            existing.setCreatedAt(ZonedDateTime.now());
+            existing.setRating(rating);
+            entityManager.persist(existing);
+        } else {
+            existing.setRating(rating);
+        }
+        entityManager.flush();
+
+        travel.setRating(averageRating(travelId));
+        return travel;
+    }
+
+    /**
+     * The viewer's own rating of a travel, or null when they haven't rated it (or are anonymous).
+     */
+    public Integer getViewerRating(Long travelId, String viewerEmail) {
+        if (viewerEmail == null) {
+            return null;
+        }
+        TravelRating rating = findViewerRating(travelId, viewerEmail);
+        return rating != null ? rating.getRating() : null;
+    }
+
+    private TravelRating findViewerRating(Long travelId, String viewerEmail) {
+        return entityManager.createQuery(
+                        "SELECT r FROM TravelRating r WHERE r.travelId = :travelId AND r.author = :author",
+                        TravelRating.class)
+                .setParameter("travelId", travelId)
+                .setParameter("author", viewerEmail)
+                .getResultList()
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Double averageRating(Long travelId) {
+        return entityManager.createQuery(
+                        "SELECT AVG(r.rating) FROM TravelRating r WHERE r.travelId = :travelId", Double.class)
+                .setParameter("travelId", travelId)
+                .getSingleResult();
     }
 
     public boolean isOwner(Long travelId, String email) {

@@ -147,6 +147,133 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
     }
 
     @Test
+    void travelsForViewerContainOnlyAccessibleTravels() {
+        User owner = createUser("feedowner@example.com", "FeedOwner");
+        User follower = createUser("feedfollower@example.com", "FeedFollower");
+        createUser("feedstranger@example.com", "FeedStranger");
+        owner.getFollowers().add(follower);
+        entityManager.merge(owner);
+        travelFacade.createTravel(request("Feed public", TravelVisibility.PUBLIC, null, List.of()), owner.getEmail());
+        travelFacade.createTravel(request("Feed followers", TravelVisibility.FOLLOWERS, null, List.of()), owner.getEmail());
+        travelFacade.createTravel(request("Feed private", TravelVisibility.PRIVATE, null, List.of()), owner.getEmail());
+        flushAndClear();
+
+        List<String> ownerTitles = titles(travelFacade.getTravelsForViewer("feedowner@example.com"));
+        assertTrue(ownerTitles.containsAll(List.of("Feed public", "Feed followers", "Feed private")));
+
+        List<String> followerTitles = titles(travelFacade.getTravelsForViewer("feedfollower@example.com"));
+        assertTrue(followerTitles.contains("Feed public"));
+        assertTrue(followerTitles.contains("Feed followers"));
+        assertFalse(followerTitles.contains("Feed private"));
+
+        List<String> strangerTitles = titles(travelFacade.getTravelsForViewer("feedstranger@example.com"));
+        assertTrue(strangerTitles.contains("Feed public"));
+        assertFalse(strangerTitles.contains("Feed followers"));
+        assertFalse(strangerTitles.contains("Feed private"));
+    }
+
+    @Test
+    void travelsForAnonymousViewerContainOnlyPublicTravels() {
+        User owner = createUser("anonfeed@example.com", "AnonFeed");
+        travelFacade.createTravel(request("Anon public", TravelVisibility.PUBLIC, null, List.of()), owner.getEmail());
+        travelFacade.createTravel(request("Anon private", TravelVisibility.PRIVATE, null, List.of()), owner.getEmail());
+        flushAndClear();
+
+        List<String> anonymousTitles = titles(travelFacade.getTravelsForViewer(null));
+        assertTrue(anonymousTitles.contains("Anon public"));
+        assertFalse(anonymousTitles.contains("Anon private"));
+    }
+
+    @Test
+    void userTravelsRespectViewerAccess() {
+        User owner = createUser("profileowner@example.com", "ProfileOwner");
+        User follower = createUser("profilefollower@example.com", "ProfileFollower");
+        createUser("profilestranger@example.com", "ProfileStranger");
+        owner.getFollowers().add(follower);
+        entityManager.merge(owner);
+        travelFacade.createTravel(request("Profile public", TravelVisibility.PUBLIC, null, List.of()), owner.getEmail());
+        travelFacade.createTravel(request("Profile followers", TravelVisibility.FOLLOWERS, null, List.of()), owner.getEmail());
+        travelFacade.createTravel(request("Profile private", TravelVisibility.PRIVATE, null, List.of()), owner.getEmail());
+        flushAndClear();
+
+        List<String> ownTitles = titles(travelFacade.getUserTravels(owner.getId(), owner.getEmail()));
+        assertTrue(ownTitles.containsAll(List.of("Profile public", "Profile followers", "Profile private")));
+
+        List<String> followerTitles = titles(travelFacade.getUserTravels(owner.getId(), follower.getEmail()));
+        assertTrue(followerTitles.containsAll(List.of("Profile public", "Profile followers")));
+        assertFalse(followerTitles.contains("Profile private"));
+
+        List<String> strangerTitles = titles(travelFacade.getUserTravels(owner.getId(), "profilestranger@example.com"));
+        assertEquals(List.of("Profile public"), strangerTitles);
+
+        List<String> anonymousTitles = titles(travelFacade.getUserTravels(owner.getId(), null));
+        assertEquals(List.of("Profile public"), anonymousTitles);
+    }
+
+    @Test
+    void anonymousViewerSeesOnlyPublicTravelDetail() {
+        User owner = createUser("anondetail@example.com", "AnonDetail");
+        TravelDetailResponse publicTravel = travelFacade.createTravel(
+                request("Anon detail public", TravelVisibility.PUBLIC, null, List.of()), owner.getEmail());
+        TravelDetailResponse privateTravel = travelFacade.createTravel(
+                request("Anon detail private", TravelVisibility.PRIVATE, null, List.of()), owner.getEmail());
+        flushAndClear();
+
+        TravelDetailResponse viewed = travelFacade.getTravel(publicTravel.id(), null);
+        assertEquals(publicTravel.id(), viewed.id());
+        // Anonymous viewers never receive the share token or a personal rating.
+        assertNull(viewed.shareToken());
+        assertNull(viewed.myRating());
+
+        assertThrows(EntityNotFoundException.class, () -> travelFacade.getTravel(privateTravel.id(), null));
+    }
+
+    @Test
+    void rateTravelAveragesRatingsAndUpsertsPerUser() {
+        User owner = createUser("rateowner@example.com", "RateOwner");
+        createUser("rater1@example.com", "RaterOne");
+        createUser("rater2@example.com", "RaterTwo");
+        TravelDetailResponse created = travelFacade.createTravel(
+                request("Rated trip", TravelVisibility.PUBLIC, null, List.of()), owner.getEmail());
+        flushAndClear();
+
+        TravelDetailResponse afterFirst = travelFacade.rateTravel(created.id(), 5, "rater1@example.com");
+        assertEquals(5.0, afterFirst.rating());
+        assertEquals(5, afterFirst.myRating());
+
+        TravelDetailResponse afterSecond = travelFacade.rateTravel(created.id(), 2, "rater2@example.com");
+        assertEquals(3.5, afterSecond.rating());
+        assertEquals(2, afterSecond.myRating());
+
+        // Re-rating replaces the user's previous rating instead of adding another row.
+        TravelDetailResponse afterRerate = travelFacade.rateTravel(created.id(), 4, "rater2@example.com");
+        assertEquals(4.5, afterRerate.rating());
+        assertEquals(4, afterRerate.myRating());
+        flushAndClear();
+
+        Travel persisted = entityManager.find(Travel.class, created.id());
+        assertEquals(4.5, persisted.getRating());
+        // The viewer's own rating is echoed back when fetching the travel.
+        assertEquals(4, travelFacade.getTravel(created.id(), "rater2@example.com").myRating());
+    }
+
+    @Test
+    void rateTravelEnforcesVisibilityAndValidRange() {
+        User owner = createUser("rateprivate@example.com", "RatePrivate");
+        createUser("ratestranger@example.com", "RateStranger");
+        TravelDetailResponse created = travelFacade.createTravel(
+                request("Unrateable", TravelVisibility.PRIVATE, null, List.of()), owner.getEmail());
+        flushAndClear();
+
+        assertThrows(EntityNotFoundException.class,
+                () -> travelFacade.rateTravel(created.id(), 4, "ratestranger@example.com"));
+        assertThrows(IllegalArgumentException.class,
+                () -> travelFacade.rateTravel(created.id(), 0, owner.getEmail()));
+        assertThrows(IllegalArgumentException.class,
+                () -> travelFacade.rateTravel(created.id(), 6, owner.getEmail()));
+    }
+
+    @Test
     void createTravelPersistsVisitedPlaces() {
         User owner = createUser("places@example.com", "Places");
         flushAndClear();
@@ -199,6 +326,10 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertEquals(135.5023, persisted.getPhotos().getFirst().getLongitude());
         assertEquals(java.time.LocalDate.parse("2026-01-12"), persisted.getPhotos().getFirst().getTakenOn());
         assertEquals(34.6937, created.photos().getFirst().latitude());
+    }
+
+    private List<String> titles(List<TravelSummaryResponse> travels) {
+        return travels.stream().map(TravelSummaryResponse::title).toList();
     }
 
     private TravelCreateRequest request(String title, TravelVisibility visibility, Long coverImageId, List<Long> fileIds) {

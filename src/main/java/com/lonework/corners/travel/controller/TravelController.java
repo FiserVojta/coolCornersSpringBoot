@@ -2,6 +2,7 @@ package com.lonework.corners.travel.controller;
 
 import com.lonework.corners.travel.model.TravelCreateRequest;
 import com.lonework.corners.travel.model.TravelDetailResponse;
+import com.lonework.corners.travel.model.TravelRateRequest;
 import com.lonework.corners.travel.model.TravelSummaryResponse;
 import com.lonework.corners.travel.model.TravelVisibilityRequest;
 import jakarta.inject.Inject;
@@ -64,6 +65,14 @@ public class TravelController {
             @RequestBody TravelVisibilityRequest request,
             @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.ok(travelFacade.updateVisibility(travelId, request.visibility(), jwt.getClaimAsString("email")));
+    }
+
+    @PatchMapping("/{travelId}/rate")
+    public ResponseEntity<TravelDetailResponse> rateTravel(
+            @PathVariable Long travelId,
+            @RequestBody TravelRateRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(travelFacade.rateTravel(travelId, request.rating(), jwt.getClaimAsString("email")));
     }
 
     @DeleteMapping("/{travelId}")

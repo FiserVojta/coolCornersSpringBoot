@@ -78,6 +78,10 @@ public class Travel {
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelPlace> places = new ArrayList<>();
 
+    /** Average of all {@link TravelRating} rows for this travel; null until first rated. */
+    @Column
+    private Double rating;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "entity_status")
     private EntityStatus entityStatus;

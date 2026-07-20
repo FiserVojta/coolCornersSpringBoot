@@ -14,7 +14,8 @@ public record TravelSummaryResponse(
         TravelVisibility visibility,
         CornerFile coverImage,
         int photoCount,
-        TravelOwner owner
+        TravelOwner owner,
+        Double rating
 ) {
     public static TravelSummaryResponse from(Travel travel) {
         return new TravelSummaryResponse(
@@ -26,7 +27,8 @@ public record TravelSummaryResponse(
                 travel.getVisibility(),
                 travel.getCoverImage(),
                 travel.getPhotos() != null ? travel.getPhotos().size() : 0,
-                TravelOwner.from(travel.getOwner())
+                TravelOwner.from(travel.getOwner()),
+                travel.getRating()
         );
     }
 }

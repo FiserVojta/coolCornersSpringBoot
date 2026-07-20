@@ -47,13 +47,22 @@ public class TravelFacade {
                 .toList();
     }
 
-    public TravelDetailResponse getTravel(Long travelId, String viewerEmail) {
-        Travel travel = travelService.getTravelForViewer(travelId, viewerEmail);
-        return TravelDetailResponse.from(travel, isOwner(travel, viewerEmail));
+    public List<TravelSummaryResponse> getTravelsForViewer(String viewerEmail) {
+        return travelService.getTravelsForViewer(viewerEmail).stream()
+                .map(TravelSummaryResponse::from)
+                .toList();
     }
 
-    public TravelDetailResponse getPublicTravel(Long travelId) {
-        return TravelDetailResponse.from(travelService.getPublicTravel(travelId), false);
+    public TravelDetailResponse getTravel(Long travelId, String viewerEmail) {
+        Travel travel = travelService.getTravelForViewer(travelId, viewerEmail);
+        return TravelDetailResponse.from(travel, isOwner(travel, viewerEmail),
+                travelService.getViewerRating(travelId, viewerEmail));
+    }
+
+    public TravelDetailResponse rateTravel(Long travelId, Integer rating, String viewerEmail) {
+        Travel travel = travelService.rateTravel(travelId, viewerEmail, rating);
+        return TravelDetailResponse.from(travel, isOwner(travel, viewerEmail),
+                travelService.getViewerRating(travelId, viewerEmail));
     }
 
     public TravelDetailResponse getSharedTravel(String shareToken) {
@@ -68,8 +77,8 @@ public class TravelFacade {
         return new PagedResult<>(data, page.totalItems);
     }
 
-    public List<TravelSummaryResponse> getPublicUserTravels(Long userId) {
-        return travelService.getPublicUserTravels(userId).stream()
+    public List<TravelSummaryResponse> getUserTravels(Long userId, String viewerEmail) {
+        return travelService.getUserTravelsForViewer(userId, viewerEmail).stream()
                 .map(TravelSummaryResponse::from)
                 .toList();
     }
