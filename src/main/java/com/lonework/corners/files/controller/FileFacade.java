@@ -3,7 +3,11 @@ package com.lonework.corners.files.controller;
 import com.lonework.corners.common.model.EntityStatus;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.files.model.CornerFile;
+import com.lonework.corners.files.model.DTO.CornerFileCompleteRequest;
 import com.lonework.corners.files.model.DTO.CornerFileList;
+import com.lonework.corners.files.model.DTO.CornerFilePresignRequest;
+import com.lonework.corners.files.model.DTO.CornerFilePresignResponse;
+import com.lonework.corners.spaces.api.PresignedUpload;
 import com.lonework.corners.spaces.api.SpacesOperations;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -82,6 +86,79 @@ public class FileFacade {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Presign direct-to-storage PUT URLs so the browser can upload without proxying the bytes
+     * through this backend. The key is generated server-side; the client only supplies the
+     * display file name and content type. For images, a second URL is presigned for the
+     * client-generated JPEG thumbnail (mirrors the {@code thumb-} key convention of
+     * {@link #uploadFile}).
+     */
+    public CornerFilePresignResponse presignUpload(CornerFilePresignRequest request) {
+        String contentType = request.contentType() == null || request.contentType().isBlank()
+                ? "application/octet-stream"
+                : request.contentType();
+        String key = UUID.randomUUID() + "-" + stripPath(request.fileName());
+        PresignedUpload upload = spacesOperations.presignUpload(key, contentType);
+
+        String thumbnailKey = null;
+        PresignedUpload thumbnailUpload = null;
+        if (request.withThumbnail() && contentType.startsWith("image/")) {
+            thumbnailKey = "thumb-" + key;
+            // Client-side thumbnails are always re-encoded as JPEG, whatever the original format.
+            thumbnailUpload = spacesOperations.presignUpload(thumbnailKey, "image/jpeg");
+        }
+
+        return new CornerFilePresignResponse(
+                key,
+                upload.url(),
+                spacesOperations.getFileUrl(key),
+                upload.headers(),
+                thumbnailKey,
+                thumbnailUpload != null ? thumbnailUpload.url() : null,
+                thumbnailKey != null ? spacesOperations.getFileUrl(thumbnailKey) : null,
+                thumbnailUpload != null ? thumbnailUpload.headers() : null);
+    }
+
+    /**
+     * Record a file the browser uploaded via presigned URLs. The main object must exist in
+     * storage; a missing thumbnail object degrades to "no thumbnail" (same as {@link #uploadFile}
+     * when generation fails) instead of failing the whole registration.
+     */
+    @Transactional
+    public CornerFile completeUpload(CornerFileCompleteRequest request, String createdBy) {
+        if (request.key() == null || request.key().isBlank()) {
+            throw new IllegalArgumentException("File key is required.");
+        }
+        String key = request.key().trim();
+        if (!spacesOperations.fileExists(key)) {
+            throw new IllegalArgumentException("File was not uploaded to storage.");
+        }
+
+        var cornerFile = new CornerFile();
+        cornerFile.setCreatedAt(ZonedDateTime.now());
+        cornerFile.setCreatedBy(createdBy);
+        cornerFile.setName(key);
+        cornerFile.setUrl(spacesOperations.getFileUrl(key));
+        cornerFile.setEntityStatus(EntityStatus.ACTIVE);
+
+        String thumbnailKey = request.thumbnailKey();
+        if (thumbnailKey != null && !thumbnailKey.isBlank() && spacesOperations.fileExists(thumbnailKey.trim())) {
+            cornerFile.setThumbnailName(thumbnailKey.trim());
+            cornerFile.setThumbnailUrl(spacesOperations.getFileUrl(thumbnailKey.trim()));
+        }
+
+        entityManager.persist(cornerFile);
+        return cornerFile;
+    }
+
+    /** Keep only the base file name — a client-supplied name must not shape the storage path. */
+    private String stripPath(String fileName) {
+        String name = fileName == null ? "" : fileName;
+        int cut = Math.max(name.lastIndexOf('/'), name.lastIndexOf('\\'));
+        name = cut >= 0 ? name.substring(cut + 1) : name;
+        return name.isBlank() ? "file" : name;
     }
 
     /**

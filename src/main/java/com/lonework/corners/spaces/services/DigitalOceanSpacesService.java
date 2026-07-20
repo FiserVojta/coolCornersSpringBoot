@@ -1,22 +1,33 @@
 package com.lonework.corners.spaces.services;
 
+import com.lonework.corners.spaces.api.PresignedUpload;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.io.InputStream;
+import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class DigitalOceanSpacesService {
 
+    /** How long a presigned browser upload URL stays valid. */
+    private static final Duration PRESIGN_EXPIRY = Duration.ofMinutes(15);
+
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
     private final DigitalOceanSpacesProperties properties;
 
-    public DigitalOceanSpacesService(S3Client s3Client, DigitalOceanSpacesProperties properties) {
+    public DigitalOceanSpacesService(S3Client s3Client, S3Presigner s3Presigner, DigitalOceanSpacesProperties properties) {
         this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
         this.properties = properties;
     }
 
@@ -141,11 +152,28 @@ public class DigitalOceanSpacesService {
     }
 
     /**
-     * Generate a pre-signed URL for temporary access (optional)
+     * Presign a PUT so the browser can upload straight to object storage, skipping the
+     * backend hop entirely. The returned headers are part of the signature and must be
+     * sent verbatim with the PUT.
      */
-    public String generatePresignedUrl(String key, int expirationMinutes) {
-        // Note: Pre-signed URLs require additional AWS SDK setup
-        // This is a simplified version - you may want to implement proper pre-signed URLs
-        return getFileUrl(key);
+    public PresignedUpload presignUpload(String key, String contentType) {
+        PutObjectRequest.Builder builder = PutObjectRequest.builder()
+                .bucket(properties.getBucket())
+                .key(key)
+                .contentType(contentType);
+        Map<String, String> headers = new LinkedHashMap<>();
+        headers.put("Content-Type", contentType);
+        if (properties.isPublicReadAcl()) {
+            builder.acl(ObjectCannedACL.PUBLIC_READ);
+            headers.put("x-amz-acl", "public-read");
+        }
+
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(PRESIGN_EXPIRY)
+                .putObjectRequest(builder.build())
+                .build();
+
+        String url = s3Presigner.presignPutObject(presignRequest).url().toString();
+        return new PresignedUpload(url, headers);
     }
 }

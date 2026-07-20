@@ -2,6 +2,10 @@ package com.lonework.corners.files.controller;
 
 import com.lonework.corners.common.model.EntityStatus;
 import com.lonework.corners.files.model.CornerFile;
+import com.lonework.corners.files.model.DTO.CornerFileCompleteRequest;
+import com.lonework.corners.files.model.DTO.CornerFilePresignRequest;
+import com.lonework.corners.files.model.DTO.CornerFilePresignResponse;
+import com.lonework.corners.spaces.api.PresignedUpload;
 import com.lonework.corners.spaces.services.DigitalOceanSpacesService;
 import com.lonework.corners.support.FacadeIntegrationTestSupport;
 import org.junit.jupiter.api.Test;
@@ -16,11 +20,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -92,6 +99,132 @@ class FileFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ImageIO.write(image, "png", out);
         return out.toByteArray();
+    }
+
+    @Test
+    void presignUploadGeneratesKeyAndUrlsWithThumbnailForImages() {
+        stubPresignAndPublicUrls();
+
+        CornerFilePresignResponse response =
+                fileFacade.presignUpload(new CornerFilePresignRequest("photo.png", "image/png", true));
+
+        assertTrue(response.key().endsWith("-photo.png"));
+        assertEquals("https://signed.example/" + response.key(), response.uploadUrl());
+        assertEquals("https://spaces.example/" + response.key(), response.publicUrl());
+        assertEquals("image/png", response.headers().get("Content-Type"));
+        assertEquals("thumb-" + response.key(), response.thumbnailKey());
+        assertEquals("https://signed.example/thumb-" + response.key(), response.thumbnailUploadUrl());
+        assertEquals("https://spaces.example/thumb-" + response.key(), response.thumbnailPublicUrl());
+        // Client-side thumbnails are always re-encoded as JPEG, whatever the original format.
+        assertEquals("image/jpeg", response.thumbnailHeaders().get("Content-Type"));
+    }
+
+    @Test
+    void presignUploadSkipsThumbnailForNonImages() {
+        stubPresignAndPublicUrls();
+
+        CornerFilePresignResponse response =
+                fileFacade.presignUpload(new CornerFilePresignRequest("doc.pdf", "application/pdf", true));
+
+        assertNotNull(response.uploadUrl());
+        assertNull(response.thumbnailKey());
+        assertNull(response.thumbnailUploadUrl());
+        assertNull(response.thumbnailPublicUrl());
+        assertNull(response.thumbnailHeaders());
+    }
+
+    @Test
+    void presignUploadStripsPathFromFileName() {
+        stubPresignAndPublicUrls();
+
+        CornerFilePresignResponse response =
+                fileFacade.presignUpload(new CornerFilePresignRequest("../nested/dir\\evil.jpg", "image/jpeg", false));
+
+        assertTrue(response.key().endsWith("-evil.jpg"));
+        assertFalse(response.key().contains("/"));
+        assertFalse(response.key().contains("\\"));
+    }
+
+    @Test
+    void completeUploadPersistsFileWithThumbnail() {
+        stubPresignAndPublicUrls();
+        when(digitalOceanSpacesService.fileExists("abc-photo.jpg")).thenReturn(true);
+        when(digitalOceanSpacesService.fileExists("thumb-abc-photo.jpg")).thenReturn(true);
+
+        CornerFile file = fileFacade.completeUpload(
+                new CornerFileCompleteRequest("abc-photo.jpg", "thumb-abc-photo.jpg"),
+                "integration@example.com");
+        flushAndClear();
+
+        CornerFile persisted = entityManager.find(CornerFile.class, file.getId());
+        assertNotNull(persisted);
+        assertEquals("abc-photo.jpg", persisted.getName());
+        assertEquals("https://spaces.example/abc-photo.jpg", persisted.getUrl());
+        assertEquals("thumb-abc-photo.jpg", persisted.getThumbnailName());
+        assertEquals("https://spaces.example/thumb-abc-photo.jpg", persisted.getThumbnailUrl());
+        assertEquals("integration@example.com", persisted.getCreatedBy());
+        assertEquals(EntityStatus.ACTIVE, persisted.getEntityStatus());
+        assertNotNull(persisted.getCreatedAt());
+    }
+
+    @Test
+    void completeUploadWithoutThumbnailPersistsPlainFile() {
+        stubPresignAndPublicUrls();
+        when(digitalOceanSpacesService.fileExists("abc-doc.pdf")).thenReturn(true);
+
+        CornerFile file = fileFacade.completeUpload(
+                new CornerFileCompleteRequest("abc-doc.pdf", null),
+                "integration@example.com");
+        flushAndClear();
+
+        CornerFile persisted = entityManager.find(CornerFile.class, file.getId());
+        assertNotNull(persisted);
+        assertEquals("https://spaces.example/abc-doc.pdf", persisted.getUrl());
+        assertNull(persisted.getThumbnailName());
+        assertNull(persisted.getThumbnailUrl());
+    }
+
+    @Test
+    void completeUploadDropsThumbnailWhenThumbnailObjectMissing() {
+        stubPresignAndPublicUrls();
+        when(digitalOceanSpacesService.fileExists("abc-photo.jpg")).thenReturn(true);
+        when(digitalOceanSpacesService.fileExists("thumb-abc-photo.jpg")).thenReturn(false);
+
+        CornerFile file = fileFacade.completeUpload(
+                new CornerFileCompleteRequest("abc-photo.jpg", "thumb-abc-photo.jpg"),
+                "integration@example.com");
+        flushAndClear();
+
+        CornerFile persisted = entityManager.find(CornerFile.class, file.getId());
+        assertNotNull(persisted);
+        assertEquals("https://spaces.example/abc-photo.jpg", persisted.getUrl());
+        assertNull(persisted.getThumbnailName());
+        assertNull(persisted.getThumbnailUrl());
+    }
+
+    @Test
+    void completeUploadRejectsWhenObjectWasNeverUploaded() {
+        when(digitalOceanSpacesService.fileExists("missing-key")).thenReturn(false);
+
+        assertThrows(IllegalArgumentException.class, () -> fileFacade.completeUpload(
+                new CornerFileCompleteRequest("missing-key", null),
+                "integration@example.com"));
+    }
+
+    @Test
+    void completeUploadRejectsBlankKey() {
+        assertThrows(IllegalArgumentException.class, () -> fileFacade.completeUpload(
+                new CornerFileCompleteRequest("  ", null),
+                "integration@example.com"));
+    }
+
+    private void stubPresignAndPublicUrls() {
+        when(digitalOceanSpacesService.presignUpload(anyString(), anyString()))
+                .thenAnswer(inv -> new PresignedUpload(
+                        "https://signed.example/" + inv.getArgument(0, String.class),
+                        Map.of("Content-Type", inv.getArgument(1, String.class))));
+        when(digitalOceanSpacesService.getFileUrl(anyString()))
+                .thenAnswer(inv -> "https://spaces.example/" + inv.getArgument(0, String.class));
     }
 
     @Test

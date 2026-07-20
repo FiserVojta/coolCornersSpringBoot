@@ -9,4 +9,10 @@ public interface SpacesOperations {
     String uploadFile(String key, byte[] content, String contentType);
 
     InputStream downloadFile(String key);
+
+    PresignedUpload presignUpload(String key, String contentType);
+
+    boolean fileExists(String key);
+
+    String getFileUrl(String key);
 }

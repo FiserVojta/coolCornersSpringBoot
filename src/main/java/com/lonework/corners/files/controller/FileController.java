@@ -1,6 +1,10 @@
 package com.lonework.corners.files.controller;
 
 
+import com.lonework.corners.files.model.CornerFile;
+import com.lonework.corners.files.model.DTO.CornerFileCompleteRequest;
+import com.lonework.corners.files.model.DTO.CornerFilePresignRequest;
+import com.lonework.corners.files.model.DTO.CornerFilePresignResponse;
 import com.lonework.corners.spaces.services.DigitalOceanSpacesProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,11 +12,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
@@ -41,6 +45,20 @@ public class FileController {
         return ResponseEntity.ok(response);
     }
 
+    /** Step 1 of the direct-to-storage upload: hand the browser presigned PUT URLs. */
+    @PostMapping("/presign")
+    public ResponseEntity<CornerFilePresignResponse> presignUpload(@RequestBody CornerFilePresignRequest request) {
+        return ResponseEntity.ok(fileFacade.presignUpload(request));
+    }
+
+    /** Step 2: after the browser PUT the object(s) to storage, record the file. */
+    @PostMapping("/complete")
+    public ResponseEntity<CornerFile> completeUpload(
+            @RequestBody CornerFileCompleteRequest request,
+            @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(fileFacade.completeUpload(request, jwt.getClaimAsString("email")));
+    }
+
     // TEMPORARY: diagnose DO Spaces uploads. Delete once the prod issue is resolved.
     @GetMapping("/debug/spaces")
     public ResponseEntity<Map<String, Object>> debugSpaces() {
@@ -64,7 +82,7 @@ public class FileController {
                     .key(key)
                     .contentType("text/plain")
                     .build();
-            s3Client.putObject(req, RequestBody.fromString("debug"));
+            s3Client.putObject(req, software.amazon.awssdk.core.sync.RequestBody.fromString("debug"));
             out.put("status", "ok");
         } catch (S3Exception e) {
             out.put("status", "s3-exception");

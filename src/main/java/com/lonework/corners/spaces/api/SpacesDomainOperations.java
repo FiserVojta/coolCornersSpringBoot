@@ -28,4 +28,19 @@ public class SpacesDomainOperations implements SpacesOperations {
     public InputStream downloadFile(String key) {
         return spacesService.downloadFile(key);
     }
+
+    @Override
+    public PresignedUpload presignUpload(String key, String contentType) {
+        return spacesService.presignUpload(key, contentType);
+    }
+
+    @Override
+    public boolean fileExists(String key) {
+        return spacesService.fileExists(key);
+    }
+
+    @Override
+    public String getFileUrl(String key) {
+        return spacesService.getFileUrl(key);
+    }
 }
