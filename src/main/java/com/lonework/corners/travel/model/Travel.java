@@ -2,8 +2,10 @@ package com.lonework.corners.travel.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.lonework.corners.category.model.Category;
 import com.lonework.corners.common.model.EntityStatus;
 import com.lonework.corners.files.model.CornerFile;
+import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.user.model.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -14,6 +16,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -33,7 +37,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"photos", "coverImage", "owner", "places"})
+@EqualsAndHashCode(exclude = {"photos", "coverImage", "owner", "places", "category", "tags"})
 public class Travel {
 
     @Id
@@ -77,6 +81,18 @@ public class Travel {
 
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelPlace> places = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Category category;
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(name = "travel_has_tag",
+            joinColumns = @JoinColumn(name = "travel_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private List<Tag> tags = new ArrayList<>();
 
     /** Average of all {@link TravelRating} rows for this travel; null until first rated. */
     @Column

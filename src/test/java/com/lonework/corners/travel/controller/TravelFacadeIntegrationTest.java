@@ -1,7 +1,10 @@
 package com.lonework.corners.travel.controller;
 
+import com.lonework.corners.category.model.Category;
+import com.lonework.corners.category.model.CategoryType;
 import com.lonework.corners.files.model.CornerFile;
 import com.lonework.corners.support.FacadeIntegrationTestSupport;
+import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.travel.model.Travel;
 import com.lonework.corners.travel.model.TravelCreateRequest;
 import com.lonework.corners.travel.model.TravelDetailResponse;
@@ -274,6 +277,58 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
     }
 
     @Test
+    void createTravelPersistsCategoryAndTags() {
+        User owner = createUser("cattag@example.com", "CatTag");
+        Category category = createCategory("Hiking", CategoryType.TRAVEL);
+        Tag quiet = createTag("quiet", "tester");
+        Tag foodie = createTag("foodie", "tester");
+        flushAndClear();
+
+        TravelDetailResponse created = travelFacade.createTravel(
+                new TravelCreateRequest(
+                        "Tatry hike",
+                        "A week in the mountains",
+                        "Slovakia",
+                        LocalDate.parse("2026-01-10"),
+                        LocalDate.parse("2026-01-20"),
+                        TravelVisibility.PUBLIC,
+                        category.getId(),
+                        List.of(quiet.getId(), foodie.getId()),
+                        null,
+                        List.of(),
+                        List.of()),
+                owner.getEmail());
+        flushAndClear();
+
+        Travel persisted = entityManager.find(Travel.class, created.id());
+        assertEquals(category.getId(), persisted.getCategory().getId());
+        assertEquals(2, persisted.getTags().size());
+        assertEquals(category.getId(), created.category().getId());
+        assertEquals(2, created.tags().size());
+
+        // Updating without category/tags clears them again.
+        travelFacade.updateTravel(created.id(),
+                new TravelCreateRequest(
+                        "Tatry hike",
+                        "A week in the mountains",
+                        "Slovakia",
+                        LocalDate.parse("2026-01-10"),
+                        LocalDate.parse("2026-01-20"),
+                        TravelVisibility.PUBLIC,
+                        null,
+                        List.of(),
+                        null,
+                        List.of(),
+                        List.of()),
+                owner.getEmail());
+        flushAndClear();
+
+        Travel cleared = entityManager.find(Travel.class, created.id());
+        assertNull(cleared.getCategory());
+        assertTrue(cleared.getTags().isEmpty());
+    }
+
+    @Test
     void createTravelPersistsVisitedPlaces() {
         User owner = createUser("places@example.com", "Places");
         flushAndClear();
@@ -286,6 +341,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         LocalDate.parse("2026-01-10"),
                         LocalDate.parse("2026-01-20"),
                         TravelVisibility.PRIVATE,
+                        null,
+                        null,
                         null,
                         List.of(),
                         List.of(
@@ -314,6 +371,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         LocalDate.parse("2026-01-20"),
                         TravelVisibility.PRIVATE,
                         null,
+                        null,
+                        null,
                         List.of(new com.lonework.corners.travel.model.TravelPhotoRequest(
                                 photo.getId(), 34.6937, 135.5023, java.time.LocalDate.parse("2026-01-12"))),
                         List.of()),
@@ -340,6 +399,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                 LocalDate.parse("2026-01-10"),
                 LocalDate.parse("2026-01-20"),
                 visibility,
+                null,
+                null,
                 coverImageId,
                 fileIds.stream()
                         .map(id -> new com.lonework.corners.travel.model.TravelPhotoRequest(id, null, null, null))

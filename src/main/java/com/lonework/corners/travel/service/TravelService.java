@@ -1,9 +1,11 @@
 package com.lonework.corners.travel.service;
 
+import com.lonework.corners.category.model.Category;
 import com.lonework.corners.common.model.EntityStatus;
 import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.files.api.FileOperations;
+import com.lonework.corners.tag.api.TagOperations;
 import com.lonework.corners.travel.model.Travel;
 import com.lonework.corners.travel.model.TravelCreateRequest;
 import com.lonework.corners.travel.model.TravelPhoto;
@@ -34,11 +36,14 @@ public class TravelService {
     private final EntityManager entityManager;
     private final UserOperations userOperations;
     private final FileOperations fileOperations;
+    private final TagOperations tagOperations;
 
-    public TravelService(EntityManager entityManager, UserOperations userOperations, FileOperations fileOperations) {
+    public TravelService(EntityManager entityManager, UserOperations userOperations,
+                         FileOperations fileOperations, TagOperations tagOperations) {
         this.entityManager = entityManager;
         this.userOperations = userOperations;
         this.fileOperations = fileOperations;
+        this.tagOperations = tagOperations;
     }
 
     public Travel createTravel(TravelCreateRequest request, String ownerEmail) {
@@ -310,6 +315,14 @@ public class TravelService {
             travel.setVisibility(request.visibility());
         } else if (travel.getVisibility() == null) {
             travel.setVisibility(TravelVisibility.PRIVATE);
+        }
+
+        travel.setCategory(request.categoryId() != null
+                ? entityManager.find(Category.class, request.categoryId())
+                : null);
+        travel.getTags().clear();
+        if (request.tags() != null && !request.tags().isEmpty()) {
+            travel.getTags().addAll(tagOperations.getTagsById(request.tags()));
         }
 
         if (request.coverImageId() != null) {

@@ -6,5 +6,6 @@ public enum CategoryType {
     PLACE,
     TRIP,
     EVENT,
-    COTRAVEL
+    COTRAVEL,
+    TRAVEL
 }

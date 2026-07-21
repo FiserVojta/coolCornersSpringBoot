@@ -13,6 +13,8 @@ public record TravelCreateRequest(
         @JsonProperty LocalDate startDate,
         @JsonProperty LocalDate endDate,
         @JsonProperty TravelVisibility visibility,
+        @JsonProperty Long categoryId,
+        @JsonProperty List<Long> tags,
         @JsonProperty Long coverImageId,
         @JsonProperty List<TravelPhotoRequest> photos,
         @JsonProperty List<TravelPlaceRequest> places

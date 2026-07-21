@@ -1,6 +1,8 @@
 package com.lonework.corners.travel.model;
 
+import com.lonework.corners.category.model.Category;
 import com.lonework.corners.files.model.CornerFile;
+import com.lonework.corners.tag.model.Tag;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -22,6 +24,8 @@ public record TravelDetailResponse(
         List<TravelPlaceResponse> places,
         Double rating,
         Integer myRating,
+        Category category,
+        List<Tag> tags,
         ZonedDateTime createdAt
 ) {
     /**
@@ -56,6 +60,8 @@ public record TravelDetailResponse(
                         : List.of(),
                 travel.getRating(),
                 myRating,
+                travel.getCategory(),
+                travel.getTags() != null ? travel.getTags() : List.of(),
                 travel.getCreatedAt()
         );
     }
