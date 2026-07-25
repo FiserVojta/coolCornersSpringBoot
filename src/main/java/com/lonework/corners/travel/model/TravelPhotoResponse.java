@@ -11,7 +11,8 @@ public record TravelPhotoResponse(
         String thumbnailUrl,
         Double latitude,
         Double longitude,
-        LocalDate takenOn
+        LocalDate takenOn,
+        String note
 ) {
     public static TravelPhotoResponse from(TravelPhoto photo) {
         return new TravelPhotoResponse(
@@ -22,7 +23,8 @@ public record TravelPhotoResponse(
                 photo.getFile() != null ? photo.getFile().getThumbnailUrl() : null,
                 photo.getLatitude(),
                 photo.getLongitude(),
-                photo.getTakenOn()
+                photo.getTakenOn(),
+                photo.getNote()
         );
     }
 }

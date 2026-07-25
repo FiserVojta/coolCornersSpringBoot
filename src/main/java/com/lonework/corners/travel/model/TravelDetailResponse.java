@@ -22,6 +22,7 @@ public record TravelDetailResponse(
         CornerFile coverImage,
         List<TravelPhotoResponse> photos,
         List<TravelPlaceResponse> places,
+        List<TravelDayNoteResponse> dayNotes,
         Double rating,
         Integer myRating,
         Category category,
@@ -57,6 +58,9 @@ public record TravelDetailResponse(
                         : List.of(),
                 travel.getPlaces() != null
                         ? travel.getPlaces().stream().map(TravelPlaceResponse::from).toList()
+                        : List.of(),
+                travel.getDayNotes() != null
+                        ? travel.getDayNotes().stream().map(TravelDayNoteResponse::from).toList()
                         : List.of(),
                 travel.getRating(),
                 myRating,

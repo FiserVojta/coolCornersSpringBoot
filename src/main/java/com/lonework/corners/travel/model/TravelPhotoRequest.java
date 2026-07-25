@@ -9,6 +9,7 @@ public record TravelPhotoRequest(
         @JsonProperty Long fileId,
         @JsonProperty Double latitude,
         @JsonProperty Double longitude,
-        @JsonProperty LocalDate takenOn
+        @JsonProperty LocalDate takenOn,
+        @JsonProperty String note
 ) {
 }

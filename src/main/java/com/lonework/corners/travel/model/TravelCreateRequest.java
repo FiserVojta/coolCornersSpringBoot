@@ -17,6 +17,7 @@ public record TravelCreateRequest(
         @JsonProperty List<Long> tags,
         @JsonProperty Long coverImageId,
         @JsonProperty List<TravelPhotoRequest> photos,
-        @JsonProperty List<TravelPlaceRequest> places
+        @JsonProperty List<TravelPlaceRequest> places,
+        @JsonProperty List<TravelDayNoteRequest> dayNotes
 ) {
 }

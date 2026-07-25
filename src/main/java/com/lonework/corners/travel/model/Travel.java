@@ -37,7 +37,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"photos", "coverImage", "owner", "places", "category", "tags"})
+@EqualsAndHashCode(exclude = {"photos", "coverImage", "owner", "places", "dayNotes", "category", "tags"})
 public class Travel {
 
     @Id
@@ -81,6 +81,9 @@ public class Travel {
 
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelPlace> places = new ArrayList<>();
+
+    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TravelDayNote> dayNotes = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "category_id")

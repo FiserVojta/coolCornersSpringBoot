@@ -8,6 +8,8 @@ import com.lonework.corners.files.api.FileOperations;
 import com.lonework.corners.tag.api.TagOperations;
 import com.lonework.corners.travel.model.Travel;
 import com.lonework.corners.travel.model.TravelCreateRequest;
+import com.lonework.corners.travel.model.TravelDayNote;
+import com.lonework.corners.travel.model.TravelDayNoteRequest;
 import com.lonework.corners.travel.model.TravelPhoto;
 import com.lonework.corners.travel.model.TravelPhotoRequest;
 import com.lonework.corners.travel.model.TravelPlace;
@@ -333,6 +335,7 @@ public class TravelService {
 
         applyPhotos(travel, request);
         applyPlaces(travel, request);
+        applyDayNotes(travel, request);
     }
 
     /**
@@ -353,6 +356,7 @@ public class TravelService {
                 photo.setLatitude(photoRequest.latitude());
                 photo.setLongitude(photoRequest.longitude());
                 photo.setTakenOn(photoRequest.takenOn());
+                photo.setNote(normalizeNote(photoRequest.note()));
                 travel.getPhotos().add(photo);
             }
         }
@@ -377,5 +381,45 @@ public class TravelService {
                 travel.getPlaces().add(place);
             }
         }
+    }
+
+    /**
+     * Replace the travel's per-day notes with those in the request. Entries without a day or
+     * with a blank note are skipped, and only the last note wins per day so a (travel, day)
+     * stays unique. Clearing the existing collection relies on orphanRemoval to delete old rows.
+     */
+    private void applyDayNotes(Travel travel, TravelCreateRequest request) {
+        travel.getDayNotes().clear();
+        if (request.dayNotes() == null) {
+            return;
+        }
+        java.util.Map<java.time.LocalDate, String> byDay = new java.util.LinkedHashMap<>();
+        for (TravelDayNoteRequest dayNoteRequest : request.dayNotes()) {
+            if (dayNoteRequest == null || dayNoteRequest.day() == null) {
+                continue;
+            }
+            String note = normalizeNote(dayNoteRequest.note());
+            if (note == null) {
+                byDay.remove(dayNoteRequest.day());
+            } else {
+                byDay.put(dayNoteRequest.day(), note);
+            }
+        }
+        byDay.forEach((day, note) -> {
+            TravelDayNote dayNote = new TravelDayNote();
+            dayNote.setTravel(travel);
+            dayNote.setDay(day);
+            dayNote.setNote(note);
+            travel.getDayNotes().add(dayNote);
+        });
+    }
+
+    /** Trims a note and collapses blank/empty input to null so we don't store empty strings. */
+    private String normalizeNote(String note) {
+        if (note == null) {
+            return null;
+        }
+        String trimmed = note.strip();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

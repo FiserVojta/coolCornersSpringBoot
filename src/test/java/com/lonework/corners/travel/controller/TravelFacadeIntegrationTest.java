@@ -296,6 +296,7 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         List.of(quiet.getId(), foodie.getId()),
                         null,
                         List.of(),
+                        List.of(),
                         List.of()),
                 owner.getEmail());
         flushAndClear();
@@ -318,6 +319,7 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         null,
                         List.of(),
                         null,
+                        List.of(),
                         List.of(),
                         List.of()),
                 owner.getEmail());
@@ -347,7 +349,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         List.of(),
                         List.of(
                                 new com.lonework.corners.travel.model.TravelPlaceRequest("Osaka", 34.6937, 135.5023),
-                                new com.lonework.corners.travel.model.TravelPlaceRequest("Tokyo", 35.6762, 139.6503))),
+                                new com.lonework.corners.travel.model.TravelPlaceRequest("Tokyo", 35.6762, 139.6503)),
+                        List.of()),
                 owner.getEmail());
         flushAndClear();
 
@@ -374,7 +377,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         null,
                         null,
                         List.of(new com.lonework.corners.travel.model.TravelPhotoRequest(
-                                photo.getId(), 34.6937, 135.5023, java.time.LocalDate.parse("2026-01-12"))),
+                                photo.getId(), 34.6937, 135.5023, java.time.LocalDate.parse("2026-01-12"), null)),
+                        List.of(),
                         List.of()),
                 owner.getEmail());
         flushAndClear();
@@ -385,6 +389,44 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertEquals(135.5023, persisted.getPhotos().getFirst().getLongitude());
         assertEquals(java.time.LocalDate.parse("2026-01-12"), persisted.getPhotos().getFirst().getTakenOn());
         assertEquals(34.6937, created.photos().getFirst().latitude());
+    }
+
+    @Test
+    void createTravelPersistsPhotoNoteAndDayNotes() {
+        User owner = createUser("notes@example.com", "Notes");
+        CornerFile photo = createCornerFile("notes.jpg", owner.getEmail());
+        flushAndClear();
+
+        TravelDetailResponse created = travelFacade.createTravel(
+                new TravelCreateRequest(
+                        "Japan",
+                        "Two weeks",
+                        "Japan",
+                        LocalDate.parse("2026-01-10"),
+                        LocalDate.parse("2026-01-20"),
+                        TravelVisibility.PRIVATE,
+                        null,
+                        null,
+                        null,
+                        List.of(new com.lonework.corners.travel.model.TravelPhotoRequest(
+                                photo.getId(), null, null, null, "Sunset over Kyoto")),
+                        List.of(),
+                        List.of(
+                                new com.lonework.corners.travel.model.TravelDayNoteRequest(
+                                        LocalDate.parse("2026-01-11"), "Arrived, wandered Gion"),
+                                // Blank notes are dropped, so this day should not be persisted.
+                                new com.lonework.corners.travel.model.TravelDayNoteRequest(
+                                        LocalDate.parse("2026-01-12"), "   "))),
+                owner.getEmail());
+        flushAndClear();
+
+        Travel persisted = entityManager.find(Travel.class, created.id());
+        assertEquals("Sunset over Kyoto", persisted.getPhotos().getFirst().getNote());
+        assertEquals(1, persisted.getDayNotes().size());
+        assertEquals(LocalDate.parse("2026-01-11"), persisted.getDayNotes().getFirst().getDay());
+        assertEquals("Arrived, wandered Gion", persisted.getDayNotes().getFirst().getNote());
+        assertEquals("Sunset over Kyoto", created.photos().getFirst().note());
+        assertEquals(1, created.dayNotes().size());
     }
 
     private List<String> titles(List<TravelSummaryResponse> travels) {
@@ -403,8 +445,9 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                 null,
                 coverImageId,
                 fileIds.stream()
-                        .map(id -> new com.lonework.corners.travel.model.TravelPhotoRequest(id, null, null, null))
+                        .map(id -> new com.lonework.corners.travel.model.TravelPhotoRequest(id, null, null, null, null))
                         .toList(),
+                List.of(),
                 List.of()
         );
     }

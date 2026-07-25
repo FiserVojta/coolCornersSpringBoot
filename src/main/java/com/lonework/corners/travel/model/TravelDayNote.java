@@ -1,8 +1,6 @@
 package com.lonework.corners.travel.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lonework.corners.files.model.CornerFile;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,16 +17,16 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 /**
- * A photo attached to a travel, with the optional location where it was taken
- * (from EXIF GPS or placed manually on the map).
+ * A free-text note attached to a single calendar day of a travel.
+ * At most one note per (travel, day).
  */
 @Entity
-@Table(name = "travel_photo")
+@Table(name = "travel_day_note")
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"travel", "file"})
-public class TravelPhoto {
+@EqualsAndHashCode(exclude = {"travel"})
+public class TravelDayNote {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,21 +37,9 @@ public class TravelPhoto {
     @JsonIgnore
     private Travel travel;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "file_id")
-    private CornerFile file;
+    @Column(name = "day", nullable = false)
+    private LocalDate day;
 
-    @Column
-    private Double latitude;
-
-    @Column
-    private Double longitude;
-
-    /** Date the photo was taken (from EXIF or set manually). Used to group photos by day. */
-    @Column(name = "taken_on")
-    private LocalDate takenOn;
-
-    /** Optional free-text note/caption for this photo. */
     @Column(columnDefinition = "TEXT")
     private String note;
 }
