@@ -297,7 +297,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         null,
                         List.of(),
                         List.of(),
-                        List.of()),
+                        List.of(),
+                        null),
                 owner.getEmail());
         flushAndClear();
 
@@ -321,7 +322,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         null,
                         List.of(),
                         List.of(),
-                        List.of()),
+                        List.of(),
+                        null),
                 owner.getEmail());
         flushAndClear();
 
@@ -350,7 +352,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         List.of(
                                 new com.lonework.corners.travel.model.TravelPlaceRequest("Osaka", 34.6937, 135.5023),
                                 new com.lonework.corners.travel.model.TravelPlaceRequest("Tokyo", 35.6762, 139.6503)),
-                        List.of()),
+                        List.of(),
+                        null),
                 owner.getEmail());
         flushAndClear();
 
@@ -379,7 +382,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         List.of(new com.lonework.corners.travel.model.TravelPhotoRequest(
                                 photo.getId(), 34.6937, 135.5023, java.time.LocalDate.parse("2026-01-12"), null)),
                         List.of(),
-                        List.of()),
+                        List.of(),
+                        null),
                 owner.getEmail());
         flushAndClear();
 
@@ -416,7 +420,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                                         LocalDate.parse("2026-01-11"), "Arrived, wandered Gion"),
                                 // Blank notes are dropped, so this day should not be persisted.
                                 new com.lonework.corners.travel.model.TravelDayNoteRequest(
-                                        LocalDate.parse("2026-01-12"), "   "))),
+                                        LocalDate.parse("2026-01-12"), "   ")),
+                        null),
                 owner.getEmail());
         flushAndClear();
 
@@ -429,11 +434,119 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertEquals(1, created.dayNotes().size());
     }
 
+    @Test
+    void versionOfTravelCountsTowardsTimesDoneAndListsTheOriginal() {
+        User original = createUser("origowner@example.com", "OriginalOwner");
+        User copycat = createUser("copycat@example.com", "Copycat");
+        TravelDetailResponse root = travelFacade.createTravel(
+                request("Tour du Mont Blanc", TravelVisibility.PUBLIC, null, List.of()), original.getEmail());
+        flushAndClear();
+
+        TravelDetailResponse version = travelFacade.createTravel(
+                request("Tour du Mont Blanc", TravelVisibility.PUBLIC, null, List.of(), root.id()),
+                copycat.getEmail());
+        flushAndClear();
+
+        assertEquals(root.id(), version.originTravelId());
+
+        // The original knows it was done twice and links to the other person's version.
+        TravelDetailResponse viewedRoot = travelFacade.getTravel(root.id(), original.getEmail());
+        assertEquals(2, viewedRoot.timesDone());
+        assertNull(viewedRoot.originTravelId());
+        assertEquals(List.of(version.id()), viewedRoot.otherVersions().stream().map(v -> v.id()).toList());
+
+        // The version points back at the original and sees it in the group.
+        TravelDetailResponse viewedVersion = travelFacade.getTravel(version.id(), copycat.getEmail());
+        assertEquals(2, viewedVersion.timesDone());
+        assertEquals(root.id(), viewedVersion.originTravelId());
+        assertEquals(List.of(root.id()), viewedVersion.otherVersions().stream().map(v -> v.id()).toList());
+    }
+
+    @Test
+    void versionsStayFlatWhenForkingAVersion() {
+        User original = createUser("flatowner@example.com", "FlatOwner");
+        User first = createUser("flatfirst@example.com", "FlatFirst");
+        User second = createUser("flatsecond@example.com", "FlatSecond");
+        TravelDetailResponse root = travelFacade.createTravel(
+                request("Camino", TravelVisibility.PUBLIC, null, List.of()), original.getEmail());
+        flushAndClear();
+
+        TravelDetailResponse firstVersion = travelFacade.createTravel(
+                request("Camino", TravelVisibility.PUBLIC, null, List.of(), root.id()), first.getEmail());
+        flushAndClear();
+
+        // Forking a version links to the original, not to that version, so the group stays flat.
+        TravelDetailResponse secondVersion = travelFacade.createTravel(
+                request("Camino", TravelVisibility.PUBLIC, null, List.of(), firstVersion.id()), second.getEmail());
+        flushAndClear();
+
+        assertEquals(root.id(), secondVersion.originTravelId());
+        assertEquals(3, travelFacade.getTravel(root.id(), original.getEmail()).timesDone());
+    }
+
+    @Test
+    void timesDoneCountsHiddenVersionsButDoesNotListThem() {
+        User original = createUser("hiddenowner@example.com", "HiddenOwner");
+        User secretive = createUser("secretive@example.com", "Secretive");
+        TravelDetailResponse root = travelFacade.createTravel(
+                request("Iceland ring road", TravelVisibility.PUBLIC, null, List.of()), original.getEmail());
+        flushAndClear();
+
+        travelFacade.createTravel(
+                request("Iceland ring road", TravelVisibility.PRIVATE, null, List.of(), root.id()),
+                secretive.getEmail());
+        flushAndClear();
+
+        TravelDetailResponse viewed = travelFacade.getTravel(root.id(), original.getEmail());
+        assertEquals(2, viewed.timesDone());
+        // The private version is counted, but its details stay hidden from the original's owner.
+        assertTrue(viewed.otherVersions().isEmpty());
+    }
+
+    @Test
+    void versionCannotBeBasedOnATravelTheCreatorCannotSee() {
+        User original = createUser("privorigin@example.com", "PrivOrigin");
+        User stranger = createUser("privstranger@example.com", "PrivStranger");
+        TravelDetailResponse root = travelFacade.createTravel(
+                request("Private original", TravelVisibility.PRIVATE, null, List.of()), original.getEmail());
+        flushAndClear();
+
+        assertThrows(EntityNotFoundException.class, () -> travelFacade.createTravel(
+                request("Copy of a secret", TravelVisibility.PUBLIC, null, List.of(), root.id()),
+                stranger.getEmail()));
+    }
+
+    @Test
+    void updatingAVersionKeepsItsOrigin() {
+        User original = createUser("keeporigin@example.com", "KeepOrigin");
+        User copycat = createUser("keepcopy@example.com", "KeepCopy");
+        TravelDetailResponse root = travelFacade.createTravel(
+                request("Dolomites", TravelVisibility.PUBLIC, null, List.of()), original.getEmail());
+        flushAndClear();
+        TravelDetailResponse version = travelFacade.createTravel(
+                request("Dolomites", TravelVisibility.PUBLIC, null, List.of(), root.id()), copycat.getEmail());
+        flushAndClear();
+
+        // The update request carries no origin; the existing link must survive it.
+        travelFacade.updateTravel(version.id(),
+                request("Dolomites, my run", TravelVisibility.PUBLIC, null, List.of()), copycat.getEmail());
+        flushAndClear();
+
+        Travel persisted = entityManager.find(Travel.class, version.id());
+        assertNotNull(persisted.getOriginTravel());
+        assertEquals(root.id(), persisted.getOriginTravel().getId());
+    }
+
     private List<String> titles(List<TravelSummaryResponse> travels) {
         return travels.stream().map(TravelSummaryResponse::title).toList();
     }
 
     private TravelCreateRequest request(String title, TravelVisibility visibility, Long coverImageId, List<Long> fileIds) {
+        return request(title, visibility, coverImageId, fileIds, null);
+    }
+
+    private TravelCreateRequest request(String title, TravelVisibility visibility, Long coverImageId,
+                                        List<Long> fileIds, Long originTravelId) {
         return new TravelCreateRequest(
                 title,
                 title + " description",
@@ -448,7 +561,8 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         .map(id -> new com.lonework.corners.travel.model.TravelPhotoRequest(id, null, null, null, null))
                         .toList(),
                 List.of(),
-                List.of()
+                List.of(),
+                originTravelId
         );
     }
 }

@@ -18,6 +18,11 @@ public record TravelCreateRequest(
         @JsonProperty Long coverImageId,
         @JsonProperty List<TravelPhotoRequest> photos,
         @JsonProperty List<TravelPlaceRequest> places,
-        @JsonProperty List<TravelDayNoteRequest> dayNotes
+        @JsonProperty List<TravelDayNoteRequest> dayNotes,
+        /**
+         * When set, the new travel is registered as another version of that travel — the same trip
+         * done again, with the creator's own photos. Only honoured on create; updates ignore it.
+         */
+        @JsonProperty Long originTravelId
 ) {
 }

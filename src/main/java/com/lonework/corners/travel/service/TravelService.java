@@ -20,6 +20,7 @@ import com.lonework.corners.user.api.UserOperations;
 import com.lonework.corners.user.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,7 @@ public class TravelService {
         travel.setShareToken(UUID.randomUUID().toString());
         travel.setEntityStatus(EntityStatus.ACTIVE);
         travel.setCreatedAt(ZonedDateTime.now());
+        travel.setOriginTravel(resolveOrigin(request.originTravelId(), ownerEmail));
         applyRequest(travel, request);
 
         entityManager.persist(travel);
@@ -143,6 +145,67 @@ public class TravelService {
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Travel not found for the provided link"));
+    }
+
+    /**
+     * How many times this trip was done: the original plus every version of it. Counts versions
+     * the viewer may not open too — it is a popularity number, not a listing.
+     */
+    public int countTimesDone(Travel travel) {
+        Long rootId = rootId(travel);
+        Long count = entityManager.createQuery(
+                        "SELECT COUNT(t) FROM Travel t WHERE t.id = :rootId OR t.originTravel.id = :rootId",
+                        Long.class)
+                .setParameter("rootId", rootId)
+                .getSingleResult();
+        return count.intValue();
+    }
+
+    /**
+     * The other travels in this trip's version group (the original and everyone else's versions,
+     * never the travel itself), filtered by the same visibility rules as viewing a travel.
+     * Oldest first, so the original leads the list.
+     */
+    public List<Travel> getOtherVersionsForViewer(Travel travel, String viewerEmail) {
+        Long rootId = rootId(travel);
+        String visibilityClause = viewerEmail == null
+                ? " AND t.visibility = :publicVisibility"
+                : " AND (t.owner.email = :email"
+                + " OR t.visibility = :publicVisibility"
+                + " OR (t.visibility = :followersVisibility AND EXISTS ("
+                + "SELECT f FROM User o JOIN o.followers f WHERE o = t.owner AND f.email = :email)))";
+
+        TypedQuery<Travel> query = entityManager.createQuery(
+                        "SELECT t FROM Travel t WHERE (t.id = :rootId OR t.originTravel.id = :rootId)"
+                                + " AND t.id <> :travelId"
+                                + visibilityClause
+                                + " ORDER BY t.createdAt ASC", Travel.class)
+                .setParameter("rootId", rootId)
+                .setParameter("travelId", travel.getId())
+                .setParameter("publicVisibility", TravelVisibility.PUBLIC);
+        if (viewerEmail != null) {
+            query.setParameter("email", viewerEmail)
+                    .setParameter("followersVisibility", TravelVisibility.FOLLOWERS);
+        }
+        return query.getResultList();
+    }
+
+    /**
+     * Resolves the travel a new version points at. Versions are kept flat: pointing at a version
+     * links to that version's original instead. The source must be visible to the creator, so a
+     * travel they cannot see also cannot be forked (or probed) by them.
+     */
+    private Travel resolveOrigin(Long originTravelId, String ownerEmail) {
+        if (originTravelId == null) {
+            return null;
+        }
+        Travel source = getTravelForViewer(originTravelId, ownerEmail);
+        return source.getOriginTravel() != null ? source.getOriginTravel() : source;
+    }
+
+    /** The id of the original of this trip: the travel's origin when it is a version, else itself. */
+    private Long rootId(Travel travel) {
+        return travel.getOriginTravel() != null ? travel.getOriginTravel().getId() : travel.getId();
     }
 
     public PagedResult<Travel> getPublicTravels(PagingQueryParams queryParams) {

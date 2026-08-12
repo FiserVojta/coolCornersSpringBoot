@@ -6,6 +6,7 @@ import com.lonework.corners.travel.model.Travel;
 import com.lonework.corners.travel.model.TravelCreateRequest;
 import com.lonework.corners.travel.model.TravelDetailResponse;
 import com.lonework.corners.travel.model.TravelSummaryResponse;
+import com.lonework.corners.travel.model.TravelVersionResponse;
 import com.lonework.corners.travel.model.TravelVisibility;
 import com.lonework.corners.travel.service.TravelService;
 import jakarta.inject.Inject;
@@ -55,18 +56,29 @@ public class TravelFacade {
 
     public TravelDetailResponse getTravel(Long travelId, String viewerEmail) {
         Travel travel = travelService.getTravelForViewer(travelId, viewerEmail);
-        return TravelDetailResponse.from(travel, isOwner(travel, viewerEmail),
-                travelService.getViewerRating(travelId, viewerEmail));
+        return withVersions(travel, isOwner(travel, viewerEmail),
+                travelService.getViewerRating(travelId, viewerEmail), viewerEmail);
     }
 
     public TravelDetailResponse rateTravel(Long travelId, Integer rating, String viewerEmail) {
         Travel travel = travelService.rateTravel(travelId, viewerEmail, rating);
-        return TravelDetailResponse.from(travel, isOwner(travel, viewerEmail),
-                travelService.getViewerRating(travelId, viewerEmail));
+        return withVersions(travel, isOwner(travel, viewerEmail),
+                travelService.getViewerRating(travelId, viewerEmail), viewerEmail);
     }
 
     public TravelDetailResponse getSharedTravel(String shareToken) {
-        return TravelDetailResponse.from(travelService.getByShareToken(shareToken), false);
+        // The link holder is anonymous, so they only see public versions of the same trip.
+        return withVersions(travelService.getByShareToken(shareToken), false, null, null);
+    }
+
+    /** Detail response enriched with this trip's version group (how often it was done, by whom). */
+    private TravelDetailResponse withVersions(Travel travel, boolean includeShareToken, Integer myRating,
+                                              String viewerEmail) {
+        return TravelDetailResponse.from(travel, includeShareToken, myRating,
+                travelService.countTimesDone(travel),
+                travelService.getOtherVersionsForViewer(travel, viewerEmail).stream()
+                        .map(TravelVersionResponse::from)
+                        .toList());
     }
 
     public PagedResult<TravelSummaryResponse> getPublicTravels(PagingQueryParams queryParams) {

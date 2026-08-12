@@ -37,7 +37,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(exclude = {"photos", "coverImage", "owner", "places", "dayNotes", "category", "tags"})
+@EqualsAndHashCode(exclude = {"photos", "coverImage", "owner", "places", "dayNotes", "category", "tags", "originTravel"})
 public class Travel {
 
     @Id
@@ -89,6 +89,16 @@ public class Travel {
     @JoinColumn(name = "category_id")
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Category category;
+
+    /**
+     * The original travel this one is a version of ("I did the same trip"), or null when this
+     * travel is itself an original. Versions always point at the original, never at another
+     * version, so a trip has one flat group of versions.
+     */
+    @ManyToOne
+    @JoinColumn(name = "origin_travel_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private Travel originTravel;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(name = "travel_has_tag",
