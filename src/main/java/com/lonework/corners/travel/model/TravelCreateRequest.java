@@ -23,6 +23,8 @@ public record TravelCreateRequest(
          * When set, the new travel is registered as another version of that travel — the same trip
          * done again, with the creator's own photos. Only honoured on create; updates ignore it.
          */
-        @JsonProperty Long originTravelId
+        @JsonProperty Long originTravelId,
+        /** How the travel was done; null leaves it unspecified. */
+        @JsonProperty TravelTransportMode transportMode
 ) {
 }

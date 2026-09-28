@@ -9,6 +9,7 @@ import com.lonework.corners.travel.model.Travel;
 import com.lonework.corners.travel.model.TravelCreateRequest;
 import com.lonework.corners.travel.model.TravelDetailResponse;
 import com.lonework.corners.travel.model.TravelSummaryResponse;
+import com.lonework.corners.travel.model.TravelTransportMode;
 import com.lonework.corners.travel.model.TravelVisibility;
 import com.lonework.corners.travel.security.TravelSecurity;
 import com.lonework.corners.travel.service.TravelService;
@@ -298,6 +299,7 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         List.of(),
                         List.of(),
                         List.of(),
+                        null,
                         null),
                 owner.getEmail());
         flushAndClear();
@@ -323,6 +325,7 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         List.of(),
                         List.of(),
                         List.of(),
+                        null,
                         null),
                 owner.getEmail());
         flushAndClear();
@@ -350,9 +353,11 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         null,
                         List.of(),
                         List.of(
-                                new com.lonework.corners.travel.model.TravelPlaceRequest("Osaka", 34.6937, 135.5023),
-                                new com.lonework.corners.travel.model.TravelPlaceRequest("Tokyo", 35.6762, 139.6503)),
+                                new com.lonework.corners.travel.model.TravelPlaceRequest("Osaka", 34.6937, 135.5023, null, List.of(List.of(1.0, 2.0))),
+                                new com.lonework.corners.travel.model.TravelPlaceRequest("Tokyo", 35.6762, 139.6503, TravelTransportMode.PUBLIC_TRANSPORT,
+                                        List.of(List.of(34.6937, 135.5023), List.of(35.0, 137.0), List.of(35.6762, 139.6503)))),
                         List.of(),
+                        null,
                         null),
                 owner.getEmail());
         flushAndClear();
@@ -360,6 +365,38 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         Travel persisted = entityManager.find(Travel.class, created.id());
         assertEquals(2, persisted.getPlaces().size());
         assertEquals(2, created.places().size());
+        assertNull(created.places().get(0).transportMode());
+        assertEquals(TravelTransportMode.PUBLIC_TRANSPORT, created.places().get(1).transportMode());
+        com.lonework.corners.travel.model.TravelPlace tokyo = persisted.getPlaces().stream()
+                .filter(place -> "Tokyo".equals(place.getName())).findFirst().orElseThrow();
+        assertEquals(TravelTransportMode.PUBLIC_TRANSPORT, tokyo.getTransportMode());
+        // A valid route line is stored as-is; a single-point line is not a route and is dropped.
+        assertEquals(List.of(34.6937, 135.5023), tokyo.getRouteGeometry().getFirst());
+        assertEquals(3, created.places().get(1).routeGeometry().size());
+        assertNull(created.places().get(0).routeGeometry());
+    }
+
+    @Test
+    void createAndUpdateTravelPersistsTransportMode() {
+        User owner = createUser("transport@example.com", "Transport");
+        flushAndClear();
+
+        TravelCreateRequest base = request("Alps", TravelVisibility.PRIVATE, null, List.of());
+        TravelDetailResponse created = travelFacade.createTravel(withTransportMode(base, TravelTransportMode.WALKING),
+                owner.getEmail());
+        flushAndClear();
+
+        assertEquals(TravelTransportMode.WALKING, created.transportMode());
+        assertEquals(TravelTransportMode.WALKING, entityManager.find(Travel.class, created.id()).getTransportMode());
+
+        TravelDetailResponse updated = travelFacade.updateTravel(created.id(),
+                withTransportMode(base, TravelTransportMode.FLYING), owner.getEmail());
+        flushAndClear();
+        assertEquals(TravelTransportMode.FLYING, updated.transportMode());
+
+        travelFacade.updateTravel(created.id(), base, owner.getEmail());
+        flushAndClear();
+        assertNull(entityManager.find(Travel.class, created.id()).getTransportMode());
     }
 
     @Test
@@ -383,6 +420,7 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                                 photo.getId(), 34.6937, 135.5023, java.time.LocalDate.parse("2026-01-12"), null)),
                         List.of(),
                         List.of(),
+                        null,
                         null),
                 owner.getEmail());
         flushAndClear();
@@ -421,6 +459,7 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                                 // Blank notes are dropped, so this day should not be persisted.
                                 new com.lonework.corners.travel.model.TravelDayNoteRequest(
                                         LocalDate.parse("2026-01-12"), "   ")),
+                        null,
                         null),
                 owner.getEmail());
         flushAndClear();
@@ -562,7 +601,14 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                         .toList(),
                 List.of(),
                 List.of(),
-                originTravelId
+                originTravelId,
+                null
         );
+    }
+
+    private TravelCreateRequest withTransportMode(TravelCreateRequest r, TravelTransportMode transportMode) {
+        return new TravelCreateRequest(r.title(), r.description(), r.location(), r.startDate(), r.endDate(),
+                r.visibility(), r.categoryId(), r.tags(), r.coverImageId(), r.photos(), r.places(), r.dayNotes(),
+                r.originTravelId(), transportMode);
     }
 }

@@ -36,7 +36,9 @@ public record TravelDetailResponse(
          */
         Integer timesDone,
         /** The other versions of this trip the viewer is allowed to see; never includes this travel. */
-        List<TravelVersionResponse> otherVersions
+        List<TravelVersionResponse> otherVersions,
+        /** How the travel was done, or null when unspecified. */
+        TravelTransportMode transportMode
 ) {
     /**
      * @param includeShareToken include the share token only when the viewer owns the travel,
@@ -87,7 +89,8 @@ public record TravelDetailResponse(
                 travel.getCreatedAt(),
                 travel.getOriginTravel() != null ? travel.getOriginTravel().getId() : null,
                 timesDone,
-                otherVersions != null ? otherVersions : List.of()
+                otherVersions != null ? otherVersions : List.of(),
+                travel.getTransportMode()
         );
     }
 }

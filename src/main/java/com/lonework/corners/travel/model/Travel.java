@@ -63,6 +63,11 @@ public class Travel {
     @Column(nullable = false)
     private TravelVisibility visibility = TravelVisibility.PRIVATE;
 
+    /** How the travel was done; null when unspecified. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "transport_mode")
+    private TravelTransportMode transportMode;
+
     @Column(name = "share_token", nullable = false, unique = true)
     private String shareToken;
 

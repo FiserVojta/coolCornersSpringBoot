@@ -36,6 +36,9 @@ import java.util.UUID;
 @Transactional
 public class TravelService {
 
+    /** Upper bound on a cached leg route; the client simplifies lines well below this. */
+    private static final int MAX_ROUTE_POINTS = 5000;
+
     private final EntityManager entityManager;
     private final UserOperations userOperations;
     private final FileOperations fileOperations;
@@ -376,6 +379,7 @@ public class TravelService {
         travel.setLocation(request.location());
         travel.setStartDate(request.startDate());
         travel.setEndDate(request.endDate());
+        travel.setTransportMode(request.transportMode());
         if (request.visibility() != null) {
             travel.setVisibility(request.visibility());
         } else if (travel.getVisibility() == null) {
@@ -441,9 +445,29 @@ public class TravelService {
                 place.setName(placeRequest.name());
                 place.setLatitude(placeRequest.latitude());
                 place.setLongitude(placeRequest.longitude());
+                place.setTransportMode(placeRequest.transportMode());
+                place.setRouteGeometry(validRouteGeometry(placeRequest.routeGeometry()));
                 travel.getPlaces().add(place);
             }
         }
+    }
+
+    /**
+     * The route line only if it is a sane list of [lat, lng] pairs; otherwise null, so a bad or
+     * oversized payload just means the map routes that leg itself instead of failing the save.
+     */
+    private static List<List<Double>> validRouteGeometry(List<List<Double>> geometry) {
+        if (geometry == null || geometry.size() < 2 || geometry.size() > MAX_ROUTE_POINTS) {
+            return null;
+        }
+        for (List<Double> point : geometry) {
+            if (point == null || point.size() != 2 || point.get(0) == null || point.get(1) == null
+                    || !Double.isFinite(point.get(0)) || !Double.isFinite(point.get(1))
+                    || Math.abs(point.get(0)) > 90 || Math.abs(point.get(1)) > 180) {
+                return null;
+            }
+        }
+        return List.copyOf(geometry.stream().map(List::copyOf).toList());
     }
 
     /**
