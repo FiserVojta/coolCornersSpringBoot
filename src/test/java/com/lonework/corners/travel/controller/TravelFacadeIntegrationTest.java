@@ -474,6 +474,30 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
     }
 
     @Test
+    void updateTravelKeepingExistingDayNoteDoesNotViolateUniqueDay() {
+        User owner = createUser("renote@example.com", "Renote");
+        flushAndClear();
+
+        TravelCreateRequest base = request("Laos", TravelVisibility.PRIVATE, null, List.of());
+        TravelCreateRequest withNote = new TravelCreateRequest(base.title(), base.description(), base.location(),
+                base.startDate(), base.endDate(), base.visibility(), base.categoryId(), base.tags(),
+                base.coverImageId(), base.photos(), base.places(),
+                List.of(new com.lonework.corners.travel.model.TravelDayNoteRequest(
+                        LocalDate.parse("2026-01-11"), "Chill time in Luang Prabang")),
+                base.originTravelId(), base.transportMode());
+        TravelDetailResponse created = travelFacade.createTravel(withNote, owner.getEmail());
+        flushAndClear();
+
+        // Re-saving the same day (edited or not) replaces the row rather than colliding with it.
+        travelFacade.updateTravel(created.id(), withNote, owner.getEmail());
+        flushAndClear();
+
+        Travel persisted = entityManager.find(Travel.class, created.id());
+        assertEquals(1, persisted.getDayNotes().size());
+        assertEquals("Chill time in Luang Prabang", persisted.getDayNotes().getFirst().getNote());
+    }
+
+    @Test
     void versionOfTravelCountsTowardsTimesDoneAndListsTheOriginal() {
         User original = createUser("origowner@example.com", "OriginalOwner");
         User copycat = createUser("copycat@example.com", "Copycat");

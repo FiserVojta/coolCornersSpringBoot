@@ -476,12 +476,9 @@ public class TravelService {
      * stays unique. Clearing the existing collection relies on orphanRemoval to delete old rows.
      */
     private void applyDayNotes(Travel travel, TravelCreateRequest request) {
-        travel.getDayNotes().clear();
-        if (request.dayNotes() == null) {
-            return;
-        }
+        List<TravelDayNoteRequest> requested = request.dayNotes() != null ? request.dayNotes() : List.of();
         java.util.Map<java.time.LocalDate, String> byDay = new java.util.LinkedHashMap<>();
-        for (TravelDayNoteRequest dayNoteRequest : request.dayNotes()) {
+        for (TravelDayNoteRequest dayNoteRequest : requested) {
             if (dayNoteRequest == null || dayNoteRequest.day() == null) {
                 continue;
             }
@@ -491,6 +488,13 @@ public class TravelService {
             } else {
                 byDay.put(dayNoteRequest.day(), note);
             }
+        }
+        // Update surviving days in place rather than clear-and-re-add: Hibernate flushes inserts
+        // before orphan deletes, so re-adding a day that already exists would hit the unique
+        // (travel_id, day) constraint.
+        travel.getDayNotes().removeIf(existing -> !byDay.containsKey(existing.getDay()));
+        for (TravelDayNote existing : travel.getDayNotes()) {
+            existing.setNote(byDay.remove(existing.getDay()));
         }
         byDay.forEach((day, note) -> {
             TravelDayNote dayNote = new TravelDayNote();
