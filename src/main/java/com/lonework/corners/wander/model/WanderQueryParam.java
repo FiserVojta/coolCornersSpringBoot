@@ -13,8 +13,9 @@ public record WanderQueryParam(
         @Param("createdBy") Long createdBy,
         @Param("categories") List<Long> categories,
         @Param("tags") List<Long> tags,
-        @Param("tags") List<String> participants,
+        @Param("participants") List<String> participants,
         @Param("sortBy") WanderSort sortBy,
-        @Param("sortDir") QueryOrder sortDir
+        @Param("sortDir") QueryOrder sortDir,
+        @Param("search") String search
 ) {
 }

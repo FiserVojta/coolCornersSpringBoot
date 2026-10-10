@@ -115,7 +115,7 @@ class WanderFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         WanderDetailResponse detail = wanderFacade.getWander(wander.getId());
         List<WanderListResponse> wanders = wanderFacade.getWanderListResponse(
                 createPagingQueryParams(),
-                new WanderQueryParam(null, null, creator.getId(), List.of(category.getId()), List.of(), List.of(), null, null)
+                new WanderQueryParam(null, null, creator.getId(), List.of(category.getId()), List.of(), List.of(), null, null, null)
         ).data;
 
         assertEquals("Listed wander", detail.description());
@@ -142,9 +142,9 @@ class WanderFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         flushAndClear();
 
         var bothResult = wanderFacade.getWanderListResponse(createPagingQueryParams(),
-                new WanderQueryParam(null, null, null, null, List.of(sunset.getId(), forest.getId()), List.of(), null, null));
+                new WanderQueryParam(null, null, null, null, List.of(sunset.getId(), forest.getId()), List.of(), null, null, null));
         var sunsetResult = wanderFacade.getWanderListResponse(createPagingQueryParams(),
-                new WanderQueryParam(null, null, null, null, List.of(sunset.getId(), sunset.getId()), List.of(), null, null));
+                new WanderQueryParam(null, null, null, null, List.of(sunset.getId(), sunset.getId()), List.of(), null, null, null));
 
         assertEquals(List.of(both.getId()), bothResult.data.stream().map(WanderListResponse::id).toList());
         assertEquals(1L, bothResult.totalItems);
@@ -165,7 +165,7 @@ class WanderFacadeIntegrationTest extends FacadeIntegrationTestSupport {
                     creator.getEmail()).getId());
         }
         flushAndClear();
-        WanderQueryParam filter = new WanderQueryParam(null, null, creator.getId(), null, null, List.of(), null, null);
+        WanderQueryParam filter = new WanderQueryParam(null, null, creator.getId(), null, null, List.of(), null, null, null);
 
         List<Long> seen = new ArrayList<>();
         for (int page = 0; page < 3; page++) {
@@ -190,6 +190,39 @@ class WanderFacadeIntegrationTest extends FacadeIntegrationTestSupport {
 
         assertThrows(IllegalArgumentException.class, () -> wanderFacade.createWander(
                 createWanderCreateRequest(category.getId(), elevenIds, List.of(), "Too many"), creator.getEmail()));
+    }
+
+    @Test
+    void getWanderListSearchesDescriptionAndStopNamesCaseInsensitively() {
+        User creator = createUser("search@example.com", "Searcher");
+        Category category = createCategory("Wander Category", CategoryType.COTRAVEL);
+        flushAndClear();
+        Wander byDescription = wanderFacade.createWander(
+                createWanderCreateRequest(category.getId(), List.of(), List.of(), "Sunset kayak trip"), creator.getEmail());
+        Wander byStop = wanderFacade.createWander(new WanderCreateRequest(
+                "Weekend outing", 10, LocalDateTime.parse("2026-03-22T18:00:00"), WanderType.PUBLIC, List.of(),
+                List.of(), category.getId(),
+                List.of(new com.lonework.corners.wander.model.WanderPartCreateRequest(List.of(), List.of(), 1, "Old Town KAYAK rental"),
+                        new com.lonework.corners.wander.model.WanderPartCreateRequest(List.of(), List.of(), 2, "Kayak return")),
+                null), creator.getEmail());
+        Wander percent = wanderFacade.createWander(
+                createWanderCreateRequest(category.getId(), List.of(), List.of(), "100% fun hike"), creator.getEmail());
+        wanderFacade.createWander(
+                createWanderCreateRequest(category.getId(), List.of(), List.of(), "Museum day"), creator.getEmail());
+        flushAndClear();
+
+        var kayak = wanderFacade.getWanderListResponse(createPagingQueryParams(),
+                new WanderQueryParam(null, null, creator.getId(), null, null, List.of(), null, null, "  kAyAk "));
+        var literalPercent = wanderFacade.getWanderListResponse(createPagingQueryParams(),
+                new WanderQueryParam(null, null, creator.getId(), null, null, List.of(), null, null, "%"));
+        var blank = wanderFacade.getWanderListResponse(createPagingQueryParams(),
+                new WanderQueryParam(null, null, creator.getId(), null, null, List.of(), null, null, " "));
+
+        assertEquals(List.of(byDescription.getId(), byStop.getId()).stream().sorted().toList(),
+                kayak.data.stream().map(WanderListResponse::id).sorted().toList());
+        assertEquals(2L, kayak.totalItems);
+        assertEquals(List.of(percent.getId()), literalPercent.data.stream().map(WanderListResponse::id).toList());
+        assertEquals(4L, blank.totalItems);
     }
 
     @Test

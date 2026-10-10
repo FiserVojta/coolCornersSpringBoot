@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 
 
 @Service
@@ -147,6 +148,20 @@ public class WanderService {
     private Predicate[] buildFilterPredicates(CriteriaBuilder cb, AbstractQuery<?> query, Root<Wander> root,
                                               WanderQueryParam filterParams) {
         List<Predicate> predicates = new ArrayList<>();
+
+        String search = filterParams.search() == null ? "" : filterParams.search().trim();
+        if (!search.isEmpty()) {
+            // Match the plan description (its card title) or the name of any of its stops.
+            String pattern = "%" + escapeLikePattern(search.toLowerCase(Locale.ROOT)) + "%";
+            Subquery<Long> stopMatch = query.subquery(Long.class);
+            Root<WanderPart> part = stopMatch.from(WanderPart.class);
+            stopMatch.select(part.get("id")).where(
+                    cb.equal(part.get("wander"), root),
+                    cb.like(cb.lower(cb.coalesce(part.<String>get("name"), "")), pattern, '\\'));
+            predicates.add(cb.or(
+                    cb.like(cb.lower(cb.coalesce(root.<String>get("description"), "")), pattern, '\\'),
+                    cb.exists(stopMatch)));
+        }
 
         if (filterParams.startsFrom() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("startTime"), filterParams.startsFrom()));
@@ -334,4 +349,10 @@ public class WanderService {
         return wanderListResponses;
     }
 
+    private static String escapeLikePattern(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+    }
 }
