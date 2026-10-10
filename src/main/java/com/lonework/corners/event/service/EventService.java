@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 @Service
@@ -73,7 +75,12 @@ public class EventService {
                 case START_TIME -> dataRoot.get("startTime");
             };
             boolean ascending = eventSearchParameters.sortDir() == com.lonework.corners.common.model.QueryOrder.ASC;
-            dataQuery.orderBy(ascending ? cb.asc(orderExpression) : cb.desc(orderExpression));
+            dataQuery.orderBy(
+                    ascending ? cb.asc(orderExpression) : cb.desc(orderExpression),
+                    cb.asc(dataRoot.get("id"))
+            );
+        } else {
+            dataQuery.orderBy(cb.asc(dataRoot.get("id")));
         }
 
         var data = entityManager.createQuery(dataQuery)
@@ -104,8 +111,30 @@ public class EventService {
         if (eventSearchParameters.categories() != null && !eventSearchParameters.categories().isEmpty()) {
             predicates.add(root.get("category").get("id").in(eventSearchParameters.categories()));
         }
+        String search = eventSearchParameters.search() != null ? eventSearchParameters.search().trim() : "";
+        if (!search.isEmpty()) {
+            String pattern = "%" + escapeLikePattern(search.toLowerCase(Locale.ROOT)) + "%";
+            predicates.add(cb.or(
+                    cb.like(cb.lower(cb.coalesce(root.<String>get("name"), "")), pattern, '\\'),
+                    cb.like(cb.lower(cb.coalesce(root.<String>get("description"), "")), pattern, '\\'),
+                    cb.like(cb.lower(cb.coalesce(root.<String>get("venue"), "")), pattern, '\\')
+            ));
+        }
+        if (eventSearchParameters.startsFrom() != null) {
+            predicates.add(cb.greaterThanOrEqualTo(root.<ZonedDateTime>get("startTime"), eventSearchParameters.startsFrom()));
+        }
+        if (eventSearchParameters.startsUntil() != null) {
+            predicates.add(cb.lessThanOrEqualTo(root.<ZonedDateTime>get("startTime"), eventSearchParameters.startsUntil()));
+        }
 
         return predicates.toArray(new jakarta.persistence.criteria.Predicate[0]);
+    }
+
+    private static String escapeLikePattern(String value) {
+        return value
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
     }
 
 

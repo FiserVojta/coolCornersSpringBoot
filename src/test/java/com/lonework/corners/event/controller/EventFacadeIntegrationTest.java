@@ -119,6 +119,80 @@ class EventFacadeIntegrationTest extends PostgresIntegrationTest {
         assertEquals(List.of("Sunrise Walk"), names);
     }
 
+    @Test
+    void findEventByParametersSearchesNameDescriptionAndVenueCaseInsensitively() {
+        Category category = createCategory("Search Category");
+        eventFacade.createEvent(eventRequest("Sunrise Walk", "Morning meetup", "Park", "2026-03-22T09:00:00Z", category.getId()), "a@example.com");
+        eventFacade.createEvent(eventRequest("Jazz Night", "Live MUSIC downtown", "Club", "2026-03-23T20:00:00Z", category.getId()), "a@example.com");
+        eventFacade.createEvent(eventRequest("Book Swap", "Bring a book", "Riverside Cafe", "2026-03-24T15:00:00Z", category.getId()), "a@example.com");
+        eventFacade.createEvent(eventRequest("100% Vinyl", "Records only", "Shop", "2026-03-25T15:00:00Z", category.getId()), "a@example.com");
+        flushAndClear();
+
+        assertEquals(List.of("Sunrise Walk"), searchNames(category, "SUNRISE"));
+        assertEquals(List.of("Jazz Night"), searchNames(category, "music"));
+        assertEquals(List.of("Book Swap"), searchNames(category, "  riverside "));
+        assertEquals(List.of("100% Vinyl"), searchNames(category, "%"));
+        assertEquals(List.of("100% Vinyl", "Book Swap", "Jazz Night", "Sunrise Walk"), searchNames(category, "  "));
+    }
+
+    @Test
+    void findEventByParametersFiltersByInclusiveStartTimeRange() {
+        Category category = createCategory("Range Category");
+        eventFacade.createEvent(eventRequest("Early", "d", "v", "2026-03-10T10:00:00Z", category.getId()), "a@example.com");
+        eventFacade.createEvent(eventRequest("Middle", "d", "v", "2026-03-20T10:00:00Z", category.getId()), "a@example.com");
+        eventFacade.createEvent(eventRequest("Late", "d", "v", "2026-03-30T10:00:00Z", category.getId()), "a@example.com");
+        flushAndClear();
+
+        ZonedDateTime from = ZonedDateTime.parse("2026-03-20T10:00:00Z");
+        ZonedDateTime until = ZonedDateTime.parse("2026-03-25T00:00:00Z");
+
+        assertEquals(List.of("Late", "Middle"), rangeNames(category, from, null));
+        assertEquals(List.of("Early", "Middle"), rangeNames(category, null, until));
+        assertEquals(List.of("Middle"), rangeNames(category, from, until));
+        assertEquals(List.of("Middle"), rangeNames(category, from, from));
+    }
+
+    @Test
+    void findEventByParametersReturnsDisjointPagesWhenSortKeysTie() {
+        Category category = createCategory("Paging Category");
+        for (int i = 1; i <= 5; i++) {
+            eventFacade.createEvent(eventRequest("Same Time " + i, "d", "v", "2026-04-01T10:00:00Z", category.getId()), "a@example.com");
+        }
+        flushAndClear();
+
+        List<String> seen = new java.util.ArrayList<>();
+        for (int page = 0; page < 3; page++) {
+            PagedResult<Event> result = eventFacade.findEventByParameters(
+                    new EventSearchParameters(null, null, List.of(category.getId()),
+                            com.lonework.corners.event.model.EventSort.START_TIME, QueryOrder.ASC, null, null, null),
+                    new PagingQueryParams(page, 2, null, null));
+            assertEquals(5L, result.totalItems);
+            result.data.forEach(event -> seen.add(event.getName()));
+        }
+
+        assertEquals(List.of("Same Time 1", "Same Time 2", "Same Time 3", "Same Time 4", "Same Time 5"),
+                seen.stream().sorted().toList());
+    }
+
+    private List<String> searchNames(Category category, String search) {
+        return eventFacade.findEventByParameters(
+                        new EventSearchParameters(null, null, List.of(category.getId()), null, null, search, null, null),
+                        new PagingQueryParams(0, 20, null, null))
+                .data.stream().map(Event::getName).sorted().toList();
+    }
+
+    private List<String> rangeNames(Category category, ZonedDateTime from, ZonedDateTime until) {
+        return eventFacade.findEventByParameters(
+                        new EventSearchParameters(null, null, List.of(category.getId()), null, null, null, from, until),
+                        new PagingQueryParams(0, 20, null, null))
+                .data.stream().map(Event::getName).sorted().toList();
+    }
+
+    private static EventCreateRequest eventRequest(String name, String description, String venue, String startTime, Long categoryId) {
+        return new EventCreateRequest(name, description, venue, ZonedDateTime.parse(startTime), "10:00",
+                "ignored-by-service@example.com", 20, 90, 0.0, categoryId);
+    }
+
     private Category createCategory(String name) {
         Category category = new Category();
         category.setId(nextCategoryId());
@@ -201,7 +275,8 @@ class EventFacadeIntegrationTest extends PostgresIntegrationTest {
     }
 
     private static EventSearchParameters createEventSearchParameters(Long categoryId) {
-        return new EventSearchParameters("integration-author@example.com", "unused", List.of(categoryId), null, null);
+        return new EventSearchParameters("integration-author@example.com", "unused", List.of(categoryId), null, null,
+                null, null, null);
     }
 
     private static PagingQueryParams createPagingQueryParams() {
