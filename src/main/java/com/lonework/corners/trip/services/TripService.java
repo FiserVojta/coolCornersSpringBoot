@@ -24,14 +24,17 @@ import com.lonework.corners.user.api.UserOperations;
 import com.lonework.corners.user.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.AbstractQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,9 +70,7 @@ public class TripService {
     public Trip createTrip(TripCreateRequest tripCreateRequest, String createdBy) {
         Trip trip = new Trip(tripCreateRequest, createdBy);
         trip.setCategory(entityManager.find(Category.class, tripCreateRequest.categoryId()));
-        trip.setTags(tripCreateRequest.tags().stream()
-                .map(id -> entityManager.find(com.lonework.corners.tag.model.Tag.class, id))
-                .toList());
+        trip.setTags(tagOperations.resolveTagsForAssignment(tripCreateRequest.tags(), List.of()));
         if (tripCreateRequest.placeIds() != null && !tripCreateRequest.placeIds().isEmpty()) {
             trip.setPlaces(tripCreateRequest.placeIds().stream()
                     .map(placeOperations::getPlaceById)
@@ -158,9 +159,7 @@ public class TripService {
         if (tripSearchRequest.categories() != null && !tripSearchRequest.categories().isEmpty()) {
             predicates.add(tripRoot.get("category").get("id").in(tripSearchRequest.categories()));
         }
-        if (tripSearchRequest.tags() != null && !tripSearchRequest.tags().isEmpty()) {
-            predicates.add(tripRoot.get("tags").get("id").in(tripSearchRequest.tags()));
-        }
+        addTagPredicates(cb, cq, tripRoot, tripSearchRequest.tags(), predicates);
         if (tripSearchRequest.minRating() != null && tripSearchRequest.minRating() > 0) {
             predicates.add(cb.greaterThanOrEqualTo(tripRoot.get("rating"), tripSearchRequest.minRating()));
         }
@@ -198,9 +197,7 @@ public class TripService {
         if (tripSearchRequest.categories() != null && !tripSearchRequest.categories().isEmpty()) {
             countPredicates.add(countRoot.get("category").get("id").in(tripSearchRequest.categories()));
         }
-        if (tripSearchRequest.tags() != null && !tripSearchRequest.tags().isEmpty()) {
-            countPredicates.add(countRoot.get("tags").get("id").in(tripSearchRequest.tags()));
-        }
+        addTagPredicates(cb, countQuery, countRoot, tripSearchRequest.tags(), countPredicates);
         if (tripSearchRequest.minRating() != null && tripSearchRequest.minRating() > 0) {
             countPredicates.add(cb.greaterThanOrEqualTo(countRoot.get("rating"), tripSearchRequest.minRating()));
         }
@@ -211,6 +208,27 @@ public class TripService {
 
         long total = entityManager.createQuery(countQuery).getSingleResult();
         return new PagedResult<>(data, total);
+    }
+
+    /**
+     * AND tag filter: one EXISTS subquery per distinct tag id, so the trip must carry every requested tag.
+     * The outer query is not joined to tags, which avoids duplicate rows and keeps the count correct.
+     */
+    private void addTagPredicates(CriteriaBuilder cb, AbstractQuery<?> query, Root<Trip> root, List<Long> tagIds,
+                                  List<jakarta.persistence.criteria.Predicate> predicates) {
+        if (tagIds == null || tagIds.isEmpty()) {
+            return;
+        }
+        for (Long tagId : new LinkedHashSet<>(tagIds)) {
+            if (tagId == null) {
+                continue;
+            }
+            Subquery<Long> tagSubquery = query.subquery(Long.class);
+            Root<Trip> tagged = tagSubquery.from(Trip.class);
+            tagSubquery.select(tagged.get("id"))
+                    .where(cb.equal(tagged, root), cb.equal(tagged.join("tags").get("id"), tagId));
+            predicates.add(cb.exists(tagSubquery));
+        }
     }
 
     @Transactional
@@ -245,7 +263,7 @@ public class TripService {
         trip.setCategory(entityManager.find(Category.class, tripUpdateRequest.categoryId()));
         trip.setDescription(tripUpdateRequest.description());
         trip.setGooglePlaces(placeOperations.getOrCreateGooglePlaces(tripUpdateRequest.googlePlaces()));
-        trip.setTags(tagOperations.getTagsById(tripUpdateRequest.tags()));
+        trip.setTags(tagOperations.resolveTagsForAssignment(tripUpdateRequest.tags(), trip.getTags()));
         if(tripUpdateRequest.files() != null && !tripUpdateRequest.files().isEmpty()) {
             List<CornerFile> files = new ArrayList<>();
             for (var file : tripUpdateRequest.files()) {

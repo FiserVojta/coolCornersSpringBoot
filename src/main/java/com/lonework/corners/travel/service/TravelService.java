@@ -6,6 +6,7 @@ import com.lonework.corners.common.model.PagedResult;
 import com.lonework.corners.common.model.PagingQueryParams;
 import com.lonework.corners.files.api.FileOperations;
 import com.lonework.corners.tag.api.TagOperations;
+import com.lonework.corners.tag.model.Tag;
 import com.lonework.corners.travel.model.Travel;
 import com.lonework.corners.travel.model.TravelCreateRequest;
 import com.lonework.corners.travel.model.TravelDayNote;
@@ -389,10 +390,10 @@ public class TravelService {
         travel.setCategory(request.categoryId() != null
                 ? entityManager.find(Category.class, request.categoryId())
                 : null);
+        // Resolve against the tags held before this request (empty for a new travel), then replace.
+        List<Tag> resolvedTags = tagOperations.resolveTagsForAssignment(request.tags(), List.copyOf(travel.getTags()));
         travel.getTags().clear();
-        if (request.tags() != null && !request.tags().isEmpty()) {
-            travel.getTags().addAll(tagOperations.getTagsById(request.tags()));
-        }
+        travel.getTags().addAll(resolvedTags);
 
         if (request.coverImageId() != null) {
             travel.setCoverImage(fileOperations.getFileMetadata(request.coverImageId()));

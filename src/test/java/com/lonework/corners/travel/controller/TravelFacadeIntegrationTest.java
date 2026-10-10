@@ -278,6 +278,23 @@ class TravelFacadeIntegrationTest extends FacadeIntegrationTestSupport {
     }
 
     @Test
+    void createTravelRejectsMoreThanTenTags() {
+        User owner = createUser("travelcap@example.com", "TravelCap");
+        List<Long> elevenIds = new java.util.ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            elevenIds.add(createTag("travel cap " + (char) ('a' + i), "tester").getId());
+        }
+        flushAndClear();
+        TravelCreateRequest base = request("Too many tags", TravelVisibility.PUBLIC, null, List.of());
+
+        assertThrows(IllegalArgumentException.class, () -> travelFacade.createTravel(
+                new TravelCreateRequest(base.title(), base.description(), base.location(), base.startDate(),
+                        base.endDate(), base.visibility(), base.categoryId(), elevenIds, base.coverImageId(),
+                        base.photos(), base.places(), base.dayNotes(), base.originTravelId(), base.transportMode()),
+                owner.getEmail()));
+    }
+
+    @Test
     void createTravelPersistsCategoryAndTags() {
         User owner = createUser("cattag@example.com", "CatTag");
         Category category = createCategory("Hiking", CategoryType.TRAVEL);

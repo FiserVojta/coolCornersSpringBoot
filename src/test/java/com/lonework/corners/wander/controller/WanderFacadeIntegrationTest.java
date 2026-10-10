@@ -12,6 +12,8 @@ import com.lonework.corners.wander.model.WanderListResponse;
 import com.lonework.corners.wander.model.WanderQueryParam;
 import com.lonework.corners.wander.model.WanderType;
 import jakarta.persistence.NoResultException;
+import com.lonework.corners.common.model.PagingQueryParams;
+import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -119,6 +121,75 @@ class WanderFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertEquals("Listed wander", detail.description());
         assertEquals(1, wanders.size());
         assertEquals(wander.getId(), wanders.getFirst().id());
+    }
+
+    @Test
+    void getWanderListRequiresAllSelectedTagsAndReturnsEachWanderOnce() {
+        User creator = createUser("tags@example.com", "Tagger");
+        Category category = createCategory("Wander Category", CategoryType.COTRAVEL);
+        Tag sunset = createTag("sunset", "integration@example.com");
+        Tag forest = createTag("forest", "integration@example.com");
+        flushAndClear();
+        Wander both = wanderFacade.createWander(
+                createWanderCreateRequest(category.getId(), List.of(sunset.getId(), forest.getId()), List.of(), "Both tags"),
+                creator.getEmail());
+        Wander sunsetOnly = wanderFacade.createWander(
+                createWanderCreateRequest(category.getId(), List.of(sunset.getId()), List.of(), "Sunset only"),
+                creator.getEmail());
+        wanderFacade.createWander(
+                createWanderCreateRequest(category.getId(), List.of(forest.getId()), List.of(), "Forest only"),
+                creator.getEmail());
+        flushAndClear();
+
+        var bothResult = wanderFacade.getWanderListResponse(createPagingQueryParams(),
+                new WanderQueryParam(null, null, null, null, List.of(sunset.getId(), forest.getId()), List.of(), null, null));
+        var sunsetResult = wanderFacade.getWanderListResponse(createPagingQueryParams(),
+                new WanderQueryParam(null, null, null, null, List.of(sunset.getId(), sunset.getId()), List.of(), null, null));
+
+        assertEquals(List.of(both.getId()), bothResult.data.stream().map(WanderListResponse::id).toList());
+        assertEquals(1L, bothResult.totalItems);
+        assertEquals(List.of(both.getId(), sunsetOnly.getId()).stream().sorted().toList(),
+                sunsetResult.data.stream().map(WanderListResponse::id).sorted().toList());
+        assertEquals(2L, sunsetResult.totalItems);
+    }
+
+    @Test
+    void getWanderListReturnsDisjointPagesCoveringAllMatches() {
+        User creator = createUser("pager@example.com", "Pager");
+        Category category = createCategory("Wander Category", CategoryType.COTRAVEL);
+        flushAndClear();
+        List<Long> created = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            created.add(wanderFacade.createWander(
+                    createWanderCreateRequest(category.getId(), List.of(), List.of(), "Paged wander " + i),
+                    creator.getEmail()).getId());
+        }
+        flushAndClear();
+        WanderQueryParam filter = new WanderQueryParam(null, null, creator.getId(), null, null, List.of(), null, null);
+
+        List<Long> seen = new ArrayList<>();
+        for (int page = 0; page < 3; page++) {
+            var result = wanderFacade.getWanderListResponse(new PagingQueryParams(page, 2, null, null), filter);
+            assertEquals(5L, result.totalItems);
+            assertEquals(page < 2 ? 2 : 1, result.data.size());
+            result.data.forEach(wander -> seen.add(wander.id()));
+        }
+
+        assertEquals(created.stream().sorted().toList(), seen.stream().sorted().toList());
+    }
+
+    @Test
+    void createWanderRejectsMoreThanTenTags() {
+        User creator = createUser("cap@example.com", "Capper");
+        Category category = createCategory("Wander Category", CategoryType.COTRAVEL);
+        List<Long> elevenIds = new ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            elevenIds.add(createTag("wander cap " + (char) ('a' + i), "integration@example.com").getId());
+        }
+        flushAndClear();
+
+        assertThrows(IllegalArgumentException.class, () -> wanderFacade.createWander(
+                createWanderCreateRequest(category.getId(), elevenIds, List.of(), "Too many"), creator.getEmail()));
     }
 
     @Test

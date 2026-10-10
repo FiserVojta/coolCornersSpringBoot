@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
@@ -138,6 +139,40 @@ class TripFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertEquals(user.getId(), persistedTrip.getCompletedByUsers().getFirst().getId());
         assertEquals(1, persistedUser.getCompletedTrips().size());
         assertEquals(trip.getId(), persistedUser.getCompletedTrips().getFirst().getId());
+    }
+
+    @Test
+    void findTripByParametersRequiresAllSelectedTagsAndReturnsEachTripOnce() {
+        Category category = createCategory("Trip Category", CategoryType.TRIP);
+        Tag food = createTag("food", "integration@example.com");
+        Tag night = createTag("night", "integration@example.com");
+        createTrip("Both Tags", category, List.of(food, night), List.of(), "integration@example.com");
+        createTrip("Food Only", category, List.of(food), List.of(), "integration@example.com");
+        createTrip("Night Only", category, List.of(night), List.of(), "integration@example.com");
+        flushAndClear();
+
+        var both = tripFacade.findTripByParameters(
+                new TripSearchRequest(null, List.of(food.getId(), night.getId()), null, null), createPagingQueryParams());
+        var foodOnly = tripFacade.findTripByParameters(
+                new TripSearchRequest(null, List.of(food.getId(), food.getId()), null, null), createPagingQueryParams());
+
+        assertEquals(List.of("Both Tags"), both.data.stream().map(Trip::getName).toList());
+        assertEquals(1L, both.totalItems);
+        assertEquals(List.of("Both Tags", "Food Only"), foodOnly.data.stream().map(Trip::getName).sorted().toList());
+        assertEquals(2L, foodOnly.totalItems);
+    }
+
+    @Test
+    void createTripRejectsMoreThanTenTags() {
+        Category category = createCategory("Trip Category", CategoryType.TRIP);
+        List<Long> elevenIds = new java.util.ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            elevenIds.add(createTag("trip cap " + (char) ('a' + i), "integration@example.com").getId());
+        }
+        flushAndClear();
+
+        assertThrows(IllegalArgumentException.class, () -> tripFacade.createTrip(
+                createTripCreateRequest(category.getId(), elevenIds, List.of(), "Too Many"), "integration@example.com"));
     }
 
     @Test

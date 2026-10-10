@@ -12,12 +12,15 @@ import com.lonework.corners.place.model.DTO.PlaceSearchRequest;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.place.model.PlaceDetailResponse;
 import com.lonework.corners.place.model.PlaceRating;
+import com.lonework.corners.tag.api.TagOperations;
 import com.lonework.corners.tag.model.Tag;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.AbstractQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
 import org.geotools.api.feature.simple.SimpleFeature;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -26,6 +29,9 @@ import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 
 @Service
@@ -37,6 +43,9 @@ public class PlaceService {
 
     @Autowired
     FeatureTypeClass featureTypeClass;
+
+    @Autowired
+    TagOperations tagOperations;
 
     public Place getPlaceById(Long id) {
         return entityManager.find(Place.class, id);
@@ -65,26 +74,29 @@ public class PlaceService {
         var query = criteriaBuilder.createQuery(Place.class);
         Root<Place> root = query.from(Place.class);
 
-        Predicate predicate = buildPredicate(criteriaBuilder, root, placeSearchRequest);
+        Predicate predicate = buildPredicate(criteriaBuilder, query, root, placeSearchRequest);
 
-        query.select(root).where(predicate);
+        // Order by id so pages are stable and never overlap.
+        query.select(root).where(predicate).orderBy(criteriaBuilder.asc(root.get("id")));
 
+        var page = pagingQueryParams.page() != null ? pagingQueryParams.page() : 0;
+        var size = pagingQueryParams.size() != null ? pagingQueryParams.size() : 10;
         var data = entityManager.createQuery(query)
-                .setFirstResult(pagingQueryParams.page() != null ? pagingQueryParams.page() : 0)
-                .setMaxResults(pagingQueryParams.size() != null ? pagingQueryParams.size() : 10)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
                 .getResultList();
 
         // --- Count query ---
         var countQuery = criteriaBuilder.createQuery(Long.class);
         Root<Place> countRoot = countQuery.from(Place.class);
-        Predicate countPredicate = buildPredicate(criteriaBuilder, countRoot, placeSearchRequest);
+        Predicate countPredicate = buildPredicate(criteriaBuilder, countQuery, countRoot, placeSearchRequest);
         countQuery.select(criteriaBuilder.count(countRoot)).where(countPredicate);
         Long total = entityManager.createQuery(countQuery).getSingleResult();
 
         return new PagedResult<>(data, total);
     }
 
-    private Predicate buildPredicate(CriteriaBuilder cb, Root<Place> root, PlaceSearchRequest request) {
+    private Predicate buildPredicate(CriteriaBuilder cb, AbstractQuery<?> query, Root<Place> root, PlaceSearchRequest request) {
         Predicate predicate = cb.conjunction();
 
         if (request.category() != null && !request.category().isEmpty()) {
@@ -96,11 +108,18 @@ public class PlaceService {
         }
 
         if (request.tags() != null && !request.tags().isEmpty()) {
-            CriteriaBuilder.In<Long> tagsInClause = cb.in(root.join("tags").get("id"));
-            for (Long tagId : request.tags()) {
-                tagsInClause.value(tagId);
+            // AND semantics: the place must carry every requested tag. One EXISTS per distinct tag keeps
+            // the outer query join-free, so rows are not duplicated and the count stays correct.
+            for (Long tagId : new LinkedHashSet<>(request.tags())) {
+                if (tagId == null) {
+                    continue;
+                }
+                Subquery<Long> tagSubquery = query.subquery(Long.class);
+                Root<Place> tagged = tagSubquery.from(Place.class);
+                tagSubquery.select(tagged.get("id"))
+                        .where(cb.equal(tagged, root), cb.equal(tagged.join("tags").get("id"), tagId));
+                predicate = cb.and(predicate, cb.exists(tagSubquery));
             }
-            predicate = cb.and(predicate, tagsInClause);
         }
 
         return predicate;
@@ -111,9 +130,7 @@ public class PlaceService {
         placeRequest.geometry().setSRID(4326);
         Place place = new Place(placeRequest, email);
         place.setCategory(entityManager.find(Category.class, placeRequest.categoryId()));
-        place.setTags(entityManager.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class)
-                .setParameter("ids", placeRequest.tags())
-                .getResultList());
+        place.setTags(tagOperations.resolveTagsForAssignment(placeRequest.tags(), List.of()));
         entityManager.persist(place);
         return null;
     }
@@ -121,12 +138,14 @@ public class PlaceService {
     @Transactional
     public Place updatePlace(PlaceCreateRequest placeRequest, String email, Long placeId) {
         placeRequest.geometry().setSRID(4326);
+        Place existing = entityManager.find(Place.class, placeId);
+        List<Tag> currentTags = existing == null || existing.getTags() == null
+                ? List.of()
+                : new ArrayList<>(existing.getTags());
         Place place = new Place(placeRequest, email);
         place.setId(placeId);
         place.setCategory(entityManager.find(Category.class, placeRequest.categoryId()));
-        place.setTags(entityManager.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class)
-                .setParameter("ids", placeRequest.tags())
-                .getResultList());
+        place.setTags(tagOperations.resolveTagsForAssignment(placeRequest.tags(), currentTags));
         entityManager.merge(place);
         return null;
     }

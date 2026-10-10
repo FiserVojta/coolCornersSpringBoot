@@ -14,16 +14,18 @@ import com.lonework.corners.wander.model.WanderPart;
 import com.lonework.corners.wander.model.WanderQueryParam;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.AbstractQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 
@@ -70,7 +72,7 @@ public class WanderService {
             wander.setCategory(categoryOperations.getCategoryById(wanderCreateRequest.category()));
         }
         if (wanderCreateRequest.tags() != null && !wanderCreateRequest.tags().isEmpty()) {
-            wander.setTags(tagOperations.getTagsById(wanderCreateRequest.tags()));
+            wander.setTags(tagOperations.resolveTagsForAssignment(wanderCreateRequest.tags(), List.of()));
         }
 
         if (wanderCreateRequest.wanderers() != null && !wanderCreateRequest.wanderers().isEmpty()) {
@@ -104,7 +106,7 @@ public class WanderService {
         CriteriaQuery<Long> countCq = cb.createQuery(Long.class);
         Root<Wander> countRoot = countCq.from(Wander.class);
         countCq.select(cb.count(countRoot));
-        Predicate[] countPredicates = buildFilterPredicates(cb, countRoot, filterParams);
+        Predicate[] countPredicates = buildFilterPredicates(cb, countCq, countRoot, filterParams);
         if (countPredicates.length > 0) {
             countCq.where(countPredicates);
         }
@@ -114,7 +116,7 @@ public class WanderService {
         CriteriaQuery<Wander> dataCq = cb.createQuery(Wander.class);
         Root<Wander> dataRoot = dataCq.from(Wander.class);
         dataCq.select(dataRoot).distinct(true);
-        Predicate[] dataPredicates = buildFilterPredicates(cb, dataRoot, filterParams);
+        Predicate[] dataPredicates = buildFilterPredicates(cb, dataCq, dataRoot, filterParams);
         if (dataPredicates.length > 0) {
             dataCq.where(dataPredicates);
         }
@@ -124,12 +126,17 @@ public class WanderService {
                 case START_TIME -> dataRoot.get("startTime");
             };
             boolean ascending = filterParams.sortDir() == com.lonework.corners.common.model.QueryOrder.ASC;
-            dataCq.orderBy(ascending ? cb.asc(orderExpression) : cb.desc(orderExpression));
+            // id as tie-breaker so pages are stable and never overlap.
+            dataCq.orderBy(ascending ? cb.asc(orderExpression) : cb.desc(orderExpression), cb.asc(dataRoot.get("id")));
+        } else {
+            dataCq.orderBy(cb.asc(dataRoot.get("id")));
         }
 
+        var page = queryParams.page() != null ? queryParams.page() : 0;
+        var size = queryParams.size() != null ? queryParams.size() : 10;
         var wanders = entityManager.createQuery(dataCq)
-                .setFirstResult(queryParams.page() != null ? queryParams.page() : 0)
-                .setMaxResults(queryParams.size() != null ? queryParams.size() : 10)
+                .setFirstResult(page * size)
+                .setMaxResults(size)
                 .getResultStream()
                 .map(WanderListResponse::new)
                 .toList();
@@ -137,7 +144,8 @@ public class WanderService {
         return new PagedResult<>(wanders, total);
     }
 
-    private Predicate[] buildFilterPredicates(CriteriaBuilder cb, Root<Wander> root, WanderQueryParam filterParams) {
+    private Predicate[] buildFilterPredicates(CriteriaBuilder cb, AbstractQuery<?> query, Root<Wander> root,
+                                              WanderQueryParam filterParams) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (filterParams.startsFrom() != null) {
@@ -157,8 +165,17 @@ public class WanderService {
             predicates.add(inClause);
         }
         if (filterParams.tags() != null && !filterParams.tags().isEmpty()) {
-            Join<Object, Object> tagJoin = root.join("tags");
-            predicates.add(tagJoin.get("id").in(filterParams.tags()));
+            // AND semantics: one EXISTS per distinct tag id; no join on the outer query, so no duplicates.
+            for (Long tagId : new LinkedHashSet<>(filterParams.tags())) {
+                if (tagId == null) {
+                    continue;
+                }
+                Subquery<Long> tagSubquery = query.subquery(Long.class);
+                Root<Wander> tagged = tagSubquery.from(Wander.class);
+                tagSubquery.select(tagged.get("id"))
+                        .where(cb.equal(tagged, root), cb.equal(tagged.join("tags").get("id"), tagId));
+                predicates.add(cb.exists(tagSubquery));
+            }
         }
 
         return predicates.toArray(new Predicate[0]);
@@ -189,7 +206,7 @@ public class WanderService {
         }
 
         if (wanderCreateRequest.tags() != null && !wanderCreateRequest.tags().isEmpty()) {
-            wander.setTags(tagOperations.getTagsById(wanderCreateRequest.tags()));
+            wander.setTags(tagOperations.resolveTagsForAssignment(wanderCreateRequest.tags(), wander.getTags()));
         } else {
             wander.setTags(new ArrayList<>());
         }

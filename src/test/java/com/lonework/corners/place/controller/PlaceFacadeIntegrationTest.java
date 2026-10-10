@@ -11,6 +11,8 @@ import com.lonework.corners.place.model.GooglePlace;
 import com.lonework.corners.place.model.Place;
 import com.lonework.corners.support.FacadeIntegrationTestSupport;
 import com.lonework.corners.tag.model.Tag;
+import com.lonework.corners.common.model.PagingQueryParams;
+import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +21,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 class PlaceFacadeIntegrationTest extends FacadeIntegrationTestSupport {
@@ -87,6 +90,72 @@ class PlaceFacadeIntegrationTest extends FacadeIntegrationTestSupport {
         assertNotNull(persistedComment);
         assertEquals("Strong coffee", persistedComment.getValue());
         assertEquals(place.getId(), persistedComment.getPlace().getId());
+    }
+
+    @Test
+    void findPlacesByParametersRequiresAllSelectedTagsAndReturnsEachPlaceOnce() {
+        Category category = createCategory("Place Category", CategoryType.PLACE);
+        Tag quiet = createTag("quiet", "integration@example.com");
+        Tag view = createTag("view", "integration@example.com");
+        createPlace("Both Tags", category, List.of(quiet, view), "integration@example.com");
+        createPlace("Quiet Only", category, List.of(quiet), "integration@example.com");
+        createPlace("View Only", category, List.of(view), "integration@example.com");
+        flushAndClear();
+
+        var both = placeFacade.findPlacesByParameters(
+                new PlaceSearchRequest(null, List.of(quiet.getId(), view.getId()), null, null), createPagingQueryParams());
+        var quietOnly = placeFacade.findPlacesByParameters(
+                new PlaceSearchRequest(null, List.of(quiet.getId(), quiet.getId()), null, null), createPagingQueryParams());
+
+        assertEquals(List.of("Both Tags"), both.data.stream().map(Place::getName).toList());
+        assertEquals(1L, both.totalItems);
+        assertEquals(List.of("Both Tags", "Quiet Only"), quietOnly.data.stream().map(Place::getName).sorted().toList());
+        assertEquals(2L, quietOnly.totalItems);
+    }
+
+    @Test
+    void findPlacesByParametersReturnsDisjointPagesCoveringAllMatches() {
+        Category category = createCategory("Paged Category", CategoryType.PLACE);
+        for (int i = 1; i <= 5; i++) {
+            createPlace("Paged Place " + i, category, List.of(), "integration@example.com");
+        }
+        flushAndClear();
+        PlaceSearchRequest request = new PlaceSearchRequest(null, null, List.of(category.getId()), null);
+
+        List<String> seen = new ArrayList<>();
+        for (int page = 0; page < 3; page++) {
+            var result = placeFacade.findPlacesByParameters(request, new PagingQueryParams(page, 2, null, null));
+            assertEquals(5L, result.totalItems);
+            assertEquals(page < 2 ? 2 : 1, result.data.size());
+            result.data.forEach(place -> seen.add(place.getName()));
+        }
+
+        assertEquals(List.of("Paged Place 1", "Paged Place 2", "Paged Place 3", "Paged Place 4", "Paged Place 5"),
+                seen.stream().sorted().toList());
+    }
+
+    @Test
+    void createAndUpdatePlaceEnforceTagAssignmentRules() {
+        Category category = createCategory("Place Category", CategoryType.PLACE);
+        List<Long> elevenIds = new ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            elevenIds.add(createTag("place cap " + (char) ('a' + i), "integration@example.com").getId());
+        }
+        Tag hidden = createTag("place hidden", "integration@example.com");
+        hidden.setStatus(com.lonework.corners.tag.model.TagStatus.HIDDEN);
+        Place withHidden = createPlace("Has Hidden", category, List.of(hidden), "integration@example.com");
+        flushAndClear();
+
+        assertThrows(IllegalArgumentException.class, () -> placeFacade.createPlace(
+                createPlaceCreateRequest(category.getId(), elevenIds, "Too Many"), "integration@example.com"));
+        assertThrows(IllegalArgumentException.class, () -> placeFacade.createPlace(
+                createPlaceCreateRequest(category.getId(), List.of(hidden.getId()), "New Hidden"), "integration@example.com"));
+
+        placeFacade.updatePlace(createPlaceCreateRequest(category.getId(), List.of(hidden.getId(), elevenIds.getFirst()),
+                "Has Hidden"), "integration@example.com", withHidden.getId());
+        flushAndClear();
+
+        assertEquals(2, entityManager.find(Place.class, withHidden.getId()).getTags().size());
     }
 
     @Test
